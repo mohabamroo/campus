@@ -1,0 +1,12 @@
+
+<% include header %>
+
+<% if(user.usertype=="student") { %>
+	<% include normalprofile %>
+
+<% } else {
+	if(user.usertype=="club") { %>
+
+	<% include clubprofile %>
+<%	}
+} %>

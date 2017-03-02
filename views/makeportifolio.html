@@ -1,0 +1,83 @@
+
+<% include header %>
+
+
+	<div class="jumbotron" >
+	<div class="container">
+		<h1 style="float: left; padding-top: 40px;">Hello, <%= user.name%>!</h1>
+		<% if(user.profilephoto!=null && user.profilephoto!="") { %>
+ 	   		<img class="img-circle" src="/user_uploads/<%= user.profilephoto %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+
+		<% } else { %>
+ 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+
+		<% } %>
+			<form method="Post" action="/users/updateportifolio/<%= user.id %>" style="float: left;">
+				<button type="submit" value="makeportifolio" class="btn btn-success" style="margin: 10px;">Update Portifolio!</button>	
+			</form>
+	</div>
+ 	   
+ 	   <br>
+    </div>
+
+   	<div class="col-xs-8 col-lg-6" style="border: 2px solid grey;
+    border-radius: 5px;">
+    	<h3>Links</h3>
+    	<table>
+    		<tr>
+	    		<div class="container">
+	    		<ul>
+	    			<%;
+	    			user.links.forEach(function(link){ %>
+	    				<li onclick="redirectToLink('<%= link %>')" style="cursor:pointer; color:blue; text-decoration: underline;"><%= link %></li>
+
+	    			<% }); %>
+	    		</ul>
+		    		<form method="POST" action="/users/addlink">
+			    		<input type="text" name="newlink" class="form-control" placeholder="http://mywebsite.com">
+			    		<button type="submit" class="btn" style="margin: 10px;">Add Link</button>	
+		    		</form>
+	    		</div>
+    		</tr>
+    	</table>
+    	
+    </div>
+
+       	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
+    border-radius: 5px;">
+    	<h3>Screenshots</h3>
+    	<table>
+    		<tr>
+	    		<div class="container">
+	    			<% user.photos.forEach(function(photo){ %>
+	    				<img style="max-width:250px; margin: 5px;" src="/user_uploads/<%= photo.src %>">
+	    				<h5 style="text-overflow: ellipsis; max-width: 100px;white-space: nowrap;
+  						overflow: hidden; "><%= photo.name %></h5>
+	    				
+	    			<% }); %>
+	    			<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/users/addscreenshot" >
+			    		<input type="text" class="form-control" name="photoName" placeholder="catpic">
+						<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px;">
+			    		<button type="submit" value="Upload Image" class="btn" style="margin: 10px;">Add Screenshot</button>	
+		    		</form>		    		
+	    		</div>
+    		</tr>
+    	</table>
+    </div>
+</div>
+
+	</body>
+</html>
+
+<script type="text/javascript">
+	var redirectSignIn = function() {
+		window.location.href = '/users/signin'; 
+	}
+	var redirectToLink = function(link) {
+		console.log(link);
+		window.open(link,'_blank');
+	}
+	var updatehidden = function() {
+		document.getElementById('hiddentxt').innerText = document.getElementById('faketxt').innerText;
+	}
+</script>

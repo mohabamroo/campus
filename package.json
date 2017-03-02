@@ -1,0 +1,32 @@
+{
+  "name": "SE-mini-project",
+  "version": "0.0.0",
+  "author": "Mohab",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "connect-flash": "*",
+    "connect-multiparty": "^2.0.0",
+    "cookie-parser": "^1.4.1",
+    "debug": "~2.6.0",
+    "ejs": "^2.3.1",
+    "express": "~4.14.1",
+    "express-handlebars": "*",
+    "express-messages": "*",
+    "express-session": "*",
+    "express-validator": "*",
+    "jade": "~1.11.0",
+    "mongodb": "*",
+    "mongoose": "*",
+    "morgan": "~1.7.0",
+    "passport": "*",
+    "passport-http": "*",
+    "passport-local": "*",
+    "serve-favicon": "~2.3.2",
+    "multer": "1.1.0"
+  }
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/sign.css" rel="stylesheet">
+	<title>Sign Up Page</title>
+</head>
+<body>
+  	<div class="container">
+    <div class="row container">
+        <div class="col-lg-12">
+          <% if (success_msg!=null && success_msg!="") { %>
+            <div class="alert alert-success"><%= success_msg %></div>
+          <% } %>
+
+          <% if (error_msg!=null && error_msg!="") { %>
+            <div class="alert alert-danger"><%= error_msg %></div>
+          <% } %>
+
+          <% if (error!=null && error!="") { %>
+            <div class="alert alert-danger"><%= error %></div>
+          <% } %>          
+        </div>
+      </div>
+      <form method="post" action="/users/signup">
+        <h2 class="form-signin-heading">Register</h2>
+        <br>
+        <label for="inputName" class="">Name</label>
+        <input type="text" id="inputName" class="form-control" placeholder="john doe" name="name" required>
+        <br>
+        <label for="inputGUCID" class="">GUC ID</label>
+        <input type="text" id="inputGUCID" class="form-control" placeholder="ex: 34-5862" name="gucid" required autofocus>
+        <br>
+        <label for="inputUsername" class="">Username</label>
+        <input type="text" id="inputUsername" class="form-control" placeholder="totti_frooti" name="username" required autofocus>
+		    <br>
+        <label for="inputPassword" class="">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" name="password" required>
+        <br>
+        <label for="inputPassword" class="">Confirm password</label>
+        <input type="password" id="inputPassword2" class="form-control" placeholder="Password" name="confirmpassword" required>
+        <br>
+        <label for="inputEmail" class="">Email</label>
+        <input type="email" id="inputEmail" class="form-control" placeholder="john@gmail.com" name="email" required>
+        <br>
+        <div class="form-group">
+		  <label for="sel1">Select a type:</label>
+		  <select class="form-control" id="userType" onchange="updateType()" name="type">
+        <option value="" disabled selected style="display:none;">choose</option>
+		    <option value="student">Student</option>
+		    <option value="club">Club</option>
+		  </select>
+		</div>
+		<br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
+      </form>
+      <br>
+      <br>
+      <button class="btn btn-lg btn-primary btn-block" onclick="redirectSignIn();">Sign In</button>
+
+    </div> <!-- /container -->
+<script type="text/javascript">
+	var redirectSignIn = function() {
+		window.location.href = '/users/signin'; 
+	}
+  var updateType = function() {
+    var currType = document.getElementById('userType').value;
+    console.log(currType);
+    if(currType=="club") {
+      document.getElementById("inputGUCID").required = false;      
+    } else {
+      document.getElementById("inputGUCID").required = true;      
+    }
+  }
+</script>
+</body>
+</html>

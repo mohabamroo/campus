@@ -1,0 +1,23 @@
+<% include header %>
+	
+	<% if(usersearchedfor!=null) {%>
+
+		<div class="container" style="margin-top: 40px;">
+		<div class="row">
+        <div class="col-lg-8" style="margin-top: 40px;">
+          <img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="200">
+          <h2><%= usersearchedfor.name %></h2>
+          <p></p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div><!-- /.col-lg-4 -->
+
+      </div><!-- /.row -->
+		</div>
+
+	<% } else {%>
+		<h1>Sorry, no users found!</h1>
+	<% } %>
+	</div>
+</body>
+
+</html>

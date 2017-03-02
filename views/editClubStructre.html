@@ -1,0 +1,95 @@
+<% include header %>
+<div class="jumbotron" >
+
+	<div class="container">
+		<h1 style="float: left; padding-top: 40px;">Hello, <%= clubRes.name%>!</h1>
+		<% if(clubRes.logo!=null && clubRes.logo!="") { %>
+ 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+
+		<% } else { %>
+ 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+
+		<% } %>
+ 	   	<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/clubs/updateLogo" style="margin-top: 150px;">
+			<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px; max-width: 400px;">
+			<input type="submit" value="Upload Logo" class="btn" style="margin: 10px;">	
+		</form>	
+	</div>
+
+	<div class="container-fluid">
+		<% if(clubRes.president!=null && clubRes.logo!="") { %>
+ 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+
+		<% } else { %>
+ 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+
+		<% } %>
+		<div class="container president" style=" margin-left:35%;">
+			<form method="POST" action="/clubs/addpresident" style="max-width: 200px;">
+				<input type="text" name="presidentID" class="form-control" placeholder="34-5862">
+				<input type="text" name="presidentName" class="form-control" placeholder="mohab amr">
+				<input type="submit" class="btn" style="margin: 10px;" value="Add President">	
+			</form>
+		</div>
+		
+
+		<div class="deps row row-eq-height">
+			<%  clubRes.departments.forEach(function(department) { %>
+				<div class="singleDepartment col-xs-4">
+					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
+					<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; margin-left: 30px;"><%= department.name %></h4>
+					<div class="deleteDiv">
+						<form method="post" action="/clubs/deleteDepartment/<%= department._id %>">
+							<input type="submit" class="btn" style="margin: 10px;" value="Delete Department">	
+						</form>
+					</div>
+					<div class="addmember">
+						<form method="POST" action="/clubs/addMember/<%= department.name %>" style="max-width: 200px;">
+							<input type="text" name="memberID" class="form-control" placeholder="34-5862">
+							<input type="text" name="memberName" class="form-control" placeholder="mohab amr">
+							<input type="submit" class="btn" style="margin: 10px;" value="Add Member">	
+						</form>
+					</div>
+					<% department.members.forEach(function(member) { %>
+						<li><%= member.name %></li>
+					<% }); %>
+				</div>
+			<%  }) %>
+			<div class="singleDepartment col-lg-3">
+				<form method="POST" action="/clubs/addDepartment" style="max-width: 200px;">
+					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
+					<br>
+					<br>
+					<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; margin-left: 30px;">New Deartment</h4>
+					<input type="text" name="departmentName" class="form-control" placeholder="Media">
+					<input type="text" name="headID" class="form-control" placeholder="34-5862">
+					<input type="text" name="departmentHead" class="form-control" placeholder="mohab amr">
+					<input type="submit" class="btn" style="margin: 10px;" value="Add Dpartment">	
+				</form>
+			</div>
+		</div>
+
+		<form method="POST" action="/clubs/updateMembers" style="width: 150px; float: right;">
+			<button type="submit" class="btn form-control btn-success" style="margin: 10px;">Update Members</button>	
+		</form>
+	</div>
+
+</div>
+<% include footer %>
+
+<style type="text/css">
+	.row {
+	  display: -webkit-box;
+	  display: -webkit-flex;
+	  display: -ms-flexbox;
+	  display:         flex;
+	  flex-wrap: wrap;
+	}
+	.row > [class*='col-'] {
+	  display: flex;
+	  flex-direction: column;
+	}
+	.singleDepartment {
+		margin-bottom: 30px;
+	}
+</style>

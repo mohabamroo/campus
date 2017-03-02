@@ -1,0 +1,46 @@
+
+<% include header %>
+
+<% if(people!=null && people.length>0) { %>
+		<div class="row" style="padding: 20px;">
+	<% people.forEach(function(person) { %>
+        <div class="col-lg-4" style="margin-top: 40px;">
+          <% if(person.photo!=null && person.photo!="") { %>
+ 	   		<img class="img-circle" src="/user_uploads/<%= person.photo %>" alt="Generic placeholder image" width="300" height="250" >
+
+		<% } else { %>
+ 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="250">
+
+		<% } %>
+          <h2 class="clickableh2" id="<%= person.id %>" style="cursor:pointer; color:gray; text-align: center;"><%= person.name %></h2>
+        </div><!-- /.col-lg-4 -->
+
+	<% });  %>    
+	</div><!-- /.row -->
+
+	<% } else { %>
+	 <h1>no users!</h1>
+	 <% } %>
+</div>
+
+
+</body>
+</html>
+
+<style type="text/css">
+	.clickableh2:hover {
+		color: blue;
+		text-decoration: underline;
+	}
+</style>
+<script type="text/javascript">
+	var h2s = document.getElementsByClassName('clickableh2');
+
+	Array.prototype.forEach.call(h2s, function(el) {
+    // Do stuff here
+	    el.onclick=function(){
+		window.location = "/users/viewprofile/"+el.id;
+	}
+	});
+
+</script>

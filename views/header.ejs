@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+	<title><%= pagetitle %></title>
+</head>
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Dashboard</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+        <form class="navbar-form navbar-left" method="POST" action="/users/search">
+        	<div class="form-group">
+        		<input type="text" class="form-control" name="searchusername" placeholder="search by username">
+			</div>
+        </form>
+        <% if(user!=null) { %>
+		<div >
+			<form class="navbar-form navbar-right" method="GET" action="/users/signout">
+				
+				<div class="form-group">
+					<a class="navbar-nav form-control" href="/users/viewprofile/<%=user.id%>"><%= user.username %></a>
+				</div>
+	            	<button type="submit" class="btn btn-success">Sign out</button>
+          	</form>
+		</div>
+		<% } else { %>
+		<form class="navbar-form navbar-right" method="GET" action="/users/signout">
+				<div class="form-group">
+					<a class="navbar-nav form-control btn-primary" href="/users/signup">Sign Up</a>
+				</div>
+				<div class="form-group">
+					<a class="navbar-nav form-control btn-primary" href="/users/signin">Sign In</a>
+				</div>
+        </form>	
+		<% } %>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+<div class="jumbotron container">
+
+        <div class="row container">
+        <div class="col-lg-12">
+          <% if (success_msg!=null && success_msg!="") { %>
+            <div class="alert alert-success"><%= success_msg %></div>
+          <% } %>
+
+          <% if (error_msg!=null && error_msg!="") { %>
+            <div class="alert alert-danger"><%= error_msg %></div>
+          <% } %>
+
+          <% if (error!=null && error!="") { %>
+            <div class="alert alert-danger"><%= error %></div>
+          <% } %>          
+        </div>
+      </div>

@@ -1,22 +1,16 @@
 
-<% include header %>
+<% include layout/header %>
 
 <% if(people!=null && people.length>0) { %>
 		<div class="row" style="padding: 20px;">
 	<% people.forEach(function(person) { %>
-        <div class="col-lg-4" style="margin-top: 40px;">
-          <% if(person.photo!=null && person.photo!="") { %>
- 	   		<img class="img-circle" src="/user_uploads/<%= person.photo %>" alt="Generic placeholder image" width="300" height="250" >
-
-		<% } else { %>
- 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="250">
-
-		<% } %>
-          <h2 class="clickableh2" id="<%= person.id %>" style="cursor:pointer; color:gray; text-align: center;"><%= person.name %></h2>
-        </div><!-- /.col-lg-4 -->
+        <div class="col-lg-2" style="margin-top: 40px; max-width: 190px; margin-right: 25px;">
+ 	   		<img class="img-circle" src="/user_uploads/<%= person.photo %>" alt="Generic placeholder image" width="150" height="150" >
+			<h2 class="clickableh2" id="<%= person.id %>" style="cursor:pointer; color:gray; text-align: center;"><%= person.name %></h2>
+        </div>
 
 	<% });  %>    
-	</div><!-- /.row -->
+	</div>
 
 	<% } else { %>
 	 <h1>no users!</h1>
@@ -31,6 +25,17 @@
 	.clickableh2:hover {
 		color: blue;
 		text-decoration: underline;
+	}
+	.row {
+	  display: -webkit-box;
+	  display: -webkit-flex;
+	  display: -ms-flexbox;
+	  display:         flex;
+	  flex-wrap: wrap;
+	}
+	.row > [class*='col-'] {
+	  display: flex;
+	  flex-direction: column;
 	}
 </style>
 <script type="text/javascript">

@@ -8,6 +8,7 @@ var flash = require('connect-flash');
 var clubUploadsPath = path.resolve(__dirname, "club_uploads");
 var Club = require('../models/club');
 var User = require('../models/user');
+var Event = require('../models/event');
 var multer  = require('multer');
 var storagetype = "logo";
 var clubStorage = multer.diskStorage({
@@ -42,12 +43,32 @@ var clubStorage = multer.diskStorage({
 });
 var clubUpload = multer({ storage : clubStorage}).single('userPhoto');
 
+function ensureAuthenticated(req, res, next){	
+	if(req.isAuthenticated()){
+		return next();
+	} else {
+		req.flash('error_msg','You are not logged in');
+		res.redirect('/users/signin');
+	}
+}
+
+router.get('/', function(req, res) {
+	Club.find(function(err, clubs) {
+		if(err) {
+			console.log(err);
+			throw err;
+		} else {
+			res.render('clubViews/allClubs.html', {clubs: clubs});
+		}
+	});
+});
+
 router.get('/editStructre/:id',  function(req, res) {
 	if(req.isAuthenticated() && req.user.id == req.params.id) {
 		Club.getClubByUserId(req.user.id, function(err, club) {
 			presidentRes = club.president;
 			departmentsRes = club.departments;
-			res.render('editClubStructre.html', {
+			res.render('clubViews/editClubStructre.html', {
 				clubRes: club
 			});
 		});
@@ -100,7 +121,7 @@ router.post('/addMember/:departmentName', function(req, res) {
 	
 });
 
-router.post('/addDepartment', function(req, res, next) {
+router.post('/addDepartment', ensureAuthenticated, function(req, res, next) {
 	var departmentName = req.body.departmentName;
 	var headID = req.body.headID;
 	var departmentHead = req.body.departmentHead;
@@ -115,6 +136,8 @@ router.post('/addDepartment', function(req, res, next) {
 		console.log(club);
 		console.log(req.user.id);
 		if(club.president==null) {
+			console.log("Null president: "+club.president);
+
 			req.flash('error_msg','You have to add president first!');
 			next();
 			return;
@@ -130,17 +153,8 @@ router.post('/addDepartment', function(req, res, next) {
 
 });
 
-router.get('/profile/:id',  function(req, res) {
-	if(req.isAuthenticated() && req.user.id == req.params.id) {
-		res.render('profile.html');
-	} else {
-		req.flash('error_msg','You are not logged in');
-		res.redirect('/users/signin');
-	}
 
-});
-
-router.post('/updateLogo', function(req, res) {
+router.post('/updateLogo', ensureAuthenticated, function(req, res) {
 	storagetype = "logo";
     clubUpload(req, res, function(err) {
         if(err) {
@@ -151,7 +165,7 @@ router.post('/updateLogo', function(req, res) {
 
 });
 
-router.post('/deleteDepartment/:depID', function(req, res) {
+router.post('/deleteDepartment/:depID', ensureAuthenticated, function(req, res) {
 	var depID = req.params.depID;
 	console.log(depID);
 	Club.update({'departments._id': depID},
@@ -172,7 +186,8 @@ router.post('/deleteDepartment/:depID', function(req, res) {
 });
 
 // links members with their profiles
-router.post('/updateMembers', function(req, res) {
+// needs to be debugged!!
+router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 	Club.getClubByUserId(req.user.id, function(err, club) {
 		var oldPresident = club.president;
 		User.getUserByGucId(oldPresident.id, function(err, presidentRes) {
@@ -189,14 +204,96 @@ router.post('/updateMembers', function(req, res) {
 					if(err)
 						console.log(err);
 				});
+				var newOrganization = {
+					name: club.name,
+					rating: "0",
+					review: "",
+					role: "president"
+				}
+				User.update({id: presidentRes.id}, {$push: {organization: newOrganization}});
 			}
-		})
-	});
-	res.render('editClubStructre.html');
+		});
 
+		club.departments.forEach(function(department) {
+			department.members.forEach(function(member) {
+				User.getUserByGucId(member.id, function(err, user) {
+					console.log("member: " + user);
+					if(user!=null) {
+						var newMember = {
+							name: user.name,
+							id: member.id,
+							exists: "true",
+							profileId: user.id
+						}
+						Club.update({'departments._id': department.id},
+							{$pull: {
+							   		'departments.$.members': {id: member.id}
+							   	},
+							$push: {
+								'departments.$.members': newMember
+							}}, function(err, pullRes) {
+							   		if(err) {
+								  		console.log("Error:\n" + err);
+								  		throw err;
+								  	} else {
+
+								  	}
+						});
+						
+						var newOrganization = {
+							name: club.name,
+							rating: "0",
+							review: "",
+							role: "president"
+						}
+
+						User.update({id: user.id}, {$push: {organization: newOrganization}});
+					}
+				});
+			});
+		});
+	});
+	res.render('clubViews/editClubStructre.html');
+	
 });
 
-router.post('/addscreenshot',function(req,res) {
+router.get('/addEvent', ensureAuthenticated, function(req, res) {
+	res.render('clubViews/addEvent.html');
+});
+
+router.post('/addEvent', ensureAuthenticated, function(req, res) {
+	var name = req.body.name;
+	var fromDate = req.body.fromDate;
+	var fromTime = req.body.fromTime;
+	var toDate = req.body.toDate;
+	var toTime = req.body.toTime;
+	var description = req.body.description;
+	var location = req.body.location;
+	var type = req.body.type || "public";
+	var newEvent = new Event({
+		name: name,
+		fromDate: fromDate,
+		fromTime: fromTime,
+		toDate: toDate,
+		toTime: toTime,
+		location: location,
+		description: description,
+		type: type,
+		logo: "event-default.jpg"
+	});
+	Event.createEvent(newEvent, function(err, eventres) {
+		if(err) {
+			console.log(err);
+			throw err;
+		} else {
+			console.log(res);
+			Club.update({userid: req.user.id}, {$push: {events: eventres._id}});
+		}
+	});
+	res.redirect('/users/profile/'+req.user.id);
+});
+
+router.post('/addscreenshot', ensureAuthenticated, function(req,res) {
 	storagetype = "screenshot";
     clubUpload(req, res, function(err) {
         if(err) {
@@ -226,22 +323,8 @@ router.post('/search', function(req, res) {
 
 });
 
-router.get('/viewprofile/:id',function(req,res){
-	User.getUserById(req.params.id, function(err, resuser) {
-		if(err)
-			console.log(err);
-		else {
-			console.log(resuser.usertype);
-			res.render('viewprofile.html', {
-	    		dude : resuser
-	    	});
-		}
-				
-	});
-    
-});
 
-router.post('/updateSummary', function(req, res) {
+router.post('/updateSummary', ensureAuthenticated, function(req, res) {
 	console.log(req.body.userDesc);
 	User.update({_id:req.user.id}, {$set:{summary:req.body.userDesc}}, function(err, res) {
 		if(err)

@@ -80,6 +80,6 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/users', users);
 app.use('/clubs', clubs);
-app.listen(3000, function() {
+app.listen(4000, function() {
 	console.log("Express app started on port 3000.");
 }); 

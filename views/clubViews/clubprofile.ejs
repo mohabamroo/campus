@@ -14,13 +14,7 @@
 		 	   	</span>
 	 	   </div>
 	 	   	
-	 	   <% if(user.profilephoto!=null && user.profilephoto!="") { %>
-	 	   		<img class="img-circle" src="/user_uploads/<%= user.profilephoto %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;position: fixed;">
-
-			<% } else { %>
-	 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="250" height="250" style="  margin-left: 50%;position: absolute;">
-
-			<% } %>
+	 	   <img class="img-circle" src="/user_uploads/<%= dude.profilephoto %>" alt="Generic placeholder image" width="300" height="250" style="margin-left: 150px;position: relative; max-width: 50%; max-height: 80%; min-width: 200px;">
  	   </div>
  	   <br>
  	   <p>
@@ -28,26 +22,19 @@
         </p>
     
     <% if(dude.id.toString()==user.id){ %>
-    <form method="GET" action="/users/profile/<%= user.id %>" style="float: left;">
-		<button type="submit" value="editprofile" class="btn" style="margin: 10px;">Edit profile </button>	
-	</form>
-		<% if(dude.portifolio!="true") { %>
-			<!-- <form method="GET" action="/users/makeportifolio/<%= user.id %>" style="float: left;">
-				<button type="submit" value="makeportifolio" class="btn" style="margin: 10px;">Make Portifolio!</button>	
-			</form> -->
-			<div style="padding:5px; margin-left: 220px;">
-				<span style="font-style: italic; font-size: 30px; color: red; font-weight: bold; font-family: sans-serif;">
-					Note:
-				</span>
-				<span>
-					You have to add at least one link/screenshot to have a portifolio!
-				</span>
-			</div>
-		<% } %>
+	    <div style="max-width: 300px;">
+	    	<form method="GET" action="/clubs/editStructre/<%= user.id %>" style="float: left;">
+				<button type="submit" value="editStructre" class="btn" style="margin: 10px;">Edit Structure</button>	
+			</form>
+			<form method="GET" action="/clubs/addEvent" style="float: right;">
+				<button type="submit" value="addEvent" class="btn" style="margin: 10px;">Add Event</button>	
+			</form>
+	    </div>
     <% } %>
     </div>
+    <div class="row">
    	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
-    border-radius: 5px;  max-width: 45%; margin-right: 5%">
+		    	border-radius: 5px;  max-width: 45%; margin-right: 5%; margin-left: 2%;">
     	<h3>Links</h3>
     	<br>
     	<table>
@@ -57,8 +44,8 @@
 	    			<%;
 	    			dude.links.forEach(function(link){ %>
 	    				<div class="row">
-	    				<li onclick="redirectToLink('<%= link.url %>')" style="padding: 5px;text-overflow: ellipsis; white-space: nowrap;overflow: hidden;">
-	    					<span style="color:black; font-size: 30px; margin-right: 5px;">
+	    				<li style="padding: 5px;text-overflow: ellipsis; white-space: nowrap;overflow: hidden;">
+	    					<span onclick="redirectToLink('<%= link.url %>')" style="color:black; font-size: 30px; margin-right: 5px;">
 	    						<%= link.name %>:
 	    					</span>
 	    					<span style="cursor:pointer; color:blue; font-size: 20px; text-decoration: underline;">
@@ -76,7 +63,7 @@
     </div>
 
        	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
-    border-radius: 5px; max-width: 45%;">
+		    	border-radius: 5px; max-width: 45%;">
     	<h3>Screenshots</h3>
     	<br>
     	<table>
@@ -93,6 +80,7 @@
     		</tr>
     	</table>
     </div>
+    </div>
 </div>
 
 	</body>
@@ -107,3 +95,17 @@
 		window.open(link,'_blank');
 	}
 </script>
+
+<style type="text/css">
+	.row {
+	  display: -webkit-box;
+	  display: -webkit-flex;
+	  display: -ms-flexbox;
+	  display:         flex;
+	  flex-wrap: wrap;
+	}
+	.row > [class*='col-'] {
+	  display: flex;
+	  flex-direction: column;
+	}
+</style>

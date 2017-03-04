@@ -7,6 +7,7 @@ var path = require("path");
 var userUploadsPath = path.resolve(__dirname, "user_uploads");
 var User = require('../models/user');
 var Club = require('../models/club');
+var Tag = require('../models/tag');
 var multer  = require('multer');
 var storagetype = "screenshot";
 var storage = multer.diskStorage({
@@ -54,9 +55,16 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage : storage}).single('userPhoto');
 
-//router.use(bodyParser);
+function ensureAuthenticated(req, res, next){	
+	if(req.isAuthenticated()){
+		return next();
+	} else {
+		req.flash('error_msg','You are not logged in');
+		res.redirect('/users/signin');
+	}
+}
 
-router.get('/profile/:id',  function(req, res) {
+router.get('/profile/:id', ensureAuthenticated, function(req, res) {
 	if(req.isAuthenticated() && req.user.id == req.params.id) {
 		res.render('profile.html');
 	} else {
@@ -64,15 +72,6 @@ router.get('/profile/:id',  function(req, res) {
 		res.redirect('/users/signin');
 	}
 
-});
-
-router.get('/makeportifolio/:id',  function(req, res) {
-	if(req.isAuthenticated() && req.user.id == req.params.id) {
-		res.render('makeportifolio.html');
-	} else {
-		req.flash('error_msg','You are not logged in');
-		res.redirect('/users/signin');
-	}
 });
 
 passport.use(new LocalStrategy(
@@ -97,7 +96,9 @@ passport.use(new LocalStrategy(
   }));
 
 passport.serializeUser(function(user, done) {
+	// saves user in req
 	done(null, user.id);
+
 });
 
 passport.deserializeUser(function(id, done) {
@@ -106,7 +107,6 @@ passport.deserializeUser(function(id, done) {
   });
 
 });
-
 
 router.post('/signin', passport.authenticate('local', {
   	successRedirect: '/',
@@ -165,12 +165,19 @@ router.post("/signup", function(req, res) {
 			usertype: type,
 			links: [],
 			summary: "no summary", 
-			phone: "no phone"
+			phone: "no phone",
+			profilephoto: "default-photo.jpeg",
+			organizations: [],
+			tags: []
 		});
 
 		User.createUser(newUser, function(err, user) {
-			if(err) throw err;
-			console.log(user);
+			if(err) {
+				console.log(err);
+				req.flash('error_msg', 'Duplicate Username!');
+				res.redirect('/users/signup');
+				return;
+			}
 			if(type=="club") {
 				var newClub = new Club({
 					name: name,
@@ -183,14 +190,16 @@ router.post("/signup", function(req, res) {
 					logo: '',
 					phone: '',
 					president: {},
-					departments: []
+					departments: [],
+					events: []
 				});
 				newClub.save();
 			}
 		});
 			
 	}
-	res.locals.pagetitle = 'Sign In',
+	res.locals.pagetitle = 'Sign In';
+	req.flash('success_msg','You signed up successfully!');
 	res.redirect('/users/signin');
 	
 });
@@ -208,7 +217,7 @@ router.get('/signout', function(req, res){
 
 });
 
-router.post('/addlink', function(req, res) {
+router.post('/addlink', ensureAuthenticated, function(req, res) {
 	if(req.body.reponame!="" && req.body.url!="") {
 		var newlink = {name: req.body.reponame, url: req.body.newlink};
 		User.getUserbyUsername(res.locals.user.username, function(err, user) {
@@ -229,43 +238,62 @@ router.post('/addlink', function(req, res) {
 
 });
 
-router.post('/addTags', function(req, res) {
+router.post('/addTags', ensureAuthenticated, function(req, res) {
 	if(req.body.tags!="") {
 		var tagsStr = req.body.tags;
 		var tagsArr = tagsStr.split(', ');
 		User.getUserbyUsername(res.locals.user.username, function(err, user) {
 			var oldTags = user.tags;
 			tagsArr.forEach(function(tag) {
-				oldTags.push(tag);
-			})
-			User.update({_id:res.locals.user.id}, {$set:{tags:oldlinks}}, function(err, res) {
-			if(err)
-				console.log(err);
+				User.update({_id:res.locals.user.id}, {$push: {tags: tag}}, function(err1, ress) {
+					if(err)
+						console.log(err1);
+				});
+				var userToAdd = {name: user.username, profileid: user.id, photo: user.profilephoto};
+				Tag.getTagbyTagname(tag, function(err2, tagres) {
+					if(tagres!=null) {
+						Tag.update({_id: tagres.id}, {$push: {users: userToAdd}}, function(errpush, pushRes) {
+							if(errpush)
+								throw errpush;
+						});
+					} else {
+						var newTag = new Tag({tag: tag, users: [userToAdd]});
+						Tag.createTag(newTag, function(err3, resnewtag) {
+							if(err3)
+								throw err3;
+							else
+								console.log(resnewtag);
+						});
+					}
+				});
 			});
+			
 		});	
 	} else {
 		// req.flash("error_msg", "Fill all the fields!")
 	}
-	
-	res.redirect('/users/profile/'+req.user.id);
-	
-	res.send(res.locals.user.username);
+	res.redirect('/users/profile/'+req.user.id);	
 
 });
 
-router.post('/deletelink/link', function(req, res) {
-	User.getUserbyUsername(res.locals.user.username, function(err, user) {
-			var oldlinks = user.links;
-			oldlinks.push(newlink);
-			User.update({_id:res.locals.user.id}, {$set:{links:oldlinks, portifolio: "true"}}, function(err, res) {
-			if(err)
-				console.log(err);
-			});
-		});	
+router.post('/deletelink/:link', ensureAuthenticated, function(req, res) {
+	var url = req.params.link;
+	User.update({_id: req.user.id},
+		{$pull: {
+		   		'links': {url: url}
+		   	}}, function(err, pullRes) {
+		   		if(err) {
+			  		console.log("Error:\n" + err);
+			  		throw err;
+			  	} else {
+			  		console.log("Deleted link!\n" + JSON.stringify(pullRes));
+			  	}
+	});
+	res.redirect('/users/profile/'+req.user.id);	
 
 });
 
-router.post('/addscreenshot',function(req,res) {
+router.post('/addscreenshot', ensureAuthenticated, function(req,res) {
 	storagetype = "screenshot";
     upload(req,res,function(err) {
         if(err) {
@@ -276,26 +304,83 @@ router.post('/addscreenshot',function(req,res) {
 
 });
 
-router.post('/search', function(req, res) {
-	// res.send(req.body.searchusername);
-	User.getUserbyUsername(req.body.searchusername, function(err, user) {
-		if(err)
-			console.log('err: '+err);
-		else {
-			console.log(req.url);
-			//req.url = req.headers.host;
-			console.log(req.url);
-			res.render('searchresults.html', {
-				'usersearchedfor': user
-			});
-		}
-			
-
+router.post('/deletescreenshot/:screenshot', ensureAuthenticated, function(req, res) {
+	var url = req.params.screenshot;
+	User.update({_id: req.user.id},
+		{$pull: {
+		   		'photos': {src: url}
+		   	}}, function(err, pullRes) {
+		   		if(err) {
+			  		console.log("Error:\n" + err);
+			  		throw err;
+			  	} else {
+			  		console.log("Deleted screenshot!\n" + JSON.stringify(pullRes));
+			  	}
 	});
+	res.redirect('/users/profile/'+req.user.id);	
 
 });
 
-router.get('/viewprofile/:id',function(req,res){
+router.post('/search', function(req, res) {
+	var searchterm = req.body.searchusername;
+	search(req, res, searchterm);
+	
+});
+
+router.get('/searchShort/:searchterm', function(req, res) {
+	search(req, res, req.params.searchterm);
+});
+
+function search(req, res, searchterm) {
+	var usersFound = [];
+	User.getUserbyUsername(searchterm, function(err, user) {
+		if(err)
+			console.log('err: '+err);
+		else {
+			if(user!=null)
+				usersFound.push(user);
+			Tag.getTagbyTagname(searchterm, function(err, tagres) {
+				if(err)
+					throw err;
+				else {
+					if(tagres!=null) {
+						var counter = tagres.users.length;
+						if(counter>0)
+							tagres.users.forEach(function(userintaglist) {
+								User.getUserById(userintaglist.profileid, function(err2, userobj) {
+									if(err2)
+										throw err2;
+									else
+										if(userobj!=null) {
+											console.log("java:\n"+userobj);
+											usersFound.push(userobj);	
+										}
+										counter--;
+										console.log(counter)
+										if(counter==0) {
+											res.render('searchresults.html', {
+														'users': usersFound
+											});
+										}
+								});
+							});
+						else {
+							res.render('searchresults.html', {
+								'users': usersFound
+							});
+						}
+					} else {
+						res.render('searchresults.html', {
+							'users': usersFound
+						});
+					}	
+				}
+			});
+		}
+	});
+}
+
+router.get('/viewprofile/:id', function(req,res) {
 	User.getUserById(req.params.id, function(err, resuser) {
 		if(err)
 			console.log(err);
@@ -310,7 +395,7 @@ router.get('/viewprofile/:id',function(req,res){
     
 });
 
-router.post('/updateSummary', function(req, res) {
+router.post('/updateSummary', ensureAuthenticated, function(req, res) {
 	console.log(req.body.userDesc);
 	User.update({_id:req.user.id}, {$set:{summary:req.body.userDesc}}, function(err, res) {
 		if(err)
@@ -320,7 +405,7 @@ router.post('/updateSummary', function(req, res) {
 
 });
 
-router.post('/updateProfilePhoto', function(req, res) {
+router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {
 	storagetype = "profilephoto";
 	upload(req,res,function(err) {
         if(err) {
@@ -328,6 +413,32 @@ router.post('/updateProfilePhoto', function(req, res) {
         }
         res.redirect('/users/profile/'+req.user.id);
     });
+
+});
+
+router.post('/updateEmail', ensureAuthenticated, function(req, res) {
+	User.update({_id:req.user.id}, {$set:{email:req.body.email}}, function(err, ress) {
+		if(err) {
+			console.log(err);
+			throw err;
+		} else {
+			console.log("email update: " + JSON.stringify(ress));
+		}
+	});
+	res.redirect('/users/profile/'+req.user.id);
+
+});
+
+router.post('/updatePhone', ensureAuthenticated, function(req, res) {
+	User.update({_id:req.user.id}, {$set:{phone:req.body.phone}}, function(err, ress) {
+		if(err) {
+			console.log(err);
+			throw err;
+		} else {
+			console.log("phone update: " + JSON.stringify(ress));
+		}
+	});
+	res.redirect('/users/profile/'+req.user.id);
 
 });
 

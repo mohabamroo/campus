@@ -1,0 +1,56 @@
+<% include ../layout/header %>
+	<br>
+    <form method="post" action="/clubs/addEvent" style="width: 50%; margin-left: 25%;">
+    	<h2 class="form-event-heading">Add Event form</h2>
+        <br>
+        <label for="inputName" class="">Name</label>
+        <input type="text" id="inputName" class="form-control" placeholder="ex: oscars night" name="name" required autofocus>
+        <br>
+
+        <label for="inputLocation" class="">Location</label>
+        <input type="text" id="inputLocation" class="form-control" placeholder="ex: platform" name="location" required>
+		<br>
+
+        <label for="inputFromDate" class="">From</label>
+        <br>
+        <div style="margin-left: 10%;">
+	        <label>Day:</label>
+	        <input type="date" id="inputFromDate" class="form-control" name="fromDate" required style="width: 80%; float: right;">
+	        <br>
+	        <br>
+	        <label>Time:</label>
+	        <input type="time" id="inputFromTime" class="form-control" name="fromTime" required style="width: 80%; float: right;">	
+        </div>
+        <br>
+        <br>
+        <label for="inputToDate" class="">To</label>
+		<div style="margin-left: 10%;">
+	        <label>Day:</label>
+	        <input type="date" id="inputToDate" class="form-control" name="toDate" required style="width: 80%; float: right;">
+	        <br>
+	        <br>
+	        <label>Time:</label>
+	        <input type="time" id="inputToTime" class="form-control" name="toTime" required style="width: 80%; float: right;">	
+        </div>
+        <br>
+
+        <label for="inputDescription" class="">Description</label>
+        <input type="text" id="inputDescription" class="form-control" placeholder="ex: giving the oscars to the winners" name="description" required>
+        <br>
+
+        <div class="form-group">
+	  		<label for="sel1">Select a type:</label>
+	  		<select class="form-control" id="eventType" name="type">
+	        	<option value="" disabled selected style="display:none;">choose</option>
+	  		    <option value="private">Private</option>
+	  		    <option value="public">Public</option>
+	  		</select>
+  		</div>
+  		<br>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
+    </form>
+
+
+
+<% include ../layout/footer %>

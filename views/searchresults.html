@@ -1,23 +1,29 @@
-<% include header %>
+<% include layout/header %>
 	
-	<% if(usersearchedfor!=null) {%>
-
-		<div class="container" style="margin-top: 40px;">
-		<div class="row">
-        <div class="col-lg-8" style="margin-top: 40px;">
-          <img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="200">
-          <h2><%= usersearchedfor.name %></h2>
-          <p></p>
-          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-        </div><!-- /.col-lg-4 -->
-
-      </div><!-- /.row -->
+		<% if(users!=null && users.length>0) {
+			users.forEach(function(user) {
+				if(user!=null) { %>
+					<div class="col-lg-4" style="margin-top: 40px;">
+			 	   		<img class="img-circle" src="/user_uploads/<%= user.profilephoto %>" alt="Generic placeholder image" width="300" height="250">
+			          	<h3 class="clickableh3" id="<%= user.id %>" style="cursor:pointer; color:gray; text-align: center; margin-bottom: 0;">
+			          		<%= user.name %>          	
+			          	</h3>
+			        </div>
+			<% 	}
+			});
+		} else { %>
+			<h1>Sorry, no users found!</h1>
+		<% } %>
 		</div>
-
-	<% } else {%>
-		<h1>Sorry, no users found!</h1>
-	<% } %>
-	</div>
-</body>
-
+	</body>
 </html>
+
+<script type="text/javascript">
+	var h3s = document.getElementsByClassName('clickableh3');
+
+	Array.prototype.forEach.call(h3s, function(el) {
+		el.onclick=function(){
+			window.location = "/users/viewprofile/"+el.id;
+		}
+	});
+</script>

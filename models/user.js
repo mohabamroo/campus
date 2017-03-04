@@ -13,7 +13,8 @@ var userSchema = mongoose.Schema({
 		type: String
 	},
 	gucid: {
-		type: String
+		type: String,
+		unique: true
 	},
 	usertype: {
 		type: String
@@ -44,6 +45,22 @@ var userSchema = mongoose.Schema({
 			}
 		}
 	],
+	organizations: [
+		{
+			role: {
+				type: String
+			},
+			rating: {
+				type: String
+			},
+			review: {
+				type: String
+			},
+			name: {
+				type: String
+			}
+		}
+	],
 	summary: {
 		type: String
 	},
@@ -56,6 +73,11 @@ var userSchema = mongoose.Schema({
 	phone: {
 		type: String
 	},
+	tags: [
+		{
+			type: String
+		}
+	]
 
 });
 

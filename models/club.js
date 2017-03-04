@@ -87,7 +87,11 @@ var clubSchema = mongoose.Schema({
 				}
 			]
 		}
-	]
+	],
+	events: [
+	{
+		type: String
+	}]
 
 });
 

@@ -1,0 +1,111 @@
+
+			<div class="jumbotron" >
+		 	   <div class="intro" style="display: flex; width: 100%; min-height: 250px;">
+			 	   <div>
+			 	   		<h1>This is <%= dude.name%>!</h1>
+			 	   		<span style="font-family: cursive; font-weight: bold;">Username: <%= dude.username%></span>
+			 	   		<br>
+				 	   	<span>Email:<span style="text-decoration: ; cursor:pointer; color:blue; text-align: center;"> <%= dude.email%></span></span>
+				 	   	<br>
+				 	   	<span>Phone: <%= dude.phone %></span>
+				 	   	<br>
+				 	   	<span>GUC-ID: <%= dude.gucid %></span>
+				 	   	<br>
+				 	   	<br>
+				 	   	<span style="font-size: 30px;">Summary:
+				 	   		<p style="margin-left: 40px;"><%= dude.summary%></p>
+				 	   	</span>
+			 	   </div>
+			 	   	
+			 	   <img class="img-circle" src="/user_uploads/<%= dude.profilephoto %>" alt="Generic placeholder image" width="300" height="250" style="margin-left: 50%;position: absolute; max-width: 20%; max-height: 80%; min-width: 200px;">
+		 	   </div>
+		 	   <br>
+		    	<% dude.tags.forEach(function(tag) { %>
+				  		<a style="margin: 5px;cursor:pointer; color:blue; text-align: center;" href="/users/searchShort/<%= tag %>">
+				  			#<%= tag %>
+				  		</a>
+				 	<% }); %>
+				 	<br>
+				 	<br>
+			    <% if(dude.id.toString()==user.id){ %>
+				    <form method="GET" action="/users/profile/<%= user.id %>" style="float: left;">
+						<button type="submit" value="editprofile" class="btn btn-success" style="margin: 10px;">Edit profile </button>	
+					</form>
+			    <% } %>
+		    </div>
+		    <div class="row">
+			   	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
+		    	border-radius: 5px;  max-width: 45%; margin-right: 5%; margin-left: 2%;">
+			    	<h3>Links</h3>
+			    	<br>
+			    	<table>
+			    		<tr>
+				    		<div class="container">
+				    		<ul>
+				    			<%;
+				    			dude.links.forEach(function(link){ %>
+				    				<div class="row">
+				    				<li style="padding: 5px;text-overflow: ellipsis; white-space: nowrap;overflow: hidden;">
+				    					<span style="color:black; font-size: 30px; margin-right: 5px;" onclick="redirectToLink('<%= link.url %>')">
+				    						<%= link.name %>:
+				    					</span>
+				    					<span style="cursor:pointer; color:blue; font-size: 20px; text-decoration: underline;">
+				    						<%= link.url %>
+				    					</span>
+				    				</li>
+				    			</div>
+				    			<% }); %>
+				    		</ul>
+					    		
+				    		</div>
+			    		</tr>
+			    	</table>
+			    	
+			    </div>
+
+			    <div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
+		    	border-radius: 5px; max-width: 45%; font-family: cursive; font-weight: bold;">
+			    	<h3>Screenshots</h3>
+			    	<br>
+			    	<table>
+			    		<tr>
+				    		<div class="container" >
+				    			<% dude.photos.forEach(function(photo){ %>
+				    				<img style="max-width:400px; margin: 5px;" src="/user_uploads/<%= photo.src %>">
+				    				<h5 style="text-overflow: ellipsis; max-width: 200px;white-space: nowrap;
+			  						overflow: hidden; "><%= photo.name %></h5>
+				    				
+				    			<% }); %>
+				    					    		
+				    		</div>
+			    		</tr>
+			    	</table>
+			    </div>
+		    </div>
+		</div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	var redirectSignIn = function() {
+		window.location.href = '/users/signin'; 
+	}
+	var redirectToLink = function(link) {
+		console.log(link);
+		window.open(link,'_blank');
+	}
+</script>
+
+<style type="text/css">
+	.row {
+	  display: -webkit-box;
+	  display: -webkit-flex;
+	  display: -ms-flexbox;
+	  display:         flex;
+	  flex-wrap: wrap;
+	}
+	.row > [class*='col-'] {
+	  display: flex;
+	  flex-direction: column;
+	}
+</style>

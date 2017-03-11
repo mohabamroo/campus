@@ -1,15 +1,21 @@
-
+<div class="normalprofile">
 			<div class="jumbotron" >
-		 	   <div class="intro" style="display: flex; width: 100%; min-height: 250px;">
+		 	   <div class="intro">
 			 	   <div>
 			 	   		<h1>This is <%= dude.name%>!</h1>
-			 	   		<span style="font-family: cursive; font-weight: bold;">Username: <%= dude.username%></span>
+			 	   		<span>Username: <%= dude.username%></span>
 			 	   		<br>
-				 	   	<span>Email:<span style="text-decoration: ; cursor:pointer; color:blue; text-align: center;"> <%= dude.email%></span></span>
+				 	   	<span >Email:
+				 	   		<span class="email">
+				 	   			<%= dude.email%>	
+				 	   		</span>
+				 	   	</span>
 				 	   	<br>
 				 	   	<span>Phone: <%= dude.phone %></span>
 				 	   	<br>
 				 	   	<span>GUC-ID: <%= dude.gucid %></span>
+				 	   	<br>
+				 	   	<span>Major: <%= dude.major %></span>
 				 	   	<br>
 				 	   	<br>
 				 	   	<span style="font-size: 30px;">Summary:
@@ -17,7 +23,7 @@
 				 	   	</span>
 			 	   </div>
 			 	   	
-			 	   <img class="img-circle" src="/user_uploads/<%= dude.profilephoto %>" alt="Generic placeholder image" width="300" height="250" style="margin-left: 50%;position: absolute; max-width: 20%; max-height: 80%; min-width: 200px;">
+			 	   <img class="img-circle profileimg" src="/user_uploads/<%= dude.profilephoto %>" alt="Generic placeholder image" width="300" height="250">
 		 	   </div>
 		 	   <br>
 		    	<% dude.tags.forEach(function(tag) { %>
@@ -82,10 +88,7 @@
 			    	</table>
 			    </div>
 		    </div>
-		</div>
-	</body>
-</html>
-
+</div>
 <script type="text/javascript">
 	var redirectSignIn = function() {
 		window.location.href = '/users/signin'; 

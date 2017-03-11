@@ -63,6 +63,33 @@ router.get('/', function(req, res) {
 	});
 });
 
+router.get('/viewClub/:id', function(req, res) {
+	console.log(req.params.id);
+	User.getUserById(req.params.id, function(err, resuser) {
+		if(err) {
+			console.log(err);
+			throw err;
+		}
+		else {
+			Club.getClubByUserId(req.params.id, function(err2, resclub) {
+				if(err2) {
+					console.log(err2);
+					throw err2;
+				} else {
+					if(resclub==null) {
+						res.end('No such club!');
+					} else {
+						res.render('viewprofile.html', {
+							dude : resuser,
+							club: resclub
+					   	});
+					}
+				}
+			});
+		}			
+	});
+})
+
 router.get('/editStructre/:id',  function(req, res) {
 	if(req.isAuthenticated() && req.user.id == req.params.id) {
 		Club.getClubByUserId(req.user.id, function(err, club) {
@@ -84,29 +111,26 @@ router.post('/addpresident', function(req, res) {
 	var presidentName = req.body.presidentName;
 	var presidentID = req.body.presidentID;
 	var newpresident = {name: presidentName, id: presidentID, profileId: "none", exists: "false"};
-	console.log('ss');
 	Club.getClubByUserId(req.user.id, function(err, club) {
-		console.log(club);
-		console.log(req.user.id);
 		Club.update({userid:req.user.id}, {$set:{president: newpresident}}, function(err, res) {
 				if(err)
 					console.log(err);
 			});
 	});
-	res.redirect('/users/editStructre/'+req.user.id)
+	res.redirect('/clubs/editStructre/'+req.user.id)
 
 });
 
-router.post('/addMember/:departmentName', function(req, res) {
-	console.log('query: '+req.params.departmentName);
-	var departmentName = req.params.departmentName;
+router.post('/addMember/:departmentID', function(req, res) {
+	console.log('query: '+req.params.departmentID);
+	var departmentID = req.params.departmentID;
 	var memberName = req.body.memberName;
 	var memberID = req.body.memberID;
 	var newMember = {name: memberName, id: memberID, profileId: "none", exists: "false"};
 	console.log(req.user.id);
 	Club.findOne(
-		{"departments.name": departmentName}, 
-		{_id: 0, departments: {$elemMatch: {name: departmentName}}}, function(err, res) {
+		{"departments._id": departmentID}, 
+		{_id: 0, departments: {$elemMatch: {_id: departmentID}}}, function(err, res) {
 			console.log("res: "+res.departments[0].id);
 			var findStr = 'departments.id';
 		    var updateStr = 'departments.'+res.departments[0].id+'.members';
@@ -197,7 +221,8 @@ router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 					name: presidentRes.name,
 					id: oldPresident.id,
 					exists: "true",
-					profileId: presidentRes.id
+					profileId: presidentRes.id,
+					rating: "0"
 				}
 				Club.update({userid:req.user.id}, {$set:{president: newPresident}}, function(err, clubres) {
 					console.log("clubres :" + res);
@@ -215,28 +240,70 @@ router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 		});
 
 		club.departments.forEach(function(department) {
-			department.members.forEach(function(member) {
-				User.getUserByGucId(member.id, function(err, user) {
-					console.log("member: " + user);
-					if(user!=null) {
+			User.getUserByGucId(department.head.id, function(err, userhead) {
+					console.log("head: " + userhead);
+					if(userhead!=null) {
 						var newMember = {
-							name: user.name,
-							id: member.id,
+							name: userhead.name,
+							id: department.head.id,
 							exists: "true",
-							profileId: user.id
+							profileId: userhead.id,
+							rating: "0"
 						}
 						Club.update({'departments._id': department.id},
-							{$pull: {
-							   		'departments.$.members': {id: member.id}
-							   	},
-							$push: {
-								'departments.$.members': newMember
-							}}, function(err, pullRes) {
+							{$set: {
+								'departments.$.head': newMember
+							}}, function(err, setRes) {
 							   		if(err) {
 								  		console.log("Error:\n" + err);
 								  		throw err;
 								  	} else {
 
+								  	}
+						});
+						
+						var newOrganization = {
+							name: club.name,
+							rating: "0",
+							review: "",
+							role: department.name
+						}
+
+						User.update({id: userhead.id}, {$push: {organizations: newOrganization}});
+					}
+				});
+			department.members.forEach(function(member) {
+				User.getUserByGucId(member.id, function(err, user) {
+					console.log("member: " + member.profileId);
+					if(user!=null) {
+						var newMember = {
+							name: user.name,
+							id: member.id,
+							exists: "true",
+							profileId: user.id,
+							rating: "0"
+						}
+						Club.update({'departments._id': department.id},
+							{$pull: {
+							   		'departments.$.members': {id: member.id}
+							   	},
+							}, function(err, pullRes) {
+							   		if(err) {
+								  		console.log("Error:\n" + err);
+								  		throw err;
+								  	} else {
+								  		console.log("pull res: "+pullRes);
+										Club.update({'departments._id': department.id},
+											{$push: {
+												'departments.$.members': newMember
+											}}, function(err2, pushRes) {
+											   		if(err2) {
+												  		console.log("Error:\n" + err);
+												  		throw err2;
+												  	} else {
+												  		console.log("push res: "+pushRes);
+												  	}
+										});
 								  	}
 						});
 						
@@ -253,8 +320,54 @@ router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 			});
 		});
 	});
-	res.render('clubViews/editClubStructre.html');
+	res.redirect('/clubs/editStructre/'+req.user.id)
 	
+});
+
+router.get("/rateMember/:depID/:memberID/:objID/:rating", ensureAuthenticated, function(req, res) {
+	var departmentID = req.params.depID;
+	var memberID = req.params.memberID;
+	var memberobjID = req.params.objID;
+	var rating = req.params.rating;
+
+	Club.update({"userid": req.user.id, 'departments._id': departmentID, 'members._id': memberID},
+							{$set: {
+							   		'departments.0.members.$': {rating: rating}
+							   	}
+							}, function(err, setRes) {
+							   		if(err) {
+								  		console.log("Error:\n" + err);
+								  		throw err;
+								  	} else {
+								  		console.log("set res rate: "+JSON.stringify(setRes));
+								  	}
+						});
+
+	Club.update({'departments._id': departmentID},
+							{$pull: {
+							   		'departments.$.members': {_id: member.id}
+							   	},
+							}, function(err, pullRes) {
+							   		if(err) {
+								  		console.log("Error:\n" + err);
+								  		throw err;
+								  	} else {
+								  		console.log("pull res: "+pullRes);
+										Club.update({'departments._id': department.id},
+											{$push: {
+												'departments.$.members': newMember
+											}}, function(err2, pushRes) {
+											   		if(err2) {
+												  		console.log("Error:\n" + err);
+												  		throw err2;
+												  	} else {
+												  		console.log("push res: "+pushRes);
+												  	}
+										});
+								  	}
+						});
+	res.redirect('/clubs/editStructre/'+req.user.id)
+
 });
 
 router.get('/addEvent', ensureAuthenticated, function(req, res) {

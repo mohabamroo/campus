@@ -1,5 +1,5 @@
 <% include ../layout/header %>
-<div class="jumbotron" >
+<div class="jumbotron editclubstructre" >
 
 	<div class="container">
 		<h1 style="float: left; padding-top: 40px;">Hello, <%= clubRes.name%>!</h1>
@@ -10,6 +10,7 @@
  	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
 
 		<% } %>
+
  	   	<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/clubs/updateLogo" style="margin-top: 150px;">
 			<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px; max-width: 400px;">
 			<input type="submit" value="Upload Logo" class="btn" style="margin: 10px;">	
@@ -17,41 +18,83 @@
 	</div>
 
 	<div class="container-fluid">
-		<% if(clubRes.president!=null && clubRes.logo!="") { %>
- 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+		<div class="row row-eq-height" style="margin-left: 30%;">
 
-		<% } else { %>
- 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+		<div class="singleDepartment col-xs-4">
 
-		<% } %>
-		<div class="container president" style=" margin-left:35%;">
-			<form method="POST" action="/clubs/addpresident" style="max-width: 200px;">
-				<input type="text" name="presidentID" class="form-control" placeholder="34-5862">
-				<input type="text" name="presidentName" class="form-control" placeholder="mohab amr">
-				<input type="submit" class="btn" style="margin: 10px;" value="Add President">	
-			</form>
+					<% if(clubRes.president!=null && clubRes.logo!="") { %>
+			 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="200" height="185">
+
+					<% } else { %>
+			 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
+					<% } %>
+
+					<h4 <%if(clubRes.president.profileId!="none") { %> 
+							class="clickableh2" id="<%= clubRes.president.profileId %>"
+							style="cursor:pointer; color:gray; margin-left: 30px;" 
+						<% } else { %>
+						style="color:gray; margin-left: 30px;"
+						<% } %>
+						>		
+						<%= clubRes.president.name %>
+					</h4>
+					<div class="container president" style="min-width: 220px;">
+						<form method="POST" action="/clubs/addpresident" style="max-width: 200px;">
+							<input type="text" name="presidentID" class="form-control" placeholder="34-5862">
+							<input type="text" name="presidentName" class="form-control" placeholder="mohab amr">
+							<input type="submit" class="btn" style="margin: 10px;" value="Add President">	
+						</form>
+					</div>
+				</div>
 		</div>
+
 		
 
 		<div class="deps row row-eq-height">
 			<%  clubRes.departments.forEach(function(department) { %>
-				<div class="singleDepartment col-xs-4">
+				<div class="singleDepartment col-xs-4" name="<%= department.name %>" id="<%= department._id %>">
 					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
-					<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; margin-left: 30px;"><%= department.name %></h4>
+					<h4 style="color:gray; margin-left: 30px;"><%= department.name %></h4>
+					<div style="vertical-align: top; margin-left: 30px;" class="nameRating">
+						<h4 <%if(department.head.profileId!="none") { %> 
+								class="clickableh2" id="<%= department.head.profileId %>"
+								style="cursor:pointer; color:gray;" 
+							<% } else { %>
+							style="color:gray;"
+							<% } %>
+							>		
+							<%= department.head.name %>
+						</h4>
+						<% include ../layout/rating %>
+		
+					</div>
+					
 					<div class="deleteDiv">
 						<form method="post" action="/clubs/deleteDepartment/<%= department._id %>">
 							<input type="submit" class="btn" style="margin: 10px;" value="Delete Department">	
 						</form>
 					</div>
 					<div class="addmember">
-						<form method="POST" action="/clubs/addMember/<%= department.name %>" style="max-width: 200px;">
+						<form method="POST" action="/clubs/addMember/<%= department._id %>" style="max-width: 200px;">
 							<input type="text" name="memberID" class="form-control" placeholder="34-5862">
 							<input type="text" name="memberName" class="form-control" placeholder="mohab amr">
 							<input type="submit" class="btn" style="margin: 10px;" value="Add Member">	
 						</form>
 					</div>
 					<% department.members.forEach(function(member) { %>
-						<li><%= member.name %></li>
+						<div style="vertical-align: top; margin-left: 30px; font-size: 10px;" class="nameRating">
+							<h4 <%if(member.profileId!="none") { %> 
+									class="clickableh2" id="<%= member.profileId %>"
+									style="cursor:pointer; color:gray;" 
+								<% } else { %>
+								style="color:gray;"
+								<% } %>
+								objID = "<%= member._id %>""
+								>		
+								<%= member.name %>
+							</h4>
+							<% include ../layout/rating %>
+						</div>
 					<% }); %>
 				</div>
 			<%  }) %>
@@ -67,6 +110,7 @@
 					<input type="submit" class="btn" style="margin: 10px;" value="Add Dpartment">	
 				</form>
 			</div>
+
 		</div>
 
 		<form method="POST" action="/clubs/updateMembers" style="width: 150px; float: right;">
@@ -93,3 +137,23 @@
 		margin-bottom: 30px;
 	}
 </style>
+
+<link href="/css/rating.css" rel="stylesheet">
+
+<script type="text/javascript">
+	var h2s = document.getElementsByClassName('clickableh2');
+
+	Array.prototype.forEach.call(h2s, function(el) {
+	    el.onclick=function() {
+			window.location = "/users/viewprofile/"+el.id;
+		}
+	});
+
+	$("input[name*='rating']").click(function() {
+		var rating = $(this).val();
+		var memberID = $(this).parent().parent().find("h4").attr('id');
+		var departmentName = $(this).parent().parent().parent().attr('name');
+		var departmentID = $(this).parent().parent().parent().attr('id');
+		window.location = "/clubs/rateMember/"+departmentID+"/"+memberID+"/"+rating;
+	});
+</script>

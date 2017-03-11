@@ -1,0 +1,43 @@
+.row {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display:         flex;
+	flex-wrap: wrap;
+	color: white;
+}
+.row > [class*='col-'] {
+	display: flex;
+	flex-direction: column;
+}
+
+.clubprofile .jumbotron, .normalprofile .jumbotron {
+	background-color: inherit;
+	color: white;
+}
+
+.editclubstructre {
+	background-color: inherit;
+	color: white;
+}
+
+.email {
+	text-decoration: ;
+	cursor:pointer;
+	color:blue;
+	text-align: center;
+}
+
+.intro {
+	display: flex;
+	width: 100%;
+	min-height: 250px;
+}
+
+.intro .profileimg {
+	margin-left: 150px;
+	position: relative;
+	max-width: 	300px;
+	max-height: 80%;
+	min-width: 200px;
+}

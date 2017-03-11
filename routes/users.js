@@ -137,6 +137,7 @@ router.post("/signup", function(req, res) {
 	var username = req.body.username;
 	var type = req.body.type;
 	var gucid = req.body.gucid;
+	var major = req.body.major || "none";
 	console.log(type);
 	req.checkBody('name', 'Name is empty!').notEmpty();
 	req.checkBody('email', 'Email is empty!').notEmpty();
@@ -166,6 +167,7 @@ router.post("/signup", function(req, res) {
 			links: [],
 			summary: "no summary", 
 			phone: "no phone",
+			major: major,
 			profilephoto: "default-photo.jpeg",
 			organizations: [],
 			tags: []
@@ -382,15 +384,22 @@ function search(req, res, searchterm) {
 
 router.get('/viewprofile/:id', function(req,res) {
 	User.getUserById(req.params.id, function(err, resuser) {
-		if(err)
+		if(err) {
 			console.log(err);
+			throw err;
+		}
 		else {
 			console.log(resuser.usertype);
-			res.render('viewprofile.html', {
-	    		dude : resuser
-	    	});
-		}
-				
+			if(resuser.usertype=="student") {
+				res.render('viewprofile.html', {
+					dude : resuser
+			   	});
+			} else {
+				if(resuser.usertype=="club") {
+					res.redirect('/clubs/viewClub/'+req.params.id);
+				}
+			}
+		}			
 	});
     
 });

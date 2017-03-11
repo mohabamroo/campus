@@ -15,7 +15,8 @@ var userUploadsPath = path.resolve(__dirname, "user_uploads");
 var publicPath = path.join(__dirname, 'public');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/communitydb');
+mongoose.connect('mongodb://mohabamroo:ghostrider1@ds127260.mlab.com:27260/communitydb');
+//mongoose.connect('mongodb://localhost/communitydb');
 var db = mongoose.connection;
 
 var routes = require('./routes/index');
@@ -80,6 +81,6 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/users', users);
 app.use('/clubs', clubs);
-app.listen(4000, function() {
+app.listen(process.env.PORT||3000, function() {
 	console.log("Express app started on port 3000.");
 }); 

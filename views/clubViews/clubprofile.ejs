@@ -1,11 +1,16 @@
-
-	<div class="jumbotron" >
- 	   <div class="intro" style="display: flex; width: 100%; min-height: 250px;">
-	 	   <div>
+<div class="clubprofile">
+	
+	<div class="jumbotron">
+ 	   <div class="intro">
+	 	   <div style="float: left">
 	 	   		<h1>This is <%= dude.name%>!</h1>
 	 	   		<span>Username: <%= dude.username%></span>
 	 	   		<br>
-		 	   	<span>Email: <%= dude.email%></span>
+		 	   	<span>Email:
+		 	   		<span class="email">
+		 	   			<%= dude.email%>
+		 	   		</span>
+		 	   	</span>
 		 	   	<br>
 		 	   	<span>Phone: <%= dude.phone %></span>
 		 	   	<br>
@@ -14,77 +19,108 @@
 		 	   	</span>
 	 	   </div>
 	 	   	
-	 	   <img class="img-circle" src="/user_uploads/<%= dude.profilephoto %>" alt="Generic placeholder image" width="300" height="250" style="margin-left: 150px;position: relative; max-width: 50%; max-height: 80%; min-width: 200px;">
+	 	   <img class="img-circle profileimg" src="/user_uploads/<%= dude.profilephoto %>" alt="Generic placeholder image" width="300" height="250">
  	   </div>
  	   <br>
  	   <p>
         	<%= dude.summarry %>
         </p>
     
-    <% if(dude.id.toString()==user.id){ %>
-	    <div style="max-width: 300px;">
-	    	<form method="GET" action="/clubs/editStructre/<%= user.id %>" style="float: left;">
-				<button type="submit" value="editStructre" class="btn" style="margin: 10px;">Edit Structure</button>	
-			</form>
-			<form method="GET" action="/clubs/addEvent" style="float: right;">
-				<button type="submit" value="addEvent" class="btn" style="margin: 10px;">Add Event</button>	
-			</form>
-	    </div>
-    <% } %>
-    </div>
-    <div class="row">
-   	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
-		    	border-radius: 5px;  max-width: 45%; margin-right: 5%; margin-left: 2%;">
-    	<h3>Links</h3>
-    	<br>
-    	<table>
-    		<tr>
-	    		<div class="container">
-	    		<ul>
-	    			<%;
-	    			dude.links.forEach(function(link){ %>
-	    				<div class="row">
-	    				<li style="padding: 5px;text-overflow: ellipsis; white-space: nowrap;overflow: hidden;">
-	    					<span onclick="redirectToLink('<%= link.url %>')" style="color:black; font-size: 30px; margin-right: 5px;">
-	    						<%= link.name %>:
-	    					</span>
-	    					<span style="cursor:pointer; color:blue; font-size: 20px; text-decoration: underline;">
-	    						<%= link.url %>
-	    					</span>
-	    				</li>
-	    			</div>
-	    			<% }); %>
-	    		</ul>
-		    		
-	    		</div>
-    		</tr>
-    	</table>
-    	
+	    <% if(dude.id.toString()==user.id){ %>
+		    <div style="max-width: 300px;">
+		    	<form method="GET" action="/clubs/editStructre/<%= user.id %>" style="float: left;">
+					<button type="submit" value="editStructre" class="btn" style="margin: 10px;">Edit Structure</button>	
+				</form>
+				<form method="GET" action="/clubs/addEvent" style="float: right;">
+					<button type="submit" value="addEvent" class="btn" style="margin: 10px;">Add Event</button>	
+				</form>
+		    </div>
+	    <% } %>
     </div>
 
-       	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
-		    	border-radius: 5px; max-width: 45%;">
-    	<h3>Screenshots</h3>
-    	<br>
-    	<table>
-    		<tr>
-	    		<div class="container" >
-	    			<% dude.photos.forEach(function(photo){ %>
-	    				<img style="max-width:400px; margin: 5px;" src="/user_uploads/<%= photo.src %>">
-	    				<h5 style="text-overflow: ellipsis; max-width: 200px;white-space: nowrap;
-  						overflow: hidden; "><%= photo.name %></h5>
-	    				
-	    			<% }); %>
-	    					    		
-	    		</div>
-    		</tr>
-    	</table>
-    </div>
+	<div class="container-fluid structure">
+		<div class="row row-eq-height" style="margin-left: 30%;">
+			<div class="singleDepartment col-xs-4">
+				<% if(club.president!=null && club.logo!="") { %>
+				 	<img class="img-circle" src="/club_uploads/<%= dude.logo %>" alt="Generic placeholder image" width="200" height="185">
+				<% } else { %>
+				 	<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
+				<% } %>
+				
+					<h4 <%if(club.president.profileId!="none") { %> 
+							class="clickableh2" id="<%= club.president.profileId %>"
+							style="cursor:pointer; color:gray; margin-left: 30px;" 
+						<% } else { %>
+						style="color:gray; margin-left: 30px;"
+						<% } %>
+						>		
+						<%= club.president.name %>
+					</h4>
+				
+			</div>
+		</div>
+
+		<div class="deps row row-eq-height">
+			<% club.departments.forEach(function(department) { %>
+				<div class="singleDepartment col-xs-4">
+					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
+					<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; margin-left: 30px;"><%= department.name %></h4>
+					<% department.members.forEach(function(member) { %>
+						<li><%= member.name %></li>
+					<% }); %>
+				</div>
+			<%  }) %>
+		</div>
+
+		<form method="POST" action="/clubs/updateMembers" style="width: 150px; float: right;">
+			<button type="submit" class="btn form-control btn-success" style="margin: 10px;">Update Members</button>	
+		</form>
+	</div>
+
+    <div class="row">
+	   	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey; border-radius: 5px;  max-width: 45%; margin-right: 5%; margin-left: 2%;">
+	    	<h3>Links</h3>
+	    	<br>
+	    	<table>
+	    		<tr>
+		    		<div class="container">
+			    		<ul>
+			    			<%;
+			    			dude.links.forEach(function(link){ %>
+			    				<div class="row">
+			    				<li style="padding: 5px;text-overflow: ellipsis; white-space: nowrap;overflow: hidden;">
+			    					<span onclick="redirectToLink('<%= link.url %>')" style="color:black; font-size: 30px; margin-right: 5px;">
+			    						<%= link.name %>:
+			    					</span>
+			    					<span style="cursor:pointer; color:blue; font-size: 20px; text-decoration: underline;">
+			    						<%= link.url %>
+			    					</span>
+			    				</li>
+			    			</div>
+			    			<% }); %>
+			    		</ul>	
+		    		</div>
+	    		</tr>
+	    	</table>	
+	    </div>
+
+	    <div class="col-xs-8 col-sm-6" style="border: 2px solid grey; border-radius: 5px; max-width: 45%;">
+	    	<h3>Screenshots</h3>
+	    	<br>
+	    	<table>
+	    		<tr>
+		    		<div class="container" >
+		    			<% dude.photos.forEach(function(photo){ %>
+		    				<img style="max-width:400px; margin: 5px;" src="/user_uploads/<%= photo.src %>">
+		    				<h5 style="text-overflow: ellipsis; max-width: 200px;white-space: nowrap;
+	  						overflow: hidden; "><%= photo.name %></h5>
+		    			<% }); %>			    		
+		    		</div>
+	    		</tr>
+	    	</table>
+	    </div>
     </div>
 </div>
-
-	</body>
-</html>
 
 <script type="text/javascript">
 	var redirectSignIn = function() {

@@ -1,12 +1,13 @@
 
 <% include layout/header %>
 
-<% if(user.usertype=="student") { %>
+<% if(dude.usertype=="student") { %>
 	<% include userViews/normalprofile %>
-
 <% } else {
-	if(user.usertype=="club") { %>
-
-	<% include clubViews/clubprofile %>
+	if(dude.usertype=="club") { %>
+		<% include clubViews/clubprofile %>
 <%	}
 } %>
+
+
+<% include layout/footer %>

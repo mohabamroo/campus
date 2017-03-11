@@ -16,6 +16,9 @@ var userSchema = mongoose.Schema({
 		type: String,
 		unique: true
 	},
+	major: {
+		type: String
+	},
 	usertype: {
 		type: String
 	},

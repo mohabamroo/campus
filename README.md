@@ -9,3 +9,10 @@ instructions:
 		nodemon app.js
 	5- you should be able to access it throw
 		http://localhost:3000/
+
+
+tasks:
+1- rate memeber
+2- review member
+3- show organizations in user (name, role, rating, review)
+4- delete member (also delet organization from his profile)

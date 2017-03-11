@@ -83,6 +83,12 @@ var clubSchema = mongoose.Schema({
 					},
 					rating: {
 						type: String
+					},
+					profileId :{
+						type: String
+					},
+					exists: {
+						type: String
 					}
 				}
 			]

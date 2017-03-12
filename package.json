@@ -4,7 +4,8 @@
   "author": "Mohab",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "production": "forever app.js"
   },
   "dependencies": {
     "bcryptjs": "*",
@@ -19,17 +20,18 @@
     "express-messages": "*",
     "express-session": "*",
     "express-validator": "*",
+    "forever": "^0.15.3",
     "jade": "~1.11.0",
     "mongodb": "*",
     "mongoose": "*",
     "morgan": "~1.7.0",
+    "multer": "1.1.0",
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
-    "serve-favicon": "~2.3.2",
-    "multer": "1.1.0"
+    "serve-favicon": "~2.3.2"
   },
   "engines": {
     "node": "4.2.x"
-    }
+  }
 }

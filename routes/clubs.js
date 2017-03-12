@@ -126,7 +126,7 @@ router.post('/addMember/:departmentID', function(req, res) {
 	var departmentID = req.params.departmentID;
 	var memberName = req.body.memberName;
 	var memberID = req.body.memberID;
-	var newMember = {name: memberName, id: memberID, profileId: "none", exists: "false"};
+	var newMember = {name: memberName, id: memberID, profileId: "none", exists: "false", rating:"0"};
 	console.log(req.user.id);
 	Club.findOne(
 		{"departments._id": departmentID}, 
@@ -329,43 +329,48 @@ router.get("/rateMember/:depID/:memberID/:objID/:rating", ensureAuthenticated, f
 	var memberID = req.params.memberID;
 	var memberobjID = req.params.objID;
 	var rating = req.params.rating;
+	console.log("obj id: "+memberobjID);
+	console.log("user id: " + memberID)
 
-	Club.update({"userid": req.user.id, 'departments._id': departmentID, 'members._id': memberID},
-							{$set: {
-							   		'departments.0.members.$': {rating: rating}
-							   	}
-							}, function(err, setRes) {
-							   		if(err) {
-								  		console.log("Error:\n" + err);
-								  		throw err;
-								  	} else {
-								  		console.log("set res rate: "+JSON.stringify(setRes));
-								  	}
-						});
-
-	Club.update({'departments._id': departmentID},
+	User.getUserById(memberID, function(err, user) {
+					console.log("member: " + user.id);
+					if(err)
+						throw err;
+					if(user!=null) {
+						var newMember = {
+							name: user.name,
+							id: user.gucid,
+							exists: "true",
+							profileId: memberID,
+							rating: rating
+						}
+						console.log("new mem: "+newMember);
+					Club.update({'departments._id': departmentID},
 							{$pull: {
-							   		'departments.$.members': {_id: member.id}
+							   		'departments.$.members': {_id: memberobjID}
 							   	},
-							}, function(err, pullRes) {
-							   		if(err) {
+							}, function(err1, pullRes) {
+							   		if(err1) {
 								  		console.log("Error:\n" + err);
-								  		throw err;
+								  		throw err1;
 								  	} else {
-								  		console.log("pull res: "+pullRes);
-										Club.update({'departments._id': department.id},
+								  		console.log("pull res: "+JSON.stringify(pullRes));
+										Club.update({'departments._id': departmentID},
 											{$push: {
 												'departments.$.members': newMember
 											}}, function(err2, pushRes) {
 											   		if(err2) {
 												  		console.log("Error:\n" + err);
-												  		throw err2;
+												  		throw err2;	
 												  	} else {
-												  		console.log("push res: "+pushRes);
+												  		console.log("push res: "+JSON.stringify(pushRes));
 												  	}
 										});
 								  	}
 						});
+}
+});
+	console.log("outside");
 	res.redirect('/clubs/editStructre/'+req.user.id)
 
 });

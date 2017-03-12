@@ -57,7 +57,7 @@
 					<h4 style="color:gray; margin-left: 30px;"><%= department.name %></h4>
 					<div style="vertical-align: top; margin-left: 30px;" class="nameRating">
 						<h4 <%if(department.head.profileId!="none") { %> 
-								class="clickableh2" id="<%= department.head.profileId %>"
+								class="clickableh2" id="sssx"
 								style="cursor:pointer; color:gray;" 
 							<% } else { %>
 							style="color:gray;"
@@ -89,11 +89,13 @@
 								<% } else { %>
 								style="color:gray;"
 								<% } %>
-								objID = "<%= member._id %>""
-								>		
+								objid= "<%= member._id %>"
+								>
 								<%= member.name %>
 							</h4>
+							<div rating="<%= member.rating %>">
 							<% include ../layout/rating %>
+							</div>
 						</div>
 					<% }); %>
 				</div>
@@ -148,12 +150,37 @@
 			window.location = "/users/viewprofile/"+el.id;
 		}
 	});
+	$("label").click(function(){
+		$(this).parent().find("input").nextAll().css({"color": "#ddd"});
+	  	$(this).css({"color": "#FFD700"});
+	  	$(this).nextAll().css({"color": "#FFD700"});
 
-	$("input[name*='rating']").click(function() {
-		var rating = $(this).val();
-		var memberID = $(this).parent().parent().find("h4").attr('id');
-		var departmentName = $(this).parent().parent().parent().attr('name');
-		var departmentID = $(this).parent().parent().parent().attr('id');
-		window.location = "/clubs/rateMember/"+departmentID+"/"+memberID+"/"+rating;
+	  	//.rating > input:checked ~ label, /* show gold star when clicked */
+
+	  	var myelement = $(this).prev();
+
+	  	console.log($(this).prev().val())
+	  	var rating = myelement.val();
+	  	var memberID = myelement.parent().parent().parent().find("h4").attr('id');
+		var departmentName = myelement.parent().parent().parent().parent().attr('name');
+		var departmentID = myelement.parent().parent().parent().parent().attr('id');
+		var objID = myelement.parent().parent().parent().find("h4").attr('objid');
+		var newUrl = "/clubs/rateMember/"+departmentID+"/"+memberID+"/"+objID+"/"+rating;
+		console.log(newUrl)
+		window.location = newUrl;
 	});
+
+
+	  $("fieldset").each(function(i) {
+	  	var rating = $(this).parent().attr('rating');
+	    console.log(rating);
+	    if(!rating)
+	    	rating="0";
+	    var inputElement = $(this).find("[value="+rating+"]");
+	    $(this).find("input").nextAll().css({"color": "#ddd"});
+	    inputElement.css({"color": "#FFD700"});
+	  	inputElement.nextAll().css({"color": "#FFD700"});
+	    console.log($(this).find("[value="+rating+"]").val());
+	  });
+
 </script>

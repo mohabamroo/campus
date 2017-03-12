@@ -25,16 +25,17 @@ h1 { font-size: 1.5em; margin: 10px; }
   position: absolute;
 }
 
+
 .rating > label { 
   color: #ddd; 
  float: right; 
 }
-
 /***** CSS Magic to Highlight Stars on Hover *****/
 
 .rating > input:checked ~ label, /* show gold star when clicked */
 .rating:not(:checked) > label:hover, /* hover current star */
-.rating:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+.rating:not(:checked) > label:hover ~ label { 
+  color: #FFD700;  } /* hover previous stars in list */
 
 .rating > input:checked + label:hover, /* hover current star when changing rating */
 .rating > input:checked ~ label:hover,

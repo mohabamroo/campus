@@ -3,15 +3,15 @@
     <form method="post" action="/clubs/addEvent" style="width: 50%; margin-left: 25%;">
     	<h2 class="form-event-heading">Add Event form</h2>
         <br>
-        <label for="inputName" class="">Name</label>
+        <label for="inputName" class="eventLabel">Name</label>
         <input type="text" id="inputName" class="form-control" placeholder="ex: oscars night" name="name" required autofocus>
         <br>
 
-        <label for="inputLocation" class="">Location</label>
+        <label for="inputLocation" class="eventLabel">Location</label>
         <input type="text" id="inputLocation" class="form-control" placeholder="ex: platform" name="location" required>
 		<br>
 
-        <label for="inputFromDate" class="">From</label>
+        <label for="inputFromDate" class="eventLabel">From</label>
         <br>
         <div style="margin-left: 10%;">
 	        <label>Day:</label>
@@ -23,7 +23,7 @@
         </div>
         <br>
         <br>
-        <label for="inputToDate" class="">To</label>
+        <label for="inputToDate" class="eventLabel">To</label>
 		<div style="margin-left: 10%;">
 	        <label>Day:</label>
 	        <input type="date" id="inputToDate" class="form-control" name="toDate" required style="width: 80%; float: right;">
@@ -34,12 +34,12 @@
         </div>
         <br>
 
-        <label for="inputDescription" class="">Description</label>
+        <label for="inputDescription" class="eventLabel">Description</label>
         <input type="text" id="inputDescription" class="form-control" placeholder="ex: giving the oscars to the winners" name="description" required>
         <br>
 
         <div class="form-group">
-	  		<label for="sel1">Select a type:</label>
+	  		<label for="sel1" class="eventLabel">Select a type:</label>
 	  		<select class="form-control" id="eventType" name="type">
 	        	<option value="" disabled selected style="display:none;">choose</option>
 	  		    <option value="private">Private</option>

@@ -1,7 +1,7 @@
 
 <% include ../layout/header %>
 
-
+<div class="editProfile">
 			<div class="jumbotron" >
 				<div class="container">
 					<h1 style="float: left; padding-top: 40px;">Hello, <%= user.name%>!</h1>
@@ -9,17 +9,18 @@
 
 					<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/users/updateProfilePhoto" style="margin-top: 150px;">
 							<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px; max-width: 400px;">
-							<button type="submit" value="Upload Image" class="btn" style="margin: 10px;">Update profile photo</button>	
+							<button type="submit" value="Upload Image" class="btn btn-success" style="margin: 10px;">Update profile photo</button>	
 					</form>
 					<form style="width: 400px;" method="post" action="/users/updateEmail">
 				 	   		<input type="email" name="email" class="form-control" placeholder="ex: mohab@gmail.com" style="max-width: 250px;">
 				 	   		<br>
-				 	   		<input type="submit" class="btn" value="Update email" style=" position: relative;">
+				 	   		<input type="submit" class="btn btn-success" value="Update email" style=" position: relative;">
 				 	</form>
+				 	<br>
 			 	   	<form style="width: 400px;" method="post" action="/users/updatePhone">
 				 	   		<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012" style="max-width: 150px;">
 				 	   		<br>
-				 	   		<input type="submit" class="btn" value="Update phone" style=" position: relative;">
+				 	   		<input type="submit" class="btn btn-success" value="Update phone" style=" position: relative;">
 				 	   </form>	
 				</div>
 			 	   
@@ -34,7 +35,7 @@
 			 	   	 	</div>
 			 	   	 	<textarea id="hiddentxt" style="display: none;" name="userDesc"></textarea>
 
-						<button type="submit" class="btn" style="margin: 10px;">Update Summary</button>	
+						<button type="submit" class="btn btn-success" style="margin: 10px;">Update Summary</button>	
 				</form>
 
 			    <br>
@@ -48,11 +49,35 @@
 				 	   	 	<br>
 				 	   	 	<input id="hiddentxt" class="form-control" name="tags" placeholder="php, java, development">
 
-							<button type="submit" class="btn" style="margin: 10px;">Add Tags</button>	
+							<button type="submit" class="btn btn-success" style="margin: 10px;">Add Tags</button>	
 				</form>
 
 		    </div>
-
+			<div class="row">
+		    	<div class="col-xs-8 col-sm-12" style="border: 2px solid grey;
+		    	border-radius: 5px;  max-width: 100%; margin-right: 3%; margin-left: 2%;">
+		    		<h3>Organizations</h3>
+		    			<div class="row" style="margin: 10px;">
+		    				<span style="width: 20%;">Name</span>
+		    				<span style="width: 20%;">Role</span>
+		    				<span style="width: 20%;">Rating</span>
+		    				<span style="width: 25%;">Review</span>
+		    				<span style="width: 15%;">Action</span>
+		    			</div>
+		    			<% user.organizations.forEach(function(organization) { %>
+		    				<div class="row" style="margin: 10px;">
+			    				<span style="width: 20%;"><%= organization.name %></span>
+			    				<span style="width: 20%;"><%= organization.role %></span>
+			    				<span style="width: 20%;"><%= organization.rating %></span>
+			    				<span style="width: 25%;"><%= organization.review %></span>
+			    				<form method="post" action="/users/deleteOrganization/<%= organization._id %>">
+			    					<input type="submit" class="btn btn-success" value="Delete" style="margin: 10px;"/>
+			    				</form>
+		    				</div>
+		    			<% }); %>
+			    </div>
+		    </div>
+		    <br>
 		    <div class="row">
 			   	<div class="col-xs-8 col-lg-6" style="border: 2px solid grey;
 		    	border-radius: 5px;  max-width: 45%; margin-right: 5%; margin-left: 2%;">
@@ -83,7 +108,7 @@
 					    		<form method="POST" action="/users/addlink">
 					    			<input type="text" name="reponame" class="form-control" placeholder="repo name">
 						    		<input type="text" name="newlink" class="form-control" placeholder="http://mywebsite.com">
-						    		<button type="submit" class="btn" style="margin: 10px;">Add Link</button>	
+						    		<button type="submit" class="btn btn-success" style="margin: 10px;">Add Link</button>	
 					    		</form>
 				    		</div>
 			    		</tr>
@@ -108,17 +133,15 @@
 				    			<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/users/addscreenshot" >
 						    		<input type="text" class="form-control" name="photoName" placeholder="catpic">
 									<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px;">
-						    		<button type="submit" value="Upload Image" class="btn" style="margin: 10px;">Add Screenshot</button>	
+						    		<button type="submit" value="Upload Image" class="btn btn-success" style="margin: 10px;">Add Screenshot</button>	
 					    		</form>		    		
 				    		</div>
 			    		</tr>
 			    	</table>
 			    </div>
 		    </div>
-
-		</div>
-	</body>
-</html>
+</div>
+<% include ../layout/footer %>
 
 <script type="text/javascript">
 	var redirectSignIn = function() {

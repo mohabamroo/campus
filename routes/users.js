@@ -66,7 +66,7 @@ function ensureAuthenticated(req, res, next){
 
 router.get('/profile/:id', ensureAuthenticated, function(req, res) {
 	if(req.isAuthenticated() && req.user.id == req.params.id) {
-		res.render('profile.html');
+		res.render('userViews/profile.html');
 	} else {
 		req.flash('error_msg','You are not logged in');
 		res.redirect('/users/signin');
@@ -449,6 +449,19 @@ router.post('/updatePhone', ensureAuthenticated, function(req, res) {
 	});
 	res.redirect('/users/profile/'+req.user.id);
 
+});
+
+router.post('/deleteOrganization/:organizationId', ensureAuthenticated, function(req, res) {
+	User.update({_id: req.user.id}, {$pull: {'organizations': {_id:req.params.organizationId}}},
+		function(err, pullRes) {
+			if(err) {
+				console.log(err);
+				throw err;
+			} else {
+				console.log(JSON.stringify(pullRes));
+			}
+			res.redirect('/users/profile/'+req.user.id);
+		});
 });
 
 module.exports = router;

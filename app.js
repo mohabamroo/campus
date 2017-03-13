@@ -22,6 +22,7 @@ var db = mongoose.connection;
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var clubs = require('./routes/clubs');
+var events = require('./routes/events');
 
 var app = express();
 
@@ -81,6 +82,7 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/users', users);
 app.use('/clubs', clubs);
+app.use('/events', events);
 app.listen(process.env.PORT||3000, function() {
 	console.log("Express app started on port 3000.");
 }); 

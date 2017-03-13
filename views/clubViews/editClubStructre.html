@@ -19,36 +19,33 @@
 
 	<div class="container-fluid">
 		<div class="row row-eq-height" style="margin-left: 30%;">
+			<div class="singleDepartment col-xs-4">
 
-		<div class="singleDepartment col-xs-4">
+						<% if(clubRes.president!=null && clubRes.logo!="") { %>
+				 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="200" height="185">
 
-					<% if(clubRes.president!=null && clubRes.logo!="") { %>
-			 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="200" height="185">
-
-					<% } else { %>
-			 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
-					<% } %>
-
-					<h4 <%if(clubRes.president.profileId!="none") { %> 
-							class="clickableh2" id="<%= clubRes.president.profileId %>"
-							style="cursor:pointer; color:gray; margin-left: 30px;" 
 						<% } else { %>
-						style="color:gray; margin-left: 30px;"
+				 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
 						<% } %>
-						>		
-						<%= clubRes.president.name %>
-					</h4>
-					<div class="container president" style="min-width: 220px;">
-						<form method="POST" action="/clubs/addpresident" style="max-width: 200px;">
-							<input type="text" name="presidentID" class="form-control" placeholder="34-5862">
-							<input type="text" name="presidentName" class="form-control" placeholder="mohab amr">
-							<input type="submit" class="btn" style="margin: 10px;" value="Add President">	
-						</form>
-					</div>
-				</div>
-		</div>
 
-		
+						<h4 <%if(clubRes.president.profileId!="none") { %> 
+								class="clickableh2" id="<%= clubRes.president.profileId %>"
+								style="cursor:pointer; color:gray; margin-left: 30px;" 
+							<% } else { %>
+							style="color:gray; margin-left: 30px;"
+							<% } %>
+							>		
+							<%= clubRes.president.name %>
+						</h4>
+						<div class="container president" style="min-width: 220px;">
+							<form method="POST" action="/clubs/addpresident" style="max-width: 200px;">
+								<input type="text" name="presidentID" class="form-control" placeholder="34-5862">
+								<input type="text" name="presidentName" class="form-control" placeholder="mohab amr">
+								<input type="submit" class="btn" style="margin: 10px;" value="Add President">	
+							</form>
+						</div>
+			</div>
+		</div>
 
 		<div class="deps row row-eq-height">
 			<%  clubRes.departments.forEach(function(department) { %>
@@ -119,6 +116,34 @@
 			<button type="submit" class="btn form-control btn-success" style="margin: 10px;">Update Members</button>	
 		</form>
 	</div>
+
+
+	<br>
+	<br>
+	<div class="row">
+	   	
+
+	    <div class="col-xs-8 col-sm-12" style="border: 2px solid grey; border-radius: 5px; max-width: 100%;">
+	    	<h3>Gallery</h3>
+	    	<br>
+	    	<table>
+	    		<tr>
+		    		<div class="container" >
+		    			<% user.photos.forEach(function(photo){ %>
+		    				<img style="max-width:400px; margin: 5px;" src="/club_uploads/<%= photo.src %>">
+		    				<h5 style="text-overflow: ellipsis; max-width: 200px;white-space: nowrap;
+	  						overflow: hidden; "><%= photo.name %></h5>
+		    			<% }); %>
+		    			<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/clubs/addPhoto" >
+							<input type="text" class="form-control" name="photoName" placeholder="catpic">
+							<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px;">
+							<button type="submit" value="Upload Image" class="btn btn-success" style="margin: 10px;">Add Photo</button>	
+					   	</form>			    		
+		    		</div>
+	    		</tr>
+	    	</table>
+	    </div>
+    </div>
 
 </div>
 <% include ../layout/footer %>

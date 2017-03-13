@@ -44,13 +44,16 @@ var clubSchema = mongoose.Schema({
 		name: {
 			type: String
 		},
-		id: {
+		gucid: {
 			type: String
 		},
 		profileId :{
 			type: String
 		},
 		exists: {
+			type: String
+		},
+		rating: {
 			type: String
 		}
 	},
@@ -60,7 +63,7 @@ var clubSchema = mongoose.Schema({
 				type: String
 			},
 			head: {
-				id: {
+				gucid: {
 					type: String
 				},
 				name: {
@@ -71,6 +74,9 @@ var clubSchema = mongoose.Schema({
 				},
 				exists: {
 					type: String
+				},
+				rating: {
+					type: String
 				}
 			},
 			members: [
@@ -78,10 +84,13 @@ var clubSchema = mongoose.Schema({
 					name: {
 						type: String
 					},
-					id: {
+					gucid: {
 						type: String
 					},
 					rating: {
+						type: String
+					},
+					review: {
 						type: String
 					},
 					profileId :{

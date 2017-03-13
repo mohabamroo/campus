@@ -11,7 +11,7 @@
 	flex-direction: column;
 }
 
-.clubprofile .jumbotron, .normalprofile .jumbotron {
+.clubprofile .jumbotron, .normalprofile .jumbotron, .editProfile .jumbotron {
 	background-color: inherit;
 	color: white;
 }
@@ -26,6 +26,10 @@
 	cursor:pointer;
 	color:blue;
 	text-align: center;
+}
+
+.eventLabel {
+	color: white;
 }
 
 .intro {

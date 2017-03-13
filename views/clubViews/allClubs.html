@@ -5,7 +5,7 @@
 		<% clubs.forEach(function(club) { %>
 			<div class="col-lg-2" style=" max-width: 190px; margin-right: 25px;">
 	 	   		<img class="img-circle" src="/user_uploads/<%= club.photo %>" alt="Generic placeholder image" width="150" height="150" >
-				<h2 class="clickableh2" id="<%= club.id %>" style="cursor:pointer; color:gray; text-align: center;"><%= club.name %></h2>
+				<h2 class="clickableh2" id="<%= club.userid %>" style="cursor:pointer; color:gray; text-align: center;"><%= club.name %></h2>
 	        </div>
 
 		<% }); %>
@@ -14,3 +14,14 @@
 
 
 <% include ../layout/footer %>
+
+<script type="text/javascript">
+	var h2s = document.getElementsByClassName('clickableh2');
+
+	Array.prototype.forEach.call(h2s, function(el) {
+	    el.onclick=function(){
+		window.location = "/clubs/viewClub/"+el.id;
+	}
+	});
+
+</script>

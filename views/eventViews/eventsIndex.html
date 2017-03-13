@@ -1,0 +1,70 @@
+
+<% include ../layout/header %>
+
+<% if(events!=null && events.length>0) { %>
+	<div class="row" style="padding: 20px; margin-left: 15%;">
+		<% events.forEach(function(event) { %>
+	        <div class="row" style="width: 100%; margin: 10px; margin-bottom: 40px;">
+	 	   		<div class="col-xs-8 col-sm-6">
+		 	   		<h2 id="<%= event._id %>" style="position: fixed; float: left; color:white; text-align: center;">
+						<%= event.name %>
+						<br>
+						<br>
+						<p style="font-size: 10px; position: fixed; float: left; text-align: left;">
+						by: <%= event.organizer %>
+						<br>
+						<br>
+						location: <%= event.location %>
+						<br>
+						<br>
+						from: <%= event.fromDate %>
+						<br>
+						<br>
+						to: <%= event.toDate %>
+					</p>
+					</h2>
+					<br>
+						
+	 	   		</div>
+				<div class="col-xs-8 col-sm-6">
+					<img class="img-circle" src="/club_uploads/<%= event.logo %>" alt="Generic placeholder image" width="150" height="150" style="float: right; margin-right: 0px;">
+				</div>
+				
+	        </div>
+
+		<% });  %>    
+	</div>
+<% } else { %>
+	<h1>no curent events!</h1>
+<% } %>
+
+<% include ../layout/footer %>
+
+<style type="text/css">
+	.clickableh2:hover {
+		color: blue;
+		text-decoration: underline;
+	}
+	.row {
+	  display: -webkit-box;
+	  display: -webkit-flex;
+	  display: -ms-flexbox;
+	  display:         flex;
+	  flex-wrap: wrap;
+	}
+	.row > [class*='col-'] {
+	  display: flex;
+	  flex-direction: column;
+	}
+</style>
+
+<script type="text/javascript">
+	var h2s = document.getElementsByClassName('clickableh2');
+
+	Array.prototype.forEach.call(h2s, function(el) {
+	    el.onclick=function(){
+			window.location = "/users/viewEvent/"+el.id;
+		}
+	});
+
+</script>

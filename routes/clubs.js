@@ -23,11 +23,7 @@ var clubStorage = multer.diskStorage({
   	var filetype = arr[arr.length-1];
   	var newfilename = req.user.username + '-' + Date.now()+'.'+filetype;
     callback(null, newfilename);
-    console.log(req.body.photoName);
-    var str;
-    if(str==null || str=="")
-    	str = filename;
-    console.log(str);
+    var title = req.body.photoName || newfilename;
     if(storagetype==="logo") {
 	    Club.update({userid: req.user.id}, {$set: {logo: newfilename}}, function(err, res) {
 	    	if(err) {
@@ -36,7 +32,26 @@ var clubStorage = multer.diskStorage({
 	    	} else {
 	    		console.log(JSON.stringify(res));
 	    	}
+	    });
+	    User.update({_id: req.user.id}, {$set: {profilephoto: newfilename}}, function(err, res) {
+	    	if(err) {
+	    		console.log("Error:\n" + err);
+	    		throw err;
+	    	} else {
+	    		console.log("user profile photo update: "+JSON.stringify(res));
+	    	}
 	    });	
+    } else {
+    	if(storagetype==="galleryPhoto") {
+    		Club.update({userid: req.user.id}, {$push: {photos: {name: title, src: newfilename}}}, function(err, res) {
+		    	if(err) {
+		    		console.log("Error:\n" + err);
+		    		throw err;
+		    	} else {
+		    		console.log(JSON.stringify(res));
+		    	}
+	    	});
+    	}
     }
     
   }
@@ -79,18 +94,53 @@ router.get('/viewClub/:id', function(req, res) {
 					if(resclub==null) {
 						res.end('No such club!');
 					} else {
-						res.render('viewprofile.html', {
-							dude : resuser,
-							club: resclub
-					   	});
+						var events = [];
+						var i = 0 ;
+						resclub.events.forEach(function(event) {
+							Event.getEventById(event.toString(), function(err, eventRes) {
+								i++;
+								console.log(i)
+								if(eventRes!=null) {
+									events.push(eventRes);
+								}
+								if(i>=resclub.events.length) {
+									console.log("finshed!!!");
+									res.render('viewprofile.html', {
+										dude : resuser,
+										club: resclub,
+										events: events
+								   	});
+								}
+							});
+						});
 					}
 				}
 			});
 		}			
 	});
-})
 
-router.get('/editStructre/:id',  function(req, res) {
+});
+
+router.post('/search', function(req, res) {
+	// res.send(req.body.searchusername);
+	User.getUserbyUsername(req.body.searchusername, function(err, user) {
+		if(err)
+			console.log('err: '+err);
+		else {
+			console.log(req.url);
+			//req.url = req.headers.host;
+			console.log(req.url);
+			res.render('searchresults.html', {
+				'usersearchedfor': user
+			});
+		}
+			
+
+	});
+
+});
+
+router.get('/editStructre/:id', ensureAuthenticated, function(req, res) {
 	if(req.isAuthenticated() && req.user.id == req.params.id) {
 		Club.getClubByUserId(req.user.id, function(err, club) {
 			presidentRes = club.president;
@@ -107,7 +157,7 @@ router.get('/editStructre/:id',  function(req, res) {
 
 });
 
-router.post('/addpresident', function(req, res) {
+router.post('/addpresident', ensureAuthenticated, function(req, res) {
 	var presidentName = req.body.presidentName;
 	var presidentID = req.body.presidentID;
 	var newpresident = {name: presidentName, id: presidentID, profileId: "none", exists: "false"};
@@ -121,7 +171,7 @@ router.post('/addpresident', function(req, res) {
 
 });
 
-router.post('/addMember/:departmentID', function(req, res) {
+router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) {
 	console.log('query: '+req.params.departmentID);
 	var departmentID = req.params.departmentID;
 	var memberName = req.body.memberName;
@@ -177,7 +227,6 @@ router.post('/addDepartment', ensureAuthenticated, function(req, res, next) {
 
 });
 
-
 router.post('/updateLogo', ensureAuthenticated, function(req, res) {
 	storagetype = "logo";
     clubUpload(req, res, function(err) {
@@ -214,12 +263,12 @@ router.post('/deleteDepartment/:depID', ensureAuthenticated, function(req, res) 
 router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 	Club.getClubByUserId(req.user.id, function(err, club) {
 		var oldPresident = club.president;
-		User.getUserByGucId(oldPresident.id, function(err, presidentRes) {
+		User.getUserByGucId(oldPresident.gucid, function(err, presidentRes) {
 			console.log("presidentRes: " + presidentRes);
-			if(presidentRes!=null) {
+			if(presidentRes!=null && oldPresident.exists==="false") {
 				var newPresident = {
 					name: presidentRes.name,
-					id: oldPresident.id,
+					gucid: oldPresident.gucid,
 					exists: "true",
 					profileId: presidentRes.id,
 					rating: "0"
@@ -235,17 +284,25 @@ router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 					review: "",
 					role: "president"
 				}
-				User.update({id: presidentRes.id}, {$push: {organization: newOrganization}});
+				User.update({id: presidentRes.id}, {$push: {organizations: newOrganization}}, 
+							function(pusherr, organizationres) {
+								if(pusherr) {
+									console.log(pusherr);
+									throw pusherr;
+								} else {
+									console.log(JSON.stringify(organizationres));
+								}
+							});
 			}
 		});
 
 		club.departments.forEach(function(department) {
-			User.getUserByGucId(department.head.id, function(err, userhead) {
+			User.getUserByGucId(department.head.gucid, function(err, userhead) {
 					console.log("head: " + userhead);
-					if(userhead!=null) {
+					if(userhead!=null && department.head.exists==="false") {
 						var newMember = {
 							name: userhead.name,
-							id: department.head.id,
+							gucid: department.head.id,
 							exists: "true",
 							profileId: userhead.id,
 							rating: "0"
@@ -264,24 +321,33 @@ router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 						
 						var newOrganization = {
 							name: club.name,
-							rating: "0",
-							review: "",
-							role: department.name
+							rating: department.head.rating||"0",
+							review: department.head.rating||"no review",
+							role: department.name + " Head"
 						}
 
-						User.update({id: userhead.id}, {$push: {organizations: newOrganization}});
+						User.update({id: userhead.id}, {$push: {organizations: newOrganization}}, 
+							function(pusherr, organizationres) {
+								if(pusherr) {
+									console.log(pusherr);
+									throw pusherr;
+								} else {
+									console.log(JSON.stringify(organizationres));
+								}
+							});
 					}
 				});
 			department.members.forEach(function(member) {
-				User.getUserByGucId(member.id, function(err, user) {
+				User.getUserByGucId(member.gucid, function(err, user) {
 					console.log("member: " + member.profileId);
-					if(user!=null) {
+					if(user!=null && member.exists==="false") {
 						var newMember = {
 							name: user.name,
-							id: member.id,
+							gucid: member.gucid,
 							exists: "true",
 							profileId: user.id,
-							rating: "0"
+							rating: member.rating||"0",
+							review: member.rating||"no review"
 						}
 						Club.update({'departments._id': department.id},
 							{$pull: {
@@ -309,12 +375,20 @@ router.post('/updateMembers', ensureAuthenticated, function(req, res) {
 						
 						var newOrganization = {
 							name: club.name,
-							rating: "0",
-							review: "",
-							role: "president"
+							rating: member.rating||"0",
+							review: member.rating||"no review",
+							role: department.name + " member"
 						}
 
-						User.update({id: user.id}, {$push: {organization: newOrganization}});
+						User.update({_id: user.id}, {$push: {organizations: newOrganization}}, 
+							function(pusherr, organizationres) {
+								if(pusherr) {
+									console.log(pusherr);
+									throw pusherr;
+								} else {
+									console.log(JSON.stringify(organizationres));
+								}
+							});
 					}
 				});
 			});
@@ -339,7 +413,7 @@ router.get("/rateMember/:depID/:memberID/:objID/:rating", ensureAuthenticated, f
 					if(user!=null) {
 						var newMember = {
 							name: user.name,
-							id: user.gucid,
+							gucid: user.gucid,
 							exists: "true",
 							profileId: memberID,
 							rating: rating
@@ -368,8 +442,8 @@ router.get("/rateMember/:depID/:memberID/:objID/:rating", ensureAuthenticated, f
 										});
 								  	}
 						});
-}
-});
+					}
+	});
 	console.log("outside");
 	res.redirect('/clubs/editStructre/'+req.user.id)
 
@@ -388,6 +462,7 @@ router.post('/addEvent', ensureAuthenticated, function(req, res) {
 	var description = req.body.description;
 	var location = req.body.location;
 	var type = req.body.type || "public";
+	console.log(fromTime);
 	var newEvent = new Event({
 		name: name,
 		fromDate: fromDate,
@@ -397,50 +472,40 @@ router.post('/addEvent', ensureAuthenticated, function(req, res) {
 		location: location,
 		description: description,
 		type: type,
-		logo: "event-default.jpg"
+		logo: "event-default.jpg",
+		organizer: req.user.name
 	});
 	Event.createEvent(newEvent, function(err, eventres) {
 		if(err) {
 			console.log(err);
 			throw err;
 		} else {
-			console.log(res);
-			Club.update({userid: req.user.id}, {$push: {events: eventres._id}});
+			console.log(eventres);
+			Club.update({userid: req.user.id}, {$push: {events: eventres._id}},
+				function(err2, pushRes) {
+					if(err2) {
+						console.log(err2);
+						throw err2;
+					} else {
+						console.log("push res: "+JSON.stringify(pushRes));
+					}
+			});
 		}
 	});
-	res.redirect('/users/profile/'+req.user.id);
+	res.redirect('/clubs/viewClub/'+req.user.id);
+
 });
 
-router.post('/addscreenshot', ensureAuthenticated, function(req,res) {
-	storagetype = "screenshot";
+router.post('/addPhoto', ensureAuthenticated, function(req,res) {
+	storagetype = "galleryPhoto";
     clubUpload(req, res, function(err) {
         if(err) {
             return res.end("Error uploading file.\n"+err);
         }
-        res.redirect('/users/profile/'+req.user.id);
+        res.redirect('/clubs/viewClub/'+req.user.id);
     });
 
 });
-
-router.post('/search', function(req, res) {
-	// res.send(req.body.searchusername);
-	User.getUserbyUsername(req.body.searchusername, function(err, user) {
-		if(err)
-			console.log('err: '+err);
-		else {
-			console.log(req.url);
-			//req.url = req.headers.host;
-			console.log(req.url);
-			res.render('searchresults.html', {
-				'usersearchedfor': user
-			});
-		}
-			
-
-	});
-
-});
-
 
 router.post('/updateSummary', ensureAuthenticated, function(req, res) {
 	console.log(req.body.userDesc);
@@ -452,7 +517,7 @@ router.post('/updateSummary', ensureAuthenticated, function(req, res) {
 
 });
 
-router.post('/updateProfilePhoto', function(req, res) {
+router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {
 	storagetype = "profilephoto";
 	upload(req,res,function(err) {
         if(err) {

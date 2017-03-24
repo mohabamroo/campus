@@ -8,7 +8,6 @@ body {
 	display: -ms-flexbox;
 	display:         flex;
 	flex-wrap: wrap;
-	color: white;
 }
 .row > [class*='col-'] {
 	display: flex;
@@ -67,3 +66,6 @@ body {
     zoom: 1;
 }
 
+.btnOnGreen {
+	background-color: #ffffff; color: #333; font-weight: bold;
+}

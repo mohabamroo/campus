@@ -1,6 +1,4 @@
 <div class="clubprofile">
-	
-
 
     <!-- Header -->
     <header>
@@ -28,14 +26,14 @@
 					    <div class="row">
 				 	   	    <% if(user!=null && dude.id.toString()==user.id){ %>
 							    	<div class="col-sm-4">
-								    	<a href="/clubs/editStructre/<%= user.id %>" class="form-control">Edit Structre</a>
+								    	<a href="/clubs/editStructre/<%= user.id %>" class="btn btn-lg btnOnGreen">Edit Structre</a>
 							    	</div>
 							    	<div class="col-sm-4">
-								   		<a href="/clubs/addEvent" class="form-control col-sm-4">Add Event</a>
+								   		<a href="/clubs/addEvent" class="btn btn-lg btnOnGreen">Add Event</a>
 							    	</div>
 						    <% } %>
 						    <div class="col-sm-4">
-						   		<a href="/clubs/viewAllMembers/<%= dude.id %>" class="form-control col-sm-4">View Members</a>
+						   		<a href="/clubs/viewAllMembers/<%= dude.id %>" class="btn btn-lg btnOnGreen">View All Members</a>
 							</div>
 					    </div>
                     </div>
@@ -99,8 +97,8 @@
 		</div>
 		
 
-		<form method="POST" action="/clubs/updateMembers" style="width: 150px; float: right;">
-			<button type="submit" class="btn form-control btn-success" style="margin: 10px;">Update Members</button>	
+		<form method="POST" action="/clubs/updateMembers" style="width: 150px;">
+			<button type="submit" class="btn btn-success btn-lg" style="margin: 10px;">Update Members</button>	
 		</form>
 	</div>
 	<br>

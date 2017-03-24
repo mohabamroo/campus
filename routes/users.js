@@ -109,6 +109,26 @@ function ensureAuthenticated(req, res, next){
 	}
 }
 
+// function ensureVerification(req, res, next) {
+// 	console.log("he")
+// 	User.getUserById(req.user.id, function(err, resuser) {
+// 		if(resuser.verificationCode==="XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe") {
+// 			return next();
+// 		} else {
+// 			req.flash('error_msg','You are not verified!');
+// 			res.redirect('/users/signin');
+// 		}
+// 	});
+// }
+
+// function ensureAuthenticated(req, res, next){	
+// 	if(req.isAuthenticated()){
+// 		ensureVerification(req, res, next);
+// 	} else {
+// 		req.flash('error_msg','You are not logged in!');
+// 		res.redirect('/users/signin');
+// 	}
+// }
 router.get('/profile/:id', ensureAuthenticated, function(req, res) {
 	if(req.isAuthenticated() && req.user.id == req.params.id) {
 		res.render('userViews/profile.html');
@@ -484,10 +504,13 @@ router.get('/viewprofile/:id', function(req,res) {
 			throw err;
 		}
 		else {
-			console.log(resuser.usertype);
+			var Bdate = resuser.birthdate;
+		    var Bday = +new Date(Bdate);
+		    var Q4A = ~~ ((Date.now() - Bday) / (31557600000));
+			console.log(Q4A);
 			if(resuser.usertype=="student") {
 				res.render('viewprofile.html', {
-					dude : resuser
+					dude : resuser, age: Q4A
 			   	});
 			} else {
 				if(resuser.usertype=="club") {
@@ -500,15 +523,6 @@ router.get('/viewprofile/:id', function(req,res) {
     
 });
 
-router.post('/updateSummary', ensureAuthenticated, function(req, res) {
-	console.log(req.body.userDesc);
-	User.update({_id:req.user.id}, {$set:{summary:req.body.userDesc}}, function(err, res) {
-		if(err)
-			console.log(err);
-	});
-	res.redirect('/users/profile/'+req.user.id);
-
-});
 
 router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {
 	storagetype = "profilephoto";
@@ -521,27 +535,28 @@ router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {
 
 });
 
-router.post('/updateEmail', ensureAuthenticated, function(req, res) {
-	User.update({_id:req.user.id}, {$set:{email:req.body.email}}, function(err, ress) {
-		if(err) {
-			console.log(err);
-			throw err;
-		} else {
-			console.log("email update: " + JSON.stringify(ress));
-		}
-	});
-	res.redirect('/users/profile/'+req.user.id);
 
-});
 
-router.post('/updatePhone', ensureAuthenticated, function(req, res) {
-	User.update({_id:req.user.id}, {$set:{phone:req.body.phone}}, function(err, ress) {
-		if(err) {
-			console.log(err);
-			throw err;
-		} else {
-			console.log("phone update: " + JSON.stringify(ress));
-		}
+router.post('/saveChanges', ensureAuthenticated, function(req, res) {
+	var phone = req.body.phone;
+	var email = req.body.email;
+	var summary = req.body.userDesc;
+	var major = req.body.major;
+	var year = req.body.year;
+	var birthdate = req.body.birthdate;
+	var gender = req.body.gender;
+	User.update({_id:req.user.id},
+		{$set: 
+			{	phone: phone,
+				email: email,
+				summary: summary,
+				year: year,
+				major: major,
+				birthdate: birthdate,
+				gender: gender
+			}}, function(err, updateRes) {
+					printError(err);
+					printResult(updateRes);
 	});
 	res.redirect('/users/profile/'+req.user.id);
 
@@ -558,6 +573,26 @@ router.post('/deleteOrganization/:organizationId', ensureAuthenticated, function
 			}
 			res.redirect('/users/profile/'+req.user.id);
 		});
+});
+
+router.post('/addOrganization', ensureAuthenticated, function(req, res) {
+	var organizationName = req.body.name;
+	var role = req.body.role;
+	var comment = req.body.comment || "no comment";
+	var newOrganization = {
+		name: organizationName,
+		role: role,
+		review: "no review",
+		rating: "no rating",
+		comment: comment
+	}
+	User.update({_id: req.user.id}, {$push: {
+		organizations: newOrganization
+	}}, function(err, updateRes) {
+		printError(err);
+		printResult(updateRes);
+	});
+	res.redirect('/users/profile/'+req.user.id);
 });
 
 module.exports = router;

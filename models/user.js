@@ -22,6 +22,12 @@ var userSchema = mongoose.Schema({
 	year: {
 		type: String
 	},
+	birthdate: {
+		type: String
+	},
+	gender: {
+		type: String
+	},
 	usertype: {
 		type: String
 	},
@@ -63,6 +69,9 @@ var userSchema = mongoose.Schema({
 				type: String
 			},
 			name: {
+				type: String
+			},
+			comment: {
 				type: String
 			}
 		}

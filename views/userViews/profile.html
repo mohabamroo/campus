@@ -11,34 +11,56 @@
 							<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px; max-width: 400px;">
 							<button type="submit" value="Upload Image" class="btn btn-success" style="margin: 10px;">Update profile photo</button>	
 					</form>
-					<form style="width: 400px;" method="post" action="/users/updateEmail">
-				 	   		<input type="email" name="email" class="form-control" placeholder="ex: mohab@gmail.com" style="max-width: 250px;">
+					<br>
+					<form style="width: 400px;" method="post" action="/users/saveChanges">
+				 	   		<input type="email" name="email" class="form-control" placeholder="ex: mohab@gmail.com" style="max-width: 250px;" value="<%= user.email %>">
 				 	   		<br>
-				 	   		<input type="submit" class="btn btn-success" value="Update email" style=" position: relative;">
+				 	   		<% if(user.phone==="no phone") { %>
+				 	   			<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012" style="max-width: 150px;">
+				 	   		<% } else { %>
+				 	   			<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012" style="max-width: 150px;" value="<%= user.phone %>">
+				 	   		<% } %>
+				 	   	 	<br>
+				 	   	 	<input type="date" name="birthdate" class="form-control" value="<%= user.birthdate %>">
+				 	   	 	<br>
+				 	   	 	<select class="form-control" name="gender" required>
+					        	<option value="<%= user.gender %>" selected style="display:none;"><%= user.gender || "choose gender" %></option>
+					  		    <option value="male">male</option>
+					  		    <option value="female">female</option>
+					  		    <option value="other">other</option>
+					  		</select>
+				 	   	 	<br>
+				 	   	 	<select class="form-control" name="major" required>
+					        	<option value="<%= user.major %>" selected style="display:none;"><%= user.major || "choose a major" %></option>
+					  		    <option value="met">MET</option>
+					  		    <option value="iet">IET</option>
+					  		</select>
+					  		<br>
+					  		<select class="form-control" name="year" required>
+					        	<option value="<%= user.year %>" selected style="display:none;"><%= user.year || "choose a year" %></option>
+					  		    <option value="1st">1st</option>
+					  		    <option value="2nd">2nd</option>
+					  		    <option value="3rd">3rd</option>
+					  		    <option value="4th">4th</option>
+					  		    <option value="5th">5th</option>
+					  		</select>
+					  		<br>
+				 	   		<div class="form-control" onkeyup="updatehidden()" style="min-width: 500px; min-height: 150px;" id='faketxt' contenteditable>
+				 	   	 		<% if(user.summary!=null && user.summary!="") { %>
+				 	   	 		<%= user.summary %>
+				 	   	 		<% } else { %>
+				 	   	 		<span style="color: gray; font-style: italic;">write a summary about yourself..</span>
+				 	   	 		<% } %>
+				 	   	 	</div>
+			 	   	 		<textarea id="hiddentxt" style="display: none;" name="userDesc"></textarea>
+			 	   	 		<br>
+				 	   		<input type="submit" class="btn btn-success" value="Save Changes" style=" position: relative;">
+				 	   		<a href="/users/viewprofile/<%=user.id%>" class="btn btn-">Cancel</a>
 				 	</form>
 				 	<br>
-			 	   	<form style="width: 400px;" method="post" action="/users/updatePhone">
-				 	   		<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012" style="max-width: 150px;">
-				 	   		<br>
-				 	   		<input type="submit" class="btn btn-success" value="Update phone" style=" position: relative;">
-				 	   </form>	
 				</div>
 			 	   
 			 	<br>
-			    <form method="POST" action="/users/updateSummary">
-			 	   	 	<div class="form-control" onkeyup="updatehidden()" style="min-width: 500px; min-height: 150px;" id='faketxt' contenteditable>
-			 	   	 		<% if(user.summary!=null && user.summary!="") { %>
-			 	   	 		<%= user.summary %>
-			 	   	 		<% } else { %>
-			 	   	 		<span style="color: gray; font-style: italic;">write a summary about yourself..</span>
-			 	   	 		<% } %>
-			 	   	 	</div>
-			 	   	 	<textarea id="hiddentxt" style="display: none;" name="userDesc"></textarea>
-
-						<button type="submit" class="btn btn-success" style="margin: 10px;">Update Summary</button>	
-				</form>
-
-			    <br>
 
 				<form method="POST" action="/users/addTags">
 
@@ -53,30 +75,58 @@
 				</form>
 
 		    </div>
-			<div class="row">
-		    	<div class="col-xs-8 col-sm-12" style="border: 2px solid grey;
-		    	border-radius: 5px;  max-width: 100%; margin-right: 3%; margin-left: 2%;">
-		    		<h3>Organizations</h3>
-		    			<div class="row" style="margin: 10px;">
-		    				<span style="width: 20%;">Name</span>
-		    				<span style="width: 20%;">Role</span>
-		    				<span style="width: 20%;">Rating</span>
-		    				<span style="width: 25%;">Review</span>
-		    				<span style="width: 15%;">Action</span>
-		    			</div>
-		    			<% user.organizations.forEach(function(organization) { %>
-		    				<div class="row" style="margin: 10px;">
-			    				<span style="width: 20%;"><%= organization.name %></span>
-			    				<span style="width: 20%;"><%= organization.role %></span>
-			    				<span style="width: 20%;"><%= organization.rating %></span>
-			    				<span style="width: 25%;"><%= organization.review %></span>
+			
+
+		    <div class="container" style="border: 2px solid grey;
+		    	border-radius: 5px;">
+		    	<br>
+			  <h2>Organizations</h2>
+			  <br>
+			  <table class="table">
+			    <thead>
+			      <tr>
+			        	<th style="width: 10%;"></th>
+						<th style="width: 20%;">Name</th>
+						<th style="width: 20%;">Role</th>
+						<th style="width: 15%;">Rating</th>
+						<th style="width: 15%;">Review</th>
+						<th style="width: 20%;">Comment</th>
+						<th style="width: 10%;">Action</th>
+
+			      </tr>
+			    </thead>
+			    <tbody>
+			    	<% user.organizations.forEach(function(organization, index) { %>
+		    			<tr>
+		    				<td>#<%= index %></td>
+			    			<td><%= organization.name %></td>
+			    			<td><%= organization.role %></td>
+			    			<td><%= organization.rating %></td>
+			    			<td><%= organization.review %></td>
+			    			<td><%= organization.comment || "no comment" %></td>
+			    			<td>
 			    				<form method="post" action="/users/deleteOrganization/<%= organization._id %>">
 			    					<input type="submit" class="btn btn-success" value="Delete" style="margin: 10px;"/>
 			    				</form>
-		    				</div>
-		    			<% }); %>
-			    </div>
-		    </div>
+			    			</td>
+		    			</tr>
+		    		<% }); %>
+		    		<tr>
+		    			<form method="post" action="/users/addOrganization/" >
+		    				<td>#</td>
+			    			<td><input type="text" name="name" class="form-control" required placeholder="Google"></td>
+			    			<td><input type="text" name="role" class="form-control" required placeholder="software engineer"></td>
+			    			<td><input type="text" name="rating" class="form-control" disabled placeholder="no rating"></td>
+			    			<td><input type="text" name="review" class="form-control" disabled placeholder="no review"></td>
+			    			<td><input type="text" name="comment" class="form-control" placeholder="any comment"></td>
+			    			<td>
+			    				<input type="submit" class="btn btn-success" value="Add" style="margin: 10px;"/>
+			    			</td>
+		    			</tr>
+			    </tbody>
+			  </table>
+			</div>
+
 		    <br>
 		    <div class="row">
 			   	<div class="col-xs-8 col-lg-6" style="border: 2px solid grey;
@@ -107,6 +157,7 @@
 				    		</ul>
 					    		<form method="POST" action="/users/addlink">
 					    			<input type="text" name="reponame" class="form-control" placeholder="repo name">
+					    			<br>
 						    		<input type="text" name="newlink" class="form-control" placeholder="http://mywebsite.com">
 						    		<button type="submit" class="btn btn-success" style="margin: 10px;">Add Link</button>	
 					    		</form>

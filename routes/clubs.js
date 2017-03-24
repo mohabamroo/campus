@@ -59,26 +59,15 @@ var clubStorage = multer.diskStorage({
 });
 var clubUpload = multer({ storage : clubStorage}).single('userPhoto');
 
-function ensureVerification(req, res, next) {
-	console.log("he")
-	User.getUserById(req.user.id, function(err, resuser) {
-		if(resuser.verificationCode==="XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe") {
-			return next();
-		} else {
-			req.flash('error_msg','You are not verified!');
-			res.redirect('/users/signin');
-		}
-	});
-}
-
 function ensureAuthenticated(req, res, next){	
 	if(req.isAuthenticated()){
-		ensureVerification(req, res, next);
+		return next();
 	} else {
-		req.flash('error_msg','You are not logged in!');
+		req.flash('error_msg','You are not logged in');
 		res.redirect('/users/signin');
 	}
 }
+
 router.get('/', function(req, res) {
 	Club.find(function(err, clubs) {
 		if(err) {

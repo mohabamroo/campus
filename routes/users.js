@@ -9,7 +9,7 @@ var User = require('../models/user');
 var Club = require('../models/club');
 var Tag = require('../models/tag');
 var multer  = require('multer');
-var nodemailer = require("nodemailer");
+// var nodemailer = require("nodemailer");
 var randomstring = require("randomstring");
 var storagetype = "screenshot";
 var storage = multer.diskStorage({
@@ -57,14 +57,14 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage : storage}).single('userPhoto');
 
-var smtpTransport = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    auth: {
-        user: "mohabamr1",
-        pass: "mohab.abdelmeguid1830"
-    }
-});
+// var smtpTransport = nodemailer.createTransport({
+//     service: "gmail",
+//     host: "smtp.gmail.com",
+//     auth: {
+//         user: "mohabamr1",
+//         pass: "mohab.abdelmeguid1830"
+//     }
+// });
 function printError(err) {
 	if(err) {
 		console.log(JSON.stringify(err));
@@ -75,48 +75,36 @@ function printError(err) {
 function printResult(result) {
 	console.log("Result: " + JSON.stringify(result));
 }
-router.get('/send', function(req,res) {
-    var rand = randomstring.generate();
-    var host = req.get('host');
-    var link = "http://"+req.get('host')+"/verify/"+req.user.id+"/"+rand;
-    var mailOptions = {
-    	from: '"Community" <mohabamr1@gmail.com>"',
-        to : "mohabamr1@gmail.com",
-        subject : "Email Verification @Community",
-        text : "verification: "+link,
-        html: '<h1>Hi, Mohab!</h1><br>'
-        + '<h3>Please click the following link to verify your account:</h3><br>'
-		+ link // html body
-    }
-    console.log(mailOptions);
-    smtpTransport.sendMail(mailOptions, function(error, info){
-    	if(error) {
-        	console.log(error);
-        	res.end("error");
-	    } else {
-	       	console.log("Message sent: " + info.response);
-	   		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
-	    }
-	});
-});
-
-function ensureVerification(req, res, next) {
-	console.log("he")
-	User.getUserById(req.user.id, function(err, resuser) {
-		if(resuser.verificationCode==="XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe") {
-			return next();
-		} else {
-			req.flash('error_msg','You are not verified!');
-			res.redirect('/users/signin');
-		}
-	});
-}
+// router.get('/send', function(req,res) {
+//     var rand = randomstring.generate();
+//     var host = req.get('host');
+//     var link = "http://"+req.get('host')+"/verify/"+req.user.id+"/"+rand;
+//     var mailOptions = {
+//     	from: '"Community" <mohabamr1@gmail.com>"',
+//         to : "mohabamr1@gmail.com",
+//         subject : "Email Verification @Community",
+//         text : "verification: "+link,
+//         html: '<h1>Hi, Mohab!</h1><br>'
+//         + '<h3>Please click the following link to verify your account:</h3><br>'
+// 		+ link // html body
+//     }
+//     console.log(mailOptions);
+//     smtpTransport.sendMail(mailOptions, function(error, info){
+//     	if(error) {
+//         	console.log(error);
+//         	res.end("error");
+// 	    } else {
+// 	       	console.log("Message sent: " + info.response);
+// 	   		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
+// 	    }
+// 	});
+// });
 
 function ensureAuthenticated(req, res, next){	
 	if(req.isAuthenticated()){
-		ensureVerification(req, res, next);
+		return next();
 	} else {
-		req.flash('error_msg','You are not logged in!');
+		req.flash('error_msg','You are not logged in');
 		res.redirect('/users/signin');
 	}
 }
@@ -239,27 +227,27 @@ router.post("/signup", function(req, res) {
 				res.redirect('/users/signup');
 				return;
 			}
-			    var host = req.get('host');
-			    var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
-			    var mailOptions = {
-			    	from: '"Community" <mohabamr1@gmail.com>"',
-			        to : email,
-			        subject : "Email Verification @Community",
-			        text : "verification: "+link,
-			        html: '<h1>Hi, '+username+'!</h1><br>'
-			        + '<h3>Please click the following link to verify your account:</h3><br>'
-			        + link // html body
-			    }
-			    console.log(mailOptions);
-			    smtpTransport.sendMail(mailOptions, function(error, info){
-			    	if(error) {
-			        	console.log(error);
-			        	res.end("error");
-				    } else {
-				       	console.log("Message sent: " + info.response);
-				   		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
-				    }
-				});
+			 //    var host = req.get('host');
+			 //    var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
+			 //    var mailOptions = {
+			 //    	from: '"Community" <mohabamr1@gmail.com>"',
+			 //        to : email,
+			 //        subject : "Email Verification @Community",
+			 //        text : "verification: "+link,
+			 //        html: '<h1>Hi, '+username+'!</h1><br>'
+			 //        + '<h3>Please click the following link to verify your account:</h3><br>'
+			 //        + link // html body
+			 //    }
+			 //    console.log(mailOptions);
+			 //    smtpTransport.sendMail(mailOptions, function(error, info){
+			 //    	if(error) {
+			 //        	console.log(error);
+			 //        	res.end("error");
+				//     } else {
+				//        	console.log("Message sent: " + info.response);
+				//    		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
+				//     }
+				// });
 			if(type=="club") {
 				var newClub = new Club({
 					name: name,

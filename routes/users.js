@@ -9,6 +9,8 @@ var User = require('../models/user');
 var Club = require('../models/club');
 var Tag = require('../models/tag');
 var multer  = require('multer');
+var nodemailer = require("nodemailer");
+var randomstring = require("randomstring");
 var storagetype = "screenshot";
 var storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -55,11 +57,66 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage : storage}).single('userPhoto');
 
+var smtpTransport = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    auth: {
+        user: "mohabamr1",
+        pass: "mohab.abdelmeguid1830"
+    }
+});
+function printError(err) {
+	if(err) {
+		console.log(JSON.stringify(err));
+		throw err;
+	}
+}
+
+function printResult(result) {
+	console.log("Result: " + JSON.stringify(result));
+}
+router.get('/send', function(req,res) {
+    var rand = randomstring.generate();
+    var host = req.get('host');
+    var link = "http://"+req.get('host')+"/verify/"+req.user.id+"/"+rand;
+    var mailOptions = {
+    	from: '"Community" <mohabamr1@gmail.com>"',
+        to : "mohabamr1@gmail.com",
+        subject : "Email Verification @Community",
+        text : "verification: "+link,
+        html: '<h1>Hi, Mohab!</h1><br>'
+        + '<h3>Please click the following link to verify your account:</h3><br>'
+		+ link // html body
+    }
+    console.log(mailOptions);
+    smtpTransport.sendMail(mailOptions, function(error, info){
+    	if(error) {
+        	console.log(error);
+        	res.end("error");
+	    } else {
+	       	console.log("Message sent: " + info.response);
+	   		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
+	    }
+	});
+});
+
+function ensureVerification(req, res, next) {
+	console.log("he")
+	User.getUserById(req.user.id, function(err, resuser) {
+		if(resuser.verificationCode==="XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe") {
+			return next();
+		} else {
+			req.flash('error_msg','You are not verified!');
+			res.redirect('/users/signin');
+		}
+	});
+}
+
 function ensureAuthenticated(req, res, next){	
 	if(req.isAuthenticated()){
-		return next();
+		ensureVerification(req, res, next);
 	} else {
-		req.flash('error_msg','You are not logged in');
+		req.flash('error_msg','You are not logged in!');
 		res.redirect('/users/signin');
 	}
 }
@@ -157,6 +214,7 @@ router.post("/signup", function(req, res) {
 			errors: errors
 		});
 	} else {
+		var rand = randomstring.generate();
 		var newUser = new User({
 			name: name,
 			email: email,
@@ -165,11 +223,12 @@ router.post("/signup", function(req, res) {
 			password: password,
 			usertype: type,
 			links: [],
-			summary: "no summary", 
-			phone: "no phone",
+			summary: "No summary.", 
+			phone: "No phone",
 			major: major,
 			profilephoto: "default-photo.jpeg",
 			organizations: [],
+			verificationCode: rand,
 			tags: []
 		});
 
@@ -180,6 +239,27 @@ router.post("/signup", function(req, res) {
 				res.redirect('/users/signup');
 				return;
 			}
+			    var host = req.get('host');
+			    var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
+			    var mailOptions = {
+			    	from: '"Community" <mohabamr1@gmail.com>"',
+			        to : email,
+			        subject : "Email Verification @Community",
+			        text : "verification: "+link,
+			        html: '<h1>Hi, '+username+'!</h1><br>'
+			        + '<h3>Please click the following link to verify your account:</h3><br>'
+			        + link // html body
+			    }
+			    console.log(mailOptions);
+			    smtpTransport.sendMail(mailOptions, function(error, info){
+			    	if(error) {
+			        	console.log(error);
+			        	res.end("error");
+				    } else {
+				       	console.log("Message sent: " + info.response);
+				   		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
+				    }
+				});
 			if(type=="club") {
 				var newClub = new Club({
 					name: name,
@@ -193,6 +273,7 @@ router.post("/signup", function(req, res) {
 					phone: '',
 					president: {},
 					departments: [],
+					newDepartments: [],
 					events: []
 				});
 				newClub.save();
@@ -200,6 +281,7 @@ router.post("/signup", function(req, res) {
 		});
 			
 	}
+
 	res.locals.pagetitle = 'Sign In';
 	req.flash('success_msg','You signed up successfully!');
 	res.redirect('/users/signin');
@@ -217,6 +299,31 @@ router.get('/signout', function(req, res){
 
 	res.redirect('/users/signin');
 
+});
+
+router.get('/verify/:userID/:code', function(req, res) {
+	var userID = req.params.userID;
+	var code = req.params.code;
+	User.getUserById(userID, function(err, resuser) {
+		printError(err);
+		if(resuser!=null) {
+			if(resuser.verificationCode===code) {
+				User.update({_id: userID}, {$set: {verificationCode: "XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe"}},
+					function(err2, updateRes) {
+						printError(err2);
+						printResult(updateRes);
+						req.flash('success_msg','Your email is verified!');
+						res.redirect('/users/signin');
+				});
+			} else {
+					req.flash('error_msg','Wrong verification code!');
+					res.redirect('/users/signin');
+			}
+		} else {
+			req.flash('error_msg','No such user!');
+			res.redirect('/users/signin');
+		}
+	});
 });
 
 router.post('/addlink', ensureAuthenticated, function(req, res) {
@@ -396,6 +503,7 @@ router.get('/viewprofile/:id', function(req,res) {
 			   	});
 			} else {
 				if(resuser.usertype=="club") {
+					console.log("viewd")
 					res.redirect('/clubs/viewClub/'+req.params.id);
 				}
 			}

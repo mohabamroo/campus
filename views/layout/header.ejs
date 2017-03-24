@@ -4,9 +4,22 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/community-default.css" rel="stylesheet">
     <script type="text/javascript" src="/js/jquery-3.1.1.min.js"></script>
+
+     <!-- Bootstrap Core CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="/css/freelancer.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+
 	<title><%= pagetitle %></title>
 </head>
-<body style="font-family: cursive; font-weight: bold; background-color: #333;">
+<body style="font-family: cursive; font-weight: bold; background-color: #fff;">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -50,7 +63,62 @@
         </div><!--/.navbar-collapse -->
       </div>
     </nav>
-<div class="jumbotron container" style="min-height: 100%; max-width: 1100px; background-color: #333;">
+
+        <!-- Navigation -->
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="/">Dashboard</a>
+            </div>
+            <form class="navbar-form navbar-left" method="POST" action="/users/search">
+              <div class="form-group">
+                <input type="text" class="form-control" name="searchusername" placeholder="search by username">
+              </div>
+            </form>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-left" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                  <li>
+                    <a class="navbar-brand" href="/clubs">Clubs</a>
+                  </li>
+                  <li>
+                    <a class="navbar-brand" href="#">Internships</a>
+                  </li>
+                  <li>
+                    <a class="navbar-brand" href="/events">Events</a>
+                  </li>
+                </ul>
+            </div>
+
+            <% if(user!=null) { %>
+            <div class="collapse navbar-collapse navbar-right">
+              <form class="navbar-form navbar-right" method="GET" action="/users/signout">
+                <div class="form-group">
+                  <a class="navbar-nav form-control" href="/users/viewprofile/<%=user.id%>"><%= user.username %></a>
+                </div>
+                <button type="submit" class="btn btn-success">Sign out</button>
+              </form>
+            </div>
+          <% } else { %>
+            <form class="navbar-form navbar-right" method="GET" action="/users/signout">
+              <div class="form-group">
+                <a class="navbar-nav form-control btn-primary" href="/users/signup">Sign Up</a>
+              </div>
+              <div class="form-group">
+                <a class="navbar-nav form-control btn-primary" href="/users/signin">Sign In</a>
+              </div>
+            </form> 
+          <% } %>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+<div class="jumbotron container" style="margin-top:50px; min-height: 100%; max-width: 1100px; background-color: #fff; min-height:100vh;">
 
       <div class="row container">
         <div class="col-lg-12">

@@ -36,6 +36,9 @@ var eventSchema = mongoose.Schema({
 	},
 	type: {
 		type: String
+	},
+	target: {
+		type: String
 	}
 
 });

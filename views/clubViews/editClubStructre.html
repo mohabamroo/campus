@@ -47,8 +47,8 @@
 			</div>
 		</div>
 
-		<div class="deps row row-eq-height">
-			<%  clubRes.departments.forEach(function(department) { %>
+		<div class=" row row-eq-height">
+			<%  departments.forEach(function(department) { %>
 				<div class="singleDepartment col-xs-4" name="<%= department.name %>" id="<%= department._id %>">
 					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
 					<h4 style="color:gray; margin-left: 30px;"><%= department.name %></h4>
@@ -71,13 +71,83 @@
 							<input type="submit" class="btn" style="margin: 10px;" value="Delete Department">	
 						</form>
 					</div>
-					<div class="addmember">
-						<form method="POST" action="/clubs/addMember/<%= department._id %>" style="max-width: 200px;">
-							<input type="text" name="memberID" class="form-control" placeholder="34-5862">
-							<input type="text" name="memberName" class="form-control" placeholder="mohab amr">
-							<input type="submit" class="btn" style="margin: 10px;" value="Add Member">	
-						</form>
-					</div>
+					<% if(department.nestedType=="true") { %>
+						<br>
+						<% department.subDepartments.forEach(function(subdepartment) { %>
+							<div class="singleDepartment">
+								<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
+								<h4 style="color:gray; margin-left: 30px;"><%= subdepartment.name %></h4>
+								<div style="vertical-align: top; margin-left: 30px;" class="nameRating">
+									<h4 <%if(subdepartment.head.profileId!="none") { %> 
+											class="clickableh2" id="sssx"
+											style="cursor:pointer; color:gray;" 
+										<% } else { %>
+										style="color:gray;"
+										<% } %>
+										>		
+										<%= subdepartment.head.name %>
+									</h4>
+									<% include ../layout/rating %>
+					
+								</div>
+								<br>
+								<br>
+								<div id="<%= subdepartment._id %>">
+									<% subdepartment.members.forEach(function(member) { %>
+										<div style="vertical-align: top; margin-left: 30px; font-size: 10px;" class="nameRating" nested="nested">
+											<h4 <%if(member.profileId!="none") { %> 
+													class="clickableh2" id="<%= member.profileId %>"
+													style="cursor:pointer; color:gray;" 
+												<% } else { %>
+												style="color:gray;"
+												<% } %>
+												objid= "<%= member._id %>"
+												>
+												<%= member.name %>
+											</h4>
+											<div rating="<%= member.rating %>">
+											<% include ../layout/rating %>
+											</div>
+										</div>
+										<br>
+									<% }); %>
+								</div>
+								<div class="addmember">
+									<form method="POST" action="/clubs/addMember/<%= department._id %>/<%= subdepartment._id %>" style="max-width: 200px;">
+										<input type="text" name="memberID" class="form-control" placeholder="34-5862">
+										<input type="text" name="memberName" class="form-control" placeholder="mohab amr">
+										<input type="submit" class="btn" style="margin: 10px;" value="Add Member">	
+									</form>
+								</div>
+							</div>
+						<% }); %>
+						<div class="singleDepartment">
+							<form method="POST" action="/clubs/addSubDepartment/<%= department.id %>" style="max-width: 200px;">
+								<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="160" height="140">
+								<br>
+								<br>
+								<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; margin-left: 30px;">New SubDeartment</h4>
+								<input type="text" name="subdepartmentName" class="form-control" placeholder="Media">
+								<input type="text" name="subheadID" class="form-control" placeholder="34-5862">
+								<input type="text" name="subdepartmentHead" class="form-control" placeholder="mohab amr">
+								<div style="width: 100%; font-size: 20px;">
+									Public
+									<input type="checkbox" class="checkbox form-control" style="max-width: 25px; max-height: 25; float: right;" checkboxVal="false">
+									<input type="text" class="checkboxVal" name="subdepartmentPublic" style="display: none;" checkboxVal="false" value="false">
+								</div>
+								<input type="submit" class="btn" style="margin: 10px;" value="Add SubDepartment">	
+							</form>
+						</div>
+					<% } else { %>
+						<div class="addmember">
+							<form method="POST" action="/clubs/addMember/<%= department._id %>" style="max-width: 200px;">
+								<input type="text" name="memberID" class="form-control" placeholder="34-5862">
+								<input type="text" name="memberName" class="form-control" placeholder="mohab amr">
+								<input type="submit" class="btn" style="margin: 10px;" value="Add Member">	
+							</form>
+						</div>					
+					<% } %>
+
 					<% department.members.forEach(function(member) { %>
 						<div style="vertical-align: top; margin-left: 30px; font-size: 10px;" class="nameRating">
 							<h4 <%if(member.profileId!="none") { %> 
@@ -98,7 +168,7 @@
 				</div>
 			<%  }) %>
 			<div class="singleDepartment col-lg-3">
-				<form method="POST" action="/clubs/addDepartment" style="max-width: 200px;">
+				<form method="POST" action="/clubs/addDepartmentNew" style="max-width: 200px;">
 					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
 					<br>
 					<br>
@@ -106,7 +176,17 @@
 					<input type="text" name="departmentName" class="form-control" placeholder="Media">
 					<input type="text" name="headID" class="form-control" placeholder="34-5862">
 					<input type="text" name="departmentHead" class="form-control" placeholder="mohab amr">
-					<input type="submit" class="btn" style="margin: 10px;" value="Add Dpartment">	
+					<div style="width: 100%; font-size: 20px;">
+						Public
+						<input type="checkbox" class="checkbox form-control" style="max-width: 25px; max-height: 25; float: right;" checkboxVal="false">
+						<input type="text" class="checkboxVal" name="departmentPublic" style="display: none;" checkboxVal="false" value="false">
+					</div>
+					<div style="width: 100%; font-size: 20px;">
+						Nested
+						<input type="checkbox" class="checkboxNested form-control" style="max-width: 25px; max-height: 25; float: right;" checkboxVal="false">
+						<input type="text" class="checkboxVal" name="departmentNested" style="display: none;" checkboxVal="false" value="false">
+					</div>
+					<input type="submit" class="btn" style="margin: 10px;" value="Add Department">	
 				</form>
 			</div>
 
@@ -190,9 +270,18 @@
 		var departmentName = myelement.parent().parent().parent().parent().attr('name');
 		var departmentID = myelement.parent().parent().parent().parent().attr('id');
 		var objID = myelement.parent().parent().parent().find("h4").attr('objid');
-		var newUrl = "/clubs/rateMember/"+departmentID+"/"+memberID+"/"+objID+"/"+rating;
-		console.log(newUrl)
+		var nestedType = myelement.parent().parent().parent().attr("nested");
+		var newUrl;
+		if(nestedType=="nested") {
+			var subDepID = myelement.parent().parent().parent().parent().attr("id");
+			newUrl = "/clubs/rateMember/"+departmentID+"/"+subDepID+"/"+memberID+"/"+objID+"/"+rating;
+			console.log(newUrl)
+		} else {
+			newUrl = "/clubs/rateMember/"+departmentID+"/"+memberID+"/"+objID+"/"+rating;
+		}
 		window.location = newUrl;
+
+		
 	});
 
 
@@ -206,6 +295,30 @@
 	    inputElement.css({"color": "#FFD700"});
 	  	inputElement.nextAll().css({"color": "#FFD700"});
 	    console.log($(this).find("[value="+rating+"]").val());
+	  });
+
+	  $(".checkbox").click(function() {
+	  	if($(this).attr('checkboxVal')=="false") {
+	  		$(this).attr('checkboxVal', 'true');
+	  		$(this).parent().find('.checkboxVal').val('true');
+	  		$(this).parent().find('.checkboxVal').attr('value', 'true');
+	  	} else {
+	  		$(this).attr('checkboxVal', 'false');
+	  		$(this).parent().find('.checkboxVal').val('false');
+	  		$(this).parent().find('.checkboxVal').attr('value', 'false');
+	  	}
+	  });
+	  $(".checkboxNested").click(function() {
+	  	if($(this).attr('checkboxVal')=="false") {
+	  		$(this).attr('checkboxVal', 'true');
+	  		$(this).parent().find('.checkboxVal').val('true');
+	  		$(this).parent().find('.checkboxVal').attr('value', 'true');
+
+	  	} else {
+	  		$(this).attr('checkboxVal', 'false');
+	  		$(this).parent().find('.checkboxVal').val('false');
+	  		$(this).parent().find('.checkboxVal').attr('value', 'false');
+	  	}
 	  });
 
 </script>

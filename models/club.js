@@ -55,10 +55,23 @@ var clubSchema = mongoose.Schema({
 		},
 		rating: {
 			type: String
+		},
+		review: {
+			type: String
 		}
 	},
+	newDepartments: [ {
+			type: String
+		}
+	],
 	departments: [
 		{
+			nestedType: {
+				type: String
+			},
+			public: {
+				type: String
+			},
 			name: {
 				type: String
 			},
@@ -100,7 +113,57 @@ var clubSchema = mongoose.Schema({
 						type: String
 					}
 				}
+			],
+			subDepartments: [
+				{
+					public: {
+						type: String
+					},
+					name: {
+						type: String
+					},
+					head: {
+						gucid: {
+							type: String
+						},
+						name: {
+							type: String
+						},
+						profileId :{
+							type: String
+						},
+						exists: {
+							type: String
+						},
+						rating: {
+							type: String
+						}
+					},
+					members: [
+						{
+							name: {
+								type: String
+							},
+							gucid: {
+								type: String
+							},
+							rating: {
+								type: String
+							},
+							review: {
+								type: String
+							},
+							profileId :{
+								type: String
+							},
+							exists: {
+								type: String
+							}
+						}
+					],
+				}
 			]
+			
 		}
 	],
 	events: [

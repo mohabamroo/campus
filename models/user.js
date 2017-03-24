@@ -19,6 +19,9 @@ var userSchema = mongoose.Schema({
 	major: {
 		type: String
 	},
+	year: {
+		type: String
+	},
 	usertype: {
 		type: String
 	},
@@ -74,6 +77,9 @@ var userSchema = mongoose.Schema({
 		type: String
 	},
 	phone: {
+		type: String
+	},
+	verificationCode: {
 		type: String
 	},
 	tags: [

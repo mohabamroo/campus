@@ -24,7 +24,7 @@ router.get('/', function(req, res) {
 	var today = d.yyyymmdd();
 	var todayint = parseInt(today);
 	var events = [];
-	Event.find(function(err, eventsres) {
+	Event.find({type: "public"}, function(err, eventsres) {
 		eventsres.forEach(function(event) {
 			var fromDate = event.fromDate.toString();
 			var fromInt = parseInt(convertDashedDate(fromDate));

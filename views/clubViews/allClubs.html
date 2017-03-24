@@ -4,7 +4,7 @@
 	<div class="clubsDiv" style="margin-top: 40px; min-height: 490px;">
 		<% clubs.forEach(function(club) { %>
 			<div class="col-lg-2" style=" max-width: 190px; margin-right: 25px;">
-	 	   		<img class="img-circle" src="/user_uploads/<%= club.photo %>" alt="Generic placeholder image" width="150" height="150" >
+	 	   		<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="150" height="150" >
 				<h2 class="clickableh2" id="<%= club.userid %>" style="cursor:pointer; color:gray; text-align: center;"><%= club.name %></h2>
 	        </div>
 

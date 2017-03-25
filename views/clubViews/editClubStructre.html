@@ -2,9 +2,9 @@
 <div class="jumbotron editclubstructre" >
 
 	<div class="container">
-		<h1 style="float: left; padding-top: 40px;">Hello, <%= clubRes.name%>!</h1>
-		<% if(clubRes.logo!=null && clubRes.logo!="") { %>
- 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+		<h1 style="float: left; padding-top: 40px;">Hello, <%= club.name%>!</h1>
+		<% if(club.logo!=null && club.logo!="") { %>
+ 	   		<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
 
 		<% } else { %>
  	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
@@ -21,21 +21,21 @@
 		<div class="row row-eq-height" style="margin-left: 30%;">
 			<div class="singleDepartment col-xs-4">
 
-						<% if(clubRes.president!=null && clubRes.logo!="") { %>
-				 	   		<img class="img-circle" src="/club_uploads/<%= clubRes.logo %>" alt="Generic placeholder image" width="200" height="185">
+						<% if(club.president!=null && club.logo!="") { %>
+				 	   		<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185">
 
 						<% } else { %>
 				 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
 						<% } %>
 
-						<h4 <%if(clubRes.president.profileId!="none") { %> 
-								class="clickableh2" id="<%= clubRes.president.profileId %>"
+						<h4 <%if(club.president.profileId!="none") { %> 
+								class="clickableh2" id="<%= club.president.profileId %>"
 								style="cursor:pointer; color:gray; margin-left: 30px;" 
 							<% } else { %>
 							style="color:gray; margin-left: 30px;"
 							<% } %>
 							>		
-							<%= clubRes.president.name %>
+							<%= club.president.name %>
 						</h4>
 						<div class="container president" style="min-width: 220px;">
 							<form method="POST" action="/clubs/addpresident" style="max-width: 200px;">

@@ -41,129 +41,10 @@ var clubSchema = mongoose.Schema({
 		type: String
 	},
 	president: {
-		name: {
-			type: String
-		},
-		gucid: {
-			type: String
-		},
-		profileId :{
-			type: String
-		},
-		exists: {
-			type: String
-		},
-		rating: {
-			type: String
-		},
-		review: {
-			type: String
-		}
+		type: String
 	},
 	newDepartments: [ {
 			type: String
-		}
-	],
-	departments: [
-		{
-			nestedType: {
-				type: String
-			},
-			public: {
-				type: String
-			},
-			name: {
-				type: String
-			},
-			head: {
-				gucid: {
-					type: String
-				},
-				name: {
-					type: String
-				},
-				profileId :{
-					type: String
-				},
-				exists: {
-					type: String
-				},
-				rating: {
-					type: String
-				}
-			},
-			members: [
-				{
-					name: {
-						type: String
-					},
-					gucid: {
-						type: String
-					},
-					rating: {
-						type: String
-					},
-					review: {
-						type: String
-					},
-					profileId :{
-						type: String
-					},
-					exists: {
-						type: String
-					}
-				}
-			],
-			subDepartments: [
-				{
-					public: {
-						type: String
-					},
-					name: {
-						type: String
-					},
-					head: {
-						gucid: {
-							type: String
-						},
-						name: {
-							type: String
-						},
-						profileId :{
-							type: String
-						},
-						exists: {
-							type: String
-						},
-						rating: {
-							type: String
-						}
-					},
-					members: [
-						{
-							name: {
-								type: String
-							},
-							gucid: {
-								type: String
-							},
-							rating: {
-								type: String
-							},
-							review: {
-								type: String
-							},
-							profileId :{
-								type: String
-							},
-							exists: {
-								type: String
-							}
-						}
-					],
-				}
-			]
-			
 		}
 	],
 	events: [
@@ -177,7 +58,7 @@ var Club = module.exports = mongoose.model('Club', clubSchema);
 
 module.exports.createClub = function(newClub, callback) {
 	bcrypt.genSalt(10, function(err, salt) {
-	    bcrypt.hash(newUser.password, salt, function(err, hash) {
+	    bcrypt.hash(newClub.password, salt, function(err, hash) {
 	        newClub.password = hash;
 	        newClub.save(callback);
 	    });

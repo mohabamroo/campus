@@ -21,7 +21,7 @@
 				 	   	<span>Phone: <%= dude.phone %></span>
 				 	   	<br>
 				 	   	<span>Summary:
-				 	   		<p><%dude.summary%></p>
+				 	   		<p><%= dude.summary%></p>
 				 	   	</span>
 					    <div class="row">
 				 	   	    <% if(user!=null && dude.id.toString()==user.id){ %>
@@ -33,7 +33,7 @@
 							    	</div>
 						    <% } %>
 						    <div class="col-sm-4">
-						   		<a href="/clubs/viewAllMembers/<%= dude.id %>" class="btn btn-lg btnOnGreen">View All Members</a>
+						   		<a href="/clubs/viewAllMembers/<%= club.id %>" class="btn btn-lg btnOnGreen">View All Members</a>
 							</div>
 					    </div>
                     </div>
@@ -42,45 +42,46 @@
         </div>
     </header>
 
-	<div class="container container-fluid structure" style="padding-top: 50px; align-self: center; background-color: #333333;">
-		<div class="row row-eq-height" style="margin-left: 37%;">
+	<div class="container container-fluid structure" style="padding-top: 50px; align-self: center; background-color: #333333; color: white;">
+		<div class="row row-eq-height" style="margin-left: 37%; color: white;">
 			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
-				<% if(club.president!=null && club.logo!="") { %>
+				<% if(president!=null && club.logo!="") { %>
 				 	<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185">
 				<% } else { %>
 				 	<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
 				<% } %>
 				
-					<h4 <%if(club.president.profileId!="none") { %> 
-							class="clickableh2" id="<%= club.president.profileId %>"
-							style="cursor:pointer; color:gray; align-self: center;" 
+					<h4 <%if(president.profileId!="none") { %> 
+							class="clickableh2" id="<%= president.profileId %>"
+							style="cursor:pointer; text-align: center;" 
 						<% } else { %>
-						style="color:gray; margin-left: 30px;"
+						style=" text-align: center;"
 						<% } %>
 						>		
-						<%= club.president.name %>
+						<%= president.name %>
 					</h4>
 				
 			</div>
 		</div>
 
-		<div class="row row-eq-height" >
+		<div class="row row-eq-height">
 			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; ">
 				<button id="scrollLeft" style="height: 300px; background-color: #333; border: none;">
 					<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
 				</button>
 			</div>
-			<div class="deps" id="depsDiv" style="display: flex; width: 90%; text-align: center;">
+			<div class="deps" id="depsDiv" style="display: flex; width: 90%; text-align: center; color: white;">
 				<% departments.forEach(function(department) { %>
 					<div class="singleDepartment " style="margin-bottom: 40px;">
 						<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
-						<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; text-align: center;"><%= department.name %></h4>
+						<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; text-align: center;"><%= department.name %></h4>
 						<% if(department.public=="false") { %>
 							<h4 style="color:gray; margin-left: 30px;">Private Memebers</h4>
 						<% } else { %>
 							<ul class="members" style="display: none;" >
 								<% department.members.forEach(function(member) { %>
-									<li style="cursor:pointer; color:gray;"><%= member.name %></li>
+									<%= member.name %>
+									<li style="cursor:pointer; color: white;"><%= member.name %></li>
 								<% }); %>	
 							</ul>
 							<h4 class="viewBtn" id="<%= department.id %>" style="cursor:pointer; color:gray; ">View Memebers</h4>

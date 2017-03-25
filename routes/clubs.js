@@ -10,6 +10,7 @@ var Club = require('../models/club');
 var User = require('../models/user');
 var Event = require('../models/event');
 var Department = require('../models/department');
+var Member = require('../models/member');
 var multer  = require('multer');
 var storagetype = "logo";
 var clubStorage = multer.diskStorage({
@@ -116,109 +117,390 @@ router.get('/getDepartments/:id', function(req, res) {
 	});
 });
 
-function getDepartments(club, departments, events, resuser, req, res) {
+// Note: worst function I ever wrote in my life, I'm so disgusted!
+function getDepartments(club, presidentRes, events, resuser, req, res) {
+	var departments = [];
 	var i = 0;
-	club.newDepartments.forEach(function(departmentid) {
-		Department.getDepartmentById(departmentid, function(err2, departmentres) {
-			printError(err2);
-			i++;
-			if(departmentres!=null) {
-				departments.push(departmentres);
-			}
-			if(i>=club.newDepartments.length) {
-				res.render('viewprofile.html', {
-					dude : resuser,
-					club: club,
-					events: events,
-					departments: departments
-				});
-			}
-		});
-	});
-}
-
-function getDepartmentsEdit(club, departments, events, req, res) {
-	var i = 0;
-	club.newDepartments.forEach(function(departmentid) {
-		Department.getDepartmentById(departmentid, function(err2, departmentres) {
-			printError(err2);
-			i++;
-			if(departmentres!=null) {
-				departments.push(departmentres);
-			}
-			if(i>=club.newDepartments.length) {
-				res.render('clubViews/editClubStructre.html', {
-					clubRes: club,
-					events: events,
-					departments: departments
-				});
-			}
-		});
-	});
-}
-router.get('/viewClub/:id', function(req, res) {
-	console.log(req.params.id);
-	User.getUserById(req.params.id, function(err, resuser) {
-		if(err) {
-			console.log(err);
-			throw err;
-		}
-		else {
-			Club.getClubByUserId(req.params.id, function(err2, resclub) {
-				if(err2) {
-					console.log(err2);
-					throw err2;
-				} else {
-					if(resclub==null) {
-						res.end('No such club!');
-					} else {
-						var events = [];
-						var departments = [];
-						var i = 0 ;
-						if(resclub.events!=null && resclub.events.length>0) {
-							resclub.events.forEach(function(event) {
-								Event.getEventById(event.toString(), function(err, eventRes) {
-									i++;
-									console.log(i)
-									if(eventRes!=null) {
-										events.push(eventRes);
-									}
-									if(i>=resclub.events.length) {
-										console.log("finshed!!!");
-										i = 0;
-										if(resclub.newDepartments!=null && resclub.newDepartments.length>0) {
-											getDepartments(resclub, departments, events, resuser, req, res);
-										} else {
-											res.render('viewprofile.html', {
-												dude : resuser,
-												club: resclub,
-												events: events,
-												departments: []
-										   	});
-										}	
-									}
+	if(club.newDepartments!=null && club.newDepartments.length>0) {
+		club.newDepartments.forEach(function(departmentid) {
+			Department.getDepartmentById(departmentid, function(err2, departmentres) {
+				printError(err2);
+				var currentDepartment = departmentres;
+				var j = 0;
+				if(departmentres.head!=null && departmentres.head!="") {
+					Member.getMemberByID(departmentres.head, function(err4, headRes) {
+						printError(err4)
+						currentDepartment.head = headRes || {};
+						if(departmentres.nestedType!="true") {
+							var mymembers = [];
+							if(departmentres.members!=null && departmentres.members.length>0) {
+								departmentres.members.forEach(function(memberID) {
+									Member.getMemberByID(memberID, function(err3, member) {
+										j++;
+										console.log(member)
+										mymembers.push(member);
+										if(j>=departmentres.members.length) {
+											currentDepartment.members = mymembers;
+											i++;
+											departments.push(currentDepartment);
+											if(i>=club.newDepartments.length) {
+												res.render('viewprofile.html', {
+													dude : resuser,
+													club: club,
+													events: events,
+													departments: departments,
+													president: presidentRes
+												});
+											}
+										}
+									});
 								});
-							});
-						} else {
-							console.log("null")
-							i = 0;
-							if(resclub.newDepartments!=null && resclub.newDepartments.length>0) {
-								getDepartments(resclub, departments, [], resuser, req, res);
 							} else {
-							res.render('viewprofile.html', {
-								dude : resuser,
-								club: resclub,
-								events: [],
-								departments: []
-							  	});
+								i++;
+								departments.push(currentDepartment);
+								if(i>=club.newDepartments.length) {
+									res.render('viewprofile.html', {
+										dude : resuser,
+										club: club,
+										events: events,
+										departments: departments,
+										president: presidentRes
+									});
+								}
+							}
+						} else {
+							var k = 0;
+							var mysubDepartments = [];
+							if(departmentres.subDepartments!=null && departmentres.subDepartments.length>0) {
+								departmentres.subDepartments.forEach(function(subDepartment) {
+									currentSubDepartment = subDepartment;
+									var mymembers = [];
+									if(subDepartment.head!=null && subDepartment.head!="") {
+										Member.getMemberByID(subDepartment.head, function(err5, subHeadRes) {
+											printError(err5);
+											currentSubDepartment.head = subHeadRes || {};
+											if(subDepartment.members!=null && subDepartment.members.length>0) {
+												var c = 0;
+												subDepartment.members.forEach(function(memberID) {
+													Member.getMemberByID(memberID, function(err6, member) {
+														c++;
+														if(member!=null)
+															mymembers.push(member);
+														if(c>=subDepartment.members.length) {
+															currentDepartment.members = mymembers;
+															mysubDepartments.push(currentSubDepartment);
+															k++;
+															if(k>=departmentres.subDepartments.length) {
+																currentDepartment.subDepartments = mysubDepartments;
+																i++;
+																departments.push(currentDepartment);
+																if(i>=club.newDepartments.length) {
+																	res.render('viewprofile.html', {
+																		dude : resuser,
+																		club: club,
+																		events: events,
+																		departments: departments,
+																		president: presidentRes
+																	});
+																}
+															}
+														}
+													})
+												})
+											} else {
+												mysubDepartments.push(currentSubDepartment);
+												k++;
+												if(k>=departmentres.subDepartments.length) {
+													currentDepartment.subDepartments = mysubDepartments;
+													i++;
+													departments.push(currentDepartment);
+													if(i>=club.newDepartments.length) {
+														res.render('viewprofile.html', {
+															dude : resuser,
+															club: club,
+															events: events,
+															departments: departments,
+															president: presidentRes
+														});
+													}
+												}
+											}
+										});
+									} else {
+										k++;
+										if(k>=departmentres.subDepartments.length) {
+											currentDepartment.subDepartments = mysubDepartments;
+											i++;
+											departments.push(currentDepartment);
+											if(i>=club.newDepartments.length) {
+												res.render('viewprofile.html', {
+													dude : resuser,
+													club: club,
+													events: events,
+													departments: departments,
+													president: presidentRes
+												});
+											}
+										}
+									}
+									
+								});
+							} else {
+								i++;
+								departments.push(currentDepartment);
+								if(i>=club.newDepartments.length) {
+									res.render('viewprofile.html', {
+										dude : resuser,
+										club: club,
+										events: events,
+										departments: departments,
+										president: presidentRes
+									});
+								}
 							}
 						}
-						
+					});
+				} else {
+					i++;
+					if(i>=club.newDepartments.length) {
+						res.render('viewprofile.html', {
+							dude : resuser,
+							club: club,
+							events: events,
+							departments: departments,
+							president: presidentRes
+						});
 					}
 				}
+
 			});
-		}			
+		});
+	}
+	else {
+		res.render('viewprofile.html', {
+						dude : resuser,
+						club: club,
+						events: events,
+						departments: departments,
+						president: presidentRes
+					});
+	}
+}
+
+function getDepartmentsEdit(club, presidentRes, events, req, res) {
+	var departments = [];
+	var i = 0;
+	console.log(club.newDepartments.length)
+	if(club.newDepartments!=null && club.newDepartments.length>0) {
+		club.newDepartments.forEach(function(departmentid) {
+			Department.getDepartmentById(departmentid, function(err2, departmentres) {
+				printError(err2);
+				printResult(departmentres)
+				var currentDepartment = departmentres;
+				var j = 0;
+				if(departmentres.head!=null && departmentres.head!="") {
+					Member.getMemberByID(departmentres.head, function(err4, headRes) {
+						printError(err4)
+						printResult(headRes);
+						currentDepartment.head = headRes || {};
+						if(departmentres.nestedType!="true") {
+							currentDepartment.members = [];
+							if(departmentres.members!=null && departmentres.members.length>0) {
+								departmentres.members.forEach(function(memberID) {
+									Member.getMemberByID(memberID, function(err3, member) {
+										j++;
+										printResult(member)
+										currentDepartment.members.push(member);
+										if(j>=departmentres.members.length) {
+											i++;
+											departments.push(currentDepartment);
+											if(i>=club.newDepartments.length) {
+												res.render('clubViews/editClubStructre.html', {
+													club: club,
+													events: events,
+													departments: departments,
+													president: presidentRes
+												});
+											}
+										}
+									});
+								});
+							} else {
+								i++;
+								departments.push(currentDepartment);
+								if(i>=club.newDepartments.length) {
+									res.render('clubViews/editClubStructre.html', {
+										club: club,
+										events: events,
+										departments: departments,
+										president: presidentRes
+									});
+								}
+							}
+						} else {
+							var k = 0;
+							currentDepartment.subDepartments = [];
+							if(departmentres.subDepartments!=null && departmentres.subDepartments.length>0) {
+								departmentres.subDepartments.forEach(function(subDepartment) {
+									currentSubDepartment = subDepartment;
+									currentSubDepartment.members = [];
+									if(subDepartment.head!=null && subDepartment.head!="") {
+										Member.getMemberByID(subDepartment.head, function(err5, subHeadRes) {
+											printError(err5);
+											printResult(subHeadRes);
+											currentSubDepartment.head = subHeadRes || {};
+											if(subDepartment.members!=null && subDepartment.members.length>0) {
+												var c = 0;
+												subDepartment.members.forEach(function(memberID) {
+													Member.getMemberByID(memberID, function(err6, member) {
+														c++;
+														if(member!=null)
+															currentSubDepartment.members.push(member);
+														if(c>=subDepartment.members.length) {
+															currentDepartment.subDepartments.push(currentSubDepartment);
+															k++;
+															if(k>=departmentres.subDepartments.length) {
+																i++;
+																departments.push(currentDepartment);
+																if(i>=club.newDepartments.length) {
+																	res.render('clubViews/editClubStructre.html', {
+																		club: club,
+																		events: events,
+																		departments: departments,
+																		president: presidentRes
+																	});
+																}
+															}
+														}
+													})
+												})
+											}
+										});
+									}
+									
+								});
+							} else {
+								i++;
+								departments.push(currentDepartment);
+								if(i>=club.newDepartments.length) {
+									res.render('clubViews/editClubStructre.html', {
+										club: club,
+										events: events,
+										departments: departments,
+										president: presidentRes
+									});
+								}
+							}
+						}
+					});
+				} else {
+					i++;
+					if(i>=club.newDepartments.length) {
+						res.render('clubViews/editClubStructre.html', {
+							club: club,
+							events: events,
+							departments: departments,
+							president: presidentRes
+						});
+					}
+				}
+
+			});
+		});
+	}
+	else {
+		res.render('clubViews/editClubStructre.html', {
+						club: club,
+						events: events,
+						departments: departments,
+						president: presidentRes
+					});
+	}
+}
+
+function getEventsAndDepartments(club, presidentRes, resuser, req, res) {
+	var events = [];
+	var i = 0 ;
+	if(club.events!=null && club.events.length>0) {
+		club.events.forEach(function(event) {
+			Event.getEventById(event.toString(), function(err, eventRes) {
+				i++;
+				if(eventRes!=null)
+					events.push(eventRes);
+				if(i>=club.events.length)
+					getDepartments(club, departments, events, resuser, req, res);	
+			});
+		});
+	} else {
+		getDepartments(club, presidentRes, events, resuser, req, res);
+	}
+}
+
+function getEventsAndDepartmentsEdit(club, presidentRes, req, res) {
+	var events = [];
+	var i = 0 ;
+	if(club.events!=null && club.events.length>0) {
+		club.events.forEach(function(event) {
+			Event.getEventById(event.toString(), function(err, eventRes) {
+				i++;
+				if(eventRes!=null)
+					events.push(eventRes);
+				if(i>=club.events.length)
+					getDepartmentsEdit(club, departments, events, req, res);	
+			});
+		});
+	} else {
+		getDepartmentsEdit(club, presidentRes, events, req, res);
+	}
+}
+
+router.get('/viewClub/:id', function(req, res) {
+	User.getUserById(req.params.id, function(err, resuser) {
+		printError(err);
+		Club.getClubByUserId(req.params.id, function(err2, resclub) {
+			printError(err2);
+			if(resclub==null) {
+				req.flash('error_msg', 'No such club!');
+				res.redirect('/clubs/');
+			} else {
+				var president;
+				if(resclub.president== null || resclub.president==="") {
+					getEventsAndDepartments(resclub, {}, resuser, req, res);
+				} else {
+					Member.getMemberByID(resclub.president, function(err3, presidentRes) {
+						printError(err3);
+						getEventsAndDepartments(resclub, presidentRes, resuser, req, res);
+					});
+				}				
+			}
+		});				
 	});
+});
+
+router.get('/editStructre/:id', ensureAuthenticated, function(req, res) {
+	if(req.isAuthenticated() && req.user.id == req.params.id) {
+		Club.getClubByUserId(req.params.id, function(err2, resclub) {
+			printError(err2);
+			if(resclub==null) {
+				req.flash('error_msg', 'No such club!');
+				res.redirect('/clubs/');
+			} else {
+				var president;
+				if(resclub.president== null || resclub.president==="") {
+					getEventsAndDepartmentsEdit(resclub, {}, req, res);
+				} else {
+					Member.getMemberByID(resclub.president, function(err3, presidentRes) {
+						printError(err3);
+						getEventsAndDepartmentsEdit(resclub, presidentRes, req, res);
+					});
+				}				
+			}
+		});
+		
+	} else {
+		req.flash('error_msg', 'You are not authorized!');
+		res.redirect('/clubs');
+	}
 
 });
 
@@ -241,74 +523,37 @@ router.post('/search', function(req, res) {
 
 });
 
-router.get('/editStructre/:id', ensureAuthenticated, function(req, res) {
-	if(req.isAuthenticated() && req.user.id == req.params.id) {
-		Club.getClubByUserId(req.user.id, function(err, resclub) {
-		printError(err);
-		if(resclub==null) {
-			res.end('No such club!');
-		} else {
-			var events = [];
-			var departments = [];
-			var i = 0 ;
-			if(resclub.events!=null && resclub.events.length>0) {
-				resclub.events.forEach(function(event) {
-					Event.getEventById(event.toString(), function(err, eventRes) {
-						i++;
-						console.log(i)
-						if(eventRes!=null) {
-							events.push(eventRes);
-						}
-						if(i>=resclub.events.length) {
-							console.log("finshed!!!");
-							i = 0;
-							if(resclub.newDepartments!=null && resclub.newDepartments.length>0) {
-								getDepartmentsEdit(resclub, departments, events, req, res);
-							} else {
-								res.render('clubViews/editClubStructre.html', {
-									dude : resuser,
-									clubRes: resclub,
-									events: events,
-									departments: []
-								});
-							}	
-						}
-					});
-				});
-			} else {
-				console.log("null")
-				i = 0;
-				if(resclub.newDepartments!=null && resclub.newDepartments.length>0) {
-					getDepartmentsEdit(resclub, departments, [], req, res);
-				} else {
-					res.render('clubViews/editClubStructre.html', {
-						dude : resuser,
-						clubRes: resclub,
-						events: [],
-						departments: []
-				 	});
-				}
-			}			
-		}
-
-		});
-	} else {
-		req.flash('error_msg', 'You are not logged in');
-		console.log(req.error_msg);
-		res.redirect('/users/signin');
-	}
-
-});
-
 router.post('/addpresident', ensureAuthenticated, function(req, res) {
 	var presidentName = req.body.presidentName;
 	var presidentID = req.body.presidentID;
-	var newpresident = {name: presidentName, gucid: presidentID, profileId: "none", exists: "false", rating: "0"};
+
 	Club.getClubByUserId(req.user.id, function(err, club) {
-		Club.update({userid:req.user.id}, {$set:{president: newpresident}}, function(err, res) {
-				if(err)
-					console.log(err);
-			});
+		printError(err);
+		var newMember = new Member({
+			name: presidentName,
+			gucid: presidentID,
+			profileId: "none",
+			exists: "false",
+			rating: "0",
+			review: "no review",
+			profilephoto: "default-photo.jpeg",
+			role: "President",
+			club: club.name,
+			clubID: club._id
+		});
+		Member.createMember(newMember, function(err2, newPresident) {
+			printError(err2);
+			printResult(newPresident);
+			if(newPresident!=null) {
+				Club.update({userid:req.user.id},
+					{$set: {president: newPresident._id}},
+						function(err3, updateRes) {
+							printError(err3);
+							printResult(updateRes);
+				});	
+			}
+		});
+
 	});
 	res.redirect('/clubs/editStructre/'+req.user.id)
 
@@ -319,27 +564,34 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 	var departmentID = req.params.departmentID;
 	var memberName = req.body.memberName;
 	var memberID = req.body.memberID;
-	var newMember = {name: memberName, gucid: memberID, profileId: "none", exists: "false", rating:"0"};
-	console.log(req.user.id);
-	Department.update({_id: departmentID}, {$push: {members: newMember}}, function(err, pushRes) {
-		printError(err);
-		printResult(pushRes);
-	});
-	// Club.findOne(
-	// 	{"departments._id": departmentID}, 
-	// 	{_id: 0, departments: {$elemMatch: {_id: departmentID}}}, function(err, res) {
-	// 		console.log("res: "+res.departments[0].id);
-	// 		var findStr = 'departments.id';
-	// 	    var updateStr = 'departments.'+res.departments[0].id+'.members';
-	// 	    console.log(findStr);
-	// 	   	Club.update({'departments._id': res.departments[0].id}, {$push: {
-	// 	   		'departments.$.members': newMember
-	// 	   	}}, function(err, res) {
-	// 	   		console.log("update res: "+JSON.stringify(res));
-	// 	   	});
-	// 	});
-	res.redirect('/clubs/editStructre/'+req.user.id);
 	
+	Club.getClubByUserId(req.user.id, function(err, club) {
+		printError(err);
+		Department.getDepartmentById(departmentID, function(err2, department) {
+			printError(err2);
+			var newMember = new Member({
+				name: memberName,
+				gucid: memberID,
+				profileId: "none",
+				exists: "false",
+				rating: "0",
+				review: "no review",
+				profilephoto: "default-photo.jpeg",
+				role: department.name + " member",
+				club: club.name,
+				clubID: club._id,
+				departmentID: department._id
+			});
+			console.log(newMember)
+			Member.createMember(newMember, function(err3, newMemberRes) {
+				Department.update({_id: departmentID}, {$push: {members: newMemberRes._id}}, function(err4, pushRes) {
+					printError(err4);
+					printResult(pushRes);
+					res.redirect('/clubs/editStructre/'+req.user.id);
+				});
+			});
+		});
+	});
 });
 
 router.post('/addMember/:departmentID/:subDepartmentID', ensureAuthenticated, function(req, res) {
@@ -424,38 +676,52 @@ router.post('/addDepartmentNew', ensureAuthenticated, function(req, res, next) {
 	var departmentHead = req.body.departmentHead;
 	var departmentPublic = req.body.departmentPublic;
 	var departmentNested = req.body.departmentNested;
-	var newDepartment = new Department({
-		nestedType: departmentNested,
-		public: departmentPublic,
-		name: departmentName, 
-		head: {
+
+	Club.getClubByUserId(req.user.id, function(err, clubRes) {
+		printError(err);
+		if(clubRes.president == null || clubRes.president==="") {
+			req.flash('error_msg','You have to add a president first!');
+			res.redirect('/clubs/editStructre/' + req.user.id);
+		} else {
+			var newMember = new Member({
 				name: departmentHead,
 				gucid: headID,
 				profileId: "none",
 				exists: "false", 
 				rating: "0",
-				review: "no review"
-			},
-		members: [],
-		subDepartments: []
-		});
-	Club.getClubByUserId(req.user.id, function(err, club) {
-		if(club.president==null) {
-			console.log("Null president: "+club.president);
-			req.flash('error_msg','You have to add president first!');
-			next();
-			return;
-		}
-		Department.createDepartment(newDepartment, function(err1, createRes) {
-			printError(err1);
-			Club.update({userid:req.user.id}, {$push:{newDepartments: createRes._id}}, function(err2, pushRes) {
-				printError(err2);
-				printResult(pushRes);
+				review: "no review",
+				club: clubRes.name,
+				role: departmentName+" Head",
+				profilephoto: "default-photo.jpeg",
+				clubID: clubRes._id,
+				departmentID: ""
 			});
-		});
+			Member.createMember(newMember, function(err2, newHead) {
+				printError(err2);
+				printResult(newHead);
+				var newDepartment = new Department({
+					nestedType: departmentNested,
+					public: departmentPublic,
+					name: departmentName, 
+					head: newHead._id,
+					members: [],
+					subDepartments: []
+				});
+				Department.createDepartment(newDepartment, function(err1, createRes) {
+					printError(err1);
+					Club.update({userid:req.user.id}, {$push:{newDepartments: createRes._id}}, function(err2, pushRes) {
+						printError(err2);
+						printResult(pushRes);
+						Member.update({_id: newHead._id}, {$set: {departmentID: createRes._id}}, function(err3, setRes) {
+							printError(err3);
+							printResult(setRes);
+							res.redirect('/clubs/editStructre/' + req.user.id);
+						});
+					});
+				});
+			});
+		}	
 	});
-	res.redirect('/clubs/editStructre/'+req.user.id);
-
 });
 
 router.post('/addSubDepartment/:depID', ensureAuthenticated, function(req, res) {
@@ -464,39 +730,46 @@ router.post('/addSubDepartment/:depID', ensureAuthenticated, function(req, res) 
 	var subheadID = req.body.subheadID;
 	var subdepartmentHead = req.body.subdepartmentHead;
 	var subdepartmentPublic = req.body.subdepartmentPublic;
-	var newSubDepartment = {
-		public: subdepartmentPublic,
-		name: subdepartmentName, 
-		head: {
+	Club.getClubByUserId(req.user.id, function(err, clubRes) {
+		printError(err);
+		Department.getDepartmentById(departmentID, function(err2, department) {
+			printError(err2);
+			var newMember = new Member({
 				name: subdepartmentHead,
-				id: subheadID,
+				gucid: subheadID,
 				profileId: "none",
-				exists: "false"
-			},
-		members: []
-		};
-	Department.update({_id: departmentID},
-		{$push: {
-			subDepartments: newSubDepartment
-		}}, function(err, pushRes) {
-			if(err) {
-				console.log("Error:\n" + err);
-				throw err;
-			} else {
-				console.log(JSON.stringify(pushRes));
-			}
-	});
-	// Club.update({'departments._id': departmentID},
-	// 	{$push: {
-	// 		'departments.$.subDepartments': newSubDepartment
-	// 	}}, function(err, pushRes) {
-	// 		if(err) {
-	// 			console.log("Error:\n" + err);
-	// 			throw err;
-	// 		} else {
-	// 			console.log(JSON.stringify(pushRes));
-	// 		}
-	// });
+				exists: "false",
+				rating: "0",
+				review: "no review",
+				profilephoto: "default-photo.jpeg",
+				role: department.name + " - " + subdepartmentName + " member",
+				club: clubRes.name,
+				clubID: clubRes._id,
+				departmentID: department._id,
+				subDepartmentID: ""
+			});
+			Member.createMember(newMember, function(err3, newSubHead) {
+				printError(err3);
+				var newSubDepartment = {
+					public: subdepartmentPublic,
+					name: subdepartmentName, 
+					head: newSubHead._id,
+					members: []
+				};
+				Department.update({_id: departmentID},
+					{$push: {
+						subDepartments: newSubDepartment
+					}}, function(err4, pushRes) {
+						printError(err4);
+						printResult(pushRes);
+				});
+			})
+		})	
+	})
+	
+	
+
+
 	res.redirect('/clubs/editStructre/'+req.user.id);
 });
 
@@ -517,9 +790,9 @@ router.post('/deleteDepartment/:depID', ensureAuthenticated, function(req, res) 
 	console.log(depID);
 	Club.update({userid: req.user.id},
 		{
-		// $pull: {
-		//   'departments': depID}
-		},
+			$pull: {
+			  "newDepartments": {$in: [depID.toString()]}}
+			},
 		function(err, pullRes) {
 		   	printError(err);
 		   	printResult(pullRes);
@@ -858,16 +1131,6 @@ router.post('/updateSummary', ensureAuthenticated, function(req, res) {
 
 });
 
-router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {
-	storagetype = "profilephoto";
-	upload(req,res,function(err) {
-        if(err) {
-            return res.end("Error uploading file.\n"+err);
-        }
-        res.redirect('/users/profile/'+req.user.id);
-    });
-
-});
 
 function getPresidentOfClub(club, members, req, res) {
 	if(club!=null) {
@@ -936,10 +1199,15 @@ function getMembersOfSingleDepartment(department, members, req, res) {
 router.get('/viewAllMembers/:clubID', function(req, res) {
 	var members = [];
 	var clubID = req.params.clubID;
-	Club.getClubByUserId(clubID, function(err, club) {
+	console.log(clubID)
+	Club.getClubById(clubID, function(err, clubRes) {
 		printError(err);
-		getPresidentOfClub(club, members, req, res);
-		getMembersOfDepartments(club, members, req, res);
+		Member.find({clubID: clubID}, function(err, membersRes) {
+			console.log(membersRes)
+			res.render('clubViews/viewAllMembers.html', {members: membersRes, club: clubRes});
+		});
+		// getPresidentOfClub(club, members, req, res);
+		// getMembersOfDepartments(club, members, req, res);
 	});
 });
 

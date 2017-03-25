@@ -22,6 +22,21 @@ var memberSchema = mongoose.Schema({
 	},
 	club: {
 		type: String
+	},
+	role: {
+		type: String
+	},
+	profilephoto: {
+		type: String
+	},
+	clubID: {
+		type: String
+	},
+	departmentID: {
+		type: String
+	},
+	subDepartmentID: {
+		type: String
 	}
 });
 

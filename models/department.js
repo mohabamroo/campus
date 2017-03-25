@@ -13,45 +13,11 @@ var departmentSchema = mongoose.Schema({
 		type: String
 	},
 	head: {
-		name: {
-			type: String
-		},
-		gucid: {
-			type: String
-		},
-		profileId :{
-			type: String
-		},
-		exists: {
-			type: String
-		},
-		rating: {
-			type: String
-		},
-		review: {
-			type: String
-		}
+		type: String
 	},
 	members: [
 		{
-			name: {
-				type: String
-			},
-			gucid: {
-				type: String
-			},
-			profileId :{
-				type: String
-			},
-			exists: {
-				type: String
-			},
-			rating: {
-				type: String
-			},
-			review: {
-				type: String
-			}
+			type: String
 		}
 	],
 	subDepartments: [
@@ -63,45 +29,11 @@ var departmentSchema = mongoose.Schema({
 				type: String
 			},
 			head: {
-				name: {
-					type: String
-				},
-				gucid: {
-					type: String
-				},
-				profileId :{
-					type: String
-				},
-				exists: {
-					type: String
-				},
-				rating: {
-					type: String
-				},
-				review: {
-					type: String
-				}
+				type: String
 			},
 			members: [
 				{
-					name: {
-						type: String
-					},
-					gucid: {
-						type: String
-					},
-					profileId :{
-						type: String
-					},
-					exists: {
-						type: String
-					},
-					rating: {
-						type: String
-					},
-					review: {
-						type: String
-					}
+					type: String
 				}
 			],
 		}

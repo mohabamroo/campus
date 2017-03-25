@@ -222,77 +222,91 @@ router.post("/signup", function(req, res) {
 			errors: errors
 		});
 	} else {
-		var rand = randomstring.generate();
-		var newUser = new User({
-			name: name,
-			email: email,
-			gucid: gucid,
-			username: username,
-			password: password,
-			usertype: type,
-			links: [],
-			summary: "No summary.", 
-			phone: "No phone",
-			major: major,
-			profilephoto: "default-photo.jpeg",
-			organizations: [],
-			verificationCode: rand,
-			tags: []
-		});
-
-		User.createUser(newUser, function(err, user) {
-			if(err) {
-				console.log(err);
+		User.getUserbyUsername(username, function(err, findRes) {
+			printError(err);
+			console.log("inside get")
+			if(findRes!=null) {
+				console.log('found username')
 				req.flash('error_msg', 'Duplicate Username!');
 				res.redirect('/users/signup');
-				return;
-			}
-			 //    var host = req.get('host');
-			 //    var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
-			 //    var mailOptions = {
-			 //    	from: '"Community" <mohabamr1@gmail.com>"',
-			 //        to : email,
-			 //        subject : "Email Verification @Community",
-			 //        text : "verification: "+link,
-			 //        html: '<h1>Hi, '+username+'!</h1><br>'
-			 //        + '<h3>Please click the following link to verify your account:</h3><br>'
-			 //        + link // html body
-			 //    }
-			 //    console.log(mailOptions);
-			 //    smtpTransport.sendMail(mailOptions, function(error, info){
-			 //    	if(error) {
-			 //        	console.log(error);
-			 //        	res.end("error");
-				//     } else {
-				//        	console.log("Message sent: " + info.response);
-				//    		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
-				//     }
-				// });
-			if(type=="club") {
-				var newClub = new Club({
+			} else {
+				var rand = randomstring.generate();
+				var newUser = new User({
 					name: name,
-					password: user.password,
-					userid: user.id,
-					alias: '',
 					email: email,
-					photos: [],
-					summary: 'no summary',
-					logo: '',
-					phone: '',
-					president: {},
-					departments: [],
-					newDepartments: [],
-					events: []
+					gucid: gucid,
+					username: username,
+					password: password,
+					usertype: type,
+					links: [],
+					summary: "No summary.", 
+					phone: "No phone",
+					major: major,
+					profilephoto: "default-photo.jpeg",
+					organizations: [],
+					verificationCode: rand,
+					tags: []
 				});
-				newClub.save();
+
+				User.createUser(newUser, function(err, user) {
+					printError(err);
+					 //    var host = req.get('host');
+					 //    var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
+					 //    var mailOptions = {
+					 //    	from: '"Community" <mohabamr1@gmail.com>"',
+					 //        to : email,
+					 //        subject : "Email Verification @Community",
+					 //        text : "verification: "+link,
+					 //        html: '<h1>Hi, '+username+'!</h1><br>'
+					 //        + '<h3>Please click the following link to verify your account:</h3><br>'
+					 //        + link // html body
+					 //    }
+					 //    console.log(mailOptions);
+					 //    smtpTransport.sendMail(mailOptions, function(error, info){
+					 //    	if(error) {
+					 //        	console.log(error);
+					 //        	res.end("error");
+						//     } else {
+						//        	console.log("Message sent: " + info.response);
+						//    		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
+						//     }
+						// });
+					if(type=="club") {
+						var newClub = new Club({
+							name: name,
+							password: user.password,
+							userid: user.id,
+							alias: '',
+							email: email,
+							photos: [],
+							summary: 'no summary',
+							logo: '',
+							phone: '',
+							president: "",
+							newDepartments: [],
+							events: []
+						});
+						newClub.save(function(err, clubRes) {
+							printError(err);
+							printResult(clubRes);
+							res.locals.pagetitle = 'Sign In';
+							req.flash('success_msg','You signed up successfully!');
+							res.redirect('/users/signin');
+						})
+					} else {
+						res.locals.pagetitle = 'Sign In';
+						req.flash('success_msg','You signed up successfully!');
+						res.redirect('/users/signin');
+					}
+						
+				});
 			}
 		});
+		
 			
 	}
 
-	res.locals.pagetitle = 'Sign In';
-	req.flash('success_msg','You signed up successfully!');
-	res.redirect('/users/signin');
+
 	
 });
 
@@ -523,7 +537,6 @@ router.get('/viewprofile/:id', function(req,res) {
     
 });
 
-
 router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {
 	storagetype = "profilephoto";
 	upload(req,res,function(err) {
@@ -534,8 +547,6 @@ router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {
     });
 
 });
-
-
 
 router.post('/saveChanges', ensureAuthenticated, function(req, res) {
 	var phone = req.body.phone;

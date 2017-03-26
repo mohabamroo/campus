@@ -1,0 +1,79 @@
+<% include ../layout/header %>
+
+
+
+<div class="container">
+  <h2>Members of <%= name %></h2>
+  <p></p>            
+  <table class="table">
+    <thead>
+      <tr>
+        	<th style="width: 10%;"></th>
+			<th style="width: 30%;">Name</th>
+			<th style="width: 20%;">Role</th>
+			<th style="width: 20%;">Rating</th>
+			<th style="width: 20%;">Review</th>
+      </tr>
+    </thead>
+    <tbody>
+      	<% members.forEach(function(member, index) { %>
+			<tr id="<%= member._id %>">
+				<td>#<%= index %></td>
+				<td>
+				<%= member.name %>
+				</td>
+				<td>
+				<%= member.role %>
+				</td>
+				<td>
+				<%= member.rating %>
+				<div rating="<%= member.rating %>">
+					<% include ../layout/rating %>
+				</div>
+				</td>
+				<td>
+				<%= member.review %>
+				</td>
+			</tr>
+		<% }) %>
+
+    </tbody>
+  </table>
+</div>
+<link href="/css/rating.css" rel="stylesheet">
+<script type="text/javascript">
+	
+	$(".ratingLabel").click(function(){
+		$(this).parent().find("input").nextAll().css({"color": "#ddd"});
+	  	$(this).css({"color": "#FFD700"});
+	  	$(this).nextAll().css({"color": "#FFD700"});
+	  	//.rating > input:checked ~ label, /* show gold star when clicked */
+	  	var myelement = $(this).prev();
+	  	var rating = myelement.val();
+	  	var fieldset = myelement.parent();
+	  	var memberID = fieldset.parent().parent().parent().attr('id');
+	  	console.log(memberID)
+		$.post('/clubs/rateMember/'+memberID+'/'+rating, function(data) {
+			myelement.val(data);
+			console.log("new rating: "+data)
+			fieldset.parent().attr('rating', data);
+		});
+		
+	});
+	$("fieldset").each(function(i) {
+	  	var rating = $(this).parent().attr('rating');
+	    console.log(rating);
+	    if(!rating)
+	    	rating="0";
+	    var inputElement = $(this).find("[value="+rating+"]");
+	    $(this).find("input").nextAll().css({"color": "#ddd"});
+	    inputElement.css({"color": "#FFD700"});
+	  	inputElement.nextAll().css({"color": "#FFD700"});
+	    console.log($(this).find("[value="+rating+"]").val());
+	  });
+</script>
+<style type="text/css">
+	
+</style>
+
+<% include ../layout/footer %>

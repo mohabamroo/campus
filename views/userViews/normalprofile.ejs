@@ -75,15 +75,16 @@
 			      <tr style="font-size: 20px;">
 			        	<th style="width: 10%;"></th>
 						<th style="width: 20%;">Name</th>
+						<th style="width: 20%;">Department</th>
 						<th style="width: 15%;">Role</th>
 						<th style="width: 20%;">Rating</th>
 						<th style="width: 20%;">Review</th>
-						<th style="width: 15%;">Review</th>
+						<th style="width: 15%;">Comment</th>
 			      </tr>
 			    </thead>
 			    <br>
-			    <tbody>
-			    	<% dude.organizations.forEach(function(organization, index) { %>
+			    <tbody id="organizationsBody">
+			    	<!-- <% dude.organizations.forEach(function(organization, index) { %>
 		    			<tr>
 		    				<td>#<%= index %></td>
 			    			<td><%= organization.name %></td>
@@ -92,7 +93,7 @@
 			    			<td><%= organization.review %></td>
 			    			<td><%= organization.comment || "no comment" %></td>
 		    			</tr>
-		    		<% }); %>
+		    		<% }); %> -->
 			    </tbody>
 			  </table>
 			</div>
@@ -155,18 +156,25 @@
 		console.log(link);
 		window.open(link,'_blank');
 	}
+	var url = $(location).attr('href').split('/');
+	var userID = url[url.length-1];
+	$.post('/users/getOrganizations/'+userID, function(myMembers) {
+		var html = "";
+		myMembers.forEach(function(memberObj, index) {
+		    html += '<tr><td>#'+index+'</td>'
+			    + '<td>'+memberObj.club+'</td>'
+			    + '<td>'+memberObj.departmentName+'</td>'
+			    + '<td>'+memberObj.role+'</td>'
+			    + '<td>'+memberObj.rating+'</td>'
+			    + '<td>'+memberObj.review+'</td>';
+			    if(memberObj.comment!=null)
+			    	html+= '<td>'+memberObj.comment +'</td></tr>';
+			    else
+			       	html+= '<td>no comment</td></tr>';
+
+			});
+		$('#organizationsBody').append(html);
+			console.log(html)
+	});
 </script>
 
-<style type="text/css">
-	.row {
-	  display: -webkit-box;
-	  display: -webkit-flex;
-	  display: -ms-flexbox;
-	  display:         flex;
-	  flex-wrap: wrap;
-	}
-	.row > [class*='col-'] {
-	  display: flex;
-	  flex-direction: column;
-	}
-</style>

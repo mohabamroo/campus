@@ -1,6 +1,4 @@
 var mongoose = require('mongoose');
-var bcrypt = require('bcryptjs');
-require('mongoose-type-email');
 
 var departmentSchema = mongoose.Schema({
 	nestedType: {

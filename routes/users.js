@@ -8,6 +8,7 @@ var userUploadsPath = path.resolve(__dirname, "user_uploads");
 var User = require('../models/user');
 var Club = require('../models/club');
 var Tag = require('../models/tag');
+var Member = require('../models/member');
 var multer  = require('multer');
 // var nodemailer = require("nodemailer");
 var randomstring = require("randomstring");
@@ -306,8 +307,6 @@ router.post("/signup", function(req, res) {
 			
 	}
 
-
-	
 });
 
 router.get('/signout', function(req, res){
@@ -346,6 +345,7 @@ router.get('/verify/:userID/:code', function(req, res) {
 			res.redirect('/users/signin');
 		}
 	});
+
 });
 
 router.post('/addlink', ensureAuthenticated, function(req, res) {
@@ -573,22 +573,19 @@ router.post('/saveChanges', ensureAuthenticated, function(req, res) {
 
 });
 
-router.post('/deleteOrganization/:organizationId', ensureAuthenticated, function(req, res) {
-	User.update({_id: req.user.id}, {$pull: {'organizations': {_id:req.params.organizationId}}},
-		function(err, pullRes) {
-			if(err) {
-				console.log(err);
-				throw err;
-			} else {
-				console.log(JSON.stringify(pullRes));
-			}
-			res.redirect('/users/profile/'+req.user.id);
-		});
+router.post('/deleteOrganization/:memberID', ensureAuthenticated, function(req, res) {
+	var memberID = req.params.memberID;
+	Member.remove({_id: memberID}, function(err, deleteRes) {
+		printError(err);
+		printResult(deleteRes);
+		res.json("ok");
+	});
 });
 
 router.post('/addOrganization', ensureAuthenticated, function(req, res) {
 	var organizationName = req.body.name;
 	var role = req.body.role;
+	var departmentName = req.body.department;
 	var comment = req.body.comment || "no comment";
 	var newOrganization = {
 		name: organizationName,
@@ -603,7 +600,33 @@ router.post('/addOrganization', ensureAuthenticated, function(req, res) {
 		printError(err);
 		printResult(updateRes);
 	});
-	res.redirect('/users/profile/'+req.user.id);
+	var newMember = new Member({
+			profileId: req.user.id,
+			exists: "true",
+			rating: "0",
+			review: "self-added",
+			profilephoto: "default-photo.jpeg",
+			role: role,
+			club: organizationName,
+			departmentName: departmentName
+		});
+	Member.createMember(newMember, function(err, createRes) {
+		printError(err);
+		printResult(createRes);
+		res.redirect('/users/profile/'+req.user.id);
+	});
+});
+
+router.post('/getOrganizations/:userID', function(req, res) {
+	var userID = req.params.userID;
+	Member.getMembersByProfileID(userID, function(err, myMembers) {
+		printError(err);
+		if(myMembers!=null && myMembers.length>0) {
+			res.json(myMembers);
+		} else {
+			res.json([]);
+		}
+	});
 });
 
 module.exports = router;

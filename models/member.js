@@ -26,6 +26,9 @@ var memberSchema = mongoose.Schema({
 	role: {
 		type: String
 	},
+	departmentName: {
+		type: String
+	},
 	profilephoto: {
 		type: String
 	},
@@ -54,8 +57,12 @@ module.exports.getMemberByID = function(memberID, callback) {
 	Member.findById(memberID, callback);
 }
 
-module.exports.getDepartmentByClubName = function(clubName, callback) {
-	Department.findOne({club: Name}, callback);
+module.exports.getMembersByProfileID = function(profileId, callback) {
+	Member.find({profileId: profileId}, callback);
+}
+
+module.exports.getMembersByClubID = function(clubID, callback) {
+	Member.find({clubID: clubID}, callback);
 }
 
 

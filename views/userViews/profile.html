@@ -1,5 +1,7 @@
 
 <% include ../layout/header %>
+<div id="topDiv" style="position: fixed; z-index: 9; width: 100%; height: 80%; display: none; color: white; align-self: center; font-size: 20px; overflow-y: scroll;">
+</div>
 
 <div class="editProfile">
 			<div class="jumbotron" >
@@ -97,21 +99,6 @@
 			      </tr>
 			    </thead>
 			    <tbody id="organizationsBody">
-<!-- 			    	<% user.organizations.forEach(function(organization, index) { %>
-		    			<tr>
-		    				<td>#<%= index %></td>
-			    			<td><%= organization.name %></td>
-			    			<td><%= organization.role %></td>
-			    			<td><%= organization.rating %></td>
-			    			<td><%= organization.review %></td>
-			    			<td><%= organization.comment || "no comment" %></td>
-			    			<td>
-			    				<form method="post" action="/users/deleteOrganization/<%= organization._id %>">
-			    					<input type="submit" class="btn btn-success" value="Delete" style="margin: 10px;"/>
-			    				</form>
-			    			</td>
-		    			</tr>
-		    		<% }); %> -->
 		    		<tr>
 		    			<form method="post" action="/users/addOrganization/" >
 		    				<td>#</td>
@@ -218,18 +205,17 @@
 			    + '<td>'+memberObj.departmentName+'</td>'
 			    + '<td>'+memberObj.role+'</td>'
 			    + '<td>'+memberObj.rating+'</td>'
-			    + '<td>'+memberObj.review+'</td>';
-			    if(memberObj.comment!=null)
-			    	html+= '<td>'+memberObj.comment +'</td>';
-			    else
-			       	html+= '<td>no comment</td>';
+			    + '<td class=\"reviewClass\" style=\"text-overflow: ellipsis; max-width: 100px;white-space: nowrap;overflow: hidden;\" onclick=\"viewReview(\''+memberObj.name+'\', \''+memberObj.review+'\')\">'+memberObj.review+'</td>';
+			var comment = memberObj.comment || "no comment";
+			html += '<td class=\"commentClass\" style=\"text-overflow: ellipsis; max-width: 100px;white-space: nowrap;overflow: hidden;\" onclick=\"editComment(\''+memberObj.club+'\', \''+memberObj._id+'\', \''+comment+'\')\">'+comment+'</td>';
+			    
 			    html +='<td><button class=\"btn btn-success deleteDepartmentClass\" style=\"margin: 10px;\">Delete</button></td></tr>';
 			});
 		$('#organizationsBody').append(html);
 		appendDeleteAction();
 	});
 
-	var appendDeleteAction = function(){
+	var appendDeleteAction = function() {
 		$('.deleteDepartmentClass').click(function() {
 			var row = $(this).parent().parent();
 			var memberID = $(this).parent().parent().attr('id');
@@ -243,4 +229,66 @@
 			});
 		});
 	}
+
+	var viewReview = function(name, review) {
+		var html = '<div id=\"reviewDiv\" style=\"position: fixed; align-self: center; margin-top: 50px; margin-left: 30%; width: 500px; height: 300px;\">'
+			+	'<h3 style=\"color: white;\">Review of '+name+'</h3><hr>'
+			+	'<p style=\"width: 100%; height: 80%; color: white;\">'+review+'</p>'
+			+	'<div style=\"float: right;\">'
+			+	'</div></div>';
+		$('#topDiv').html(html);
+		$('#backgroundDiv').show();
+	    $('#topDiv').show();
+	}
+
+	var editComment = function(organizationName, id, comment) {
+		var html = '<div id=\"reviewDiv\" style=\"position: fixed; align-self: center; margin-top: 50px; margin-left: 30%; width: 500px; height: 300px;\">'
+			+	'<h3 style=\"color: white;\">Comment about '+organizationName+'</h3><hr>'
+			+	'<textarea id=\"newComment\" style=\"width: 100%; height: 80%; color: black;\" placeholder=\"'+comment+'\"></textarea>'
+			+	'<div style=\"float: right;\">'
+			+	'<button class=\"btn cancelBtn\" style=\"margin-right: 10px;\">Cancel</button>'
+			+	'<button class=\"btn btn-success\" onclick=\"editCommentOf(\''+id+'\')\">Update</button>'
+			+	'</div></div>';
+		$('#topDiv').html(html);
+		$('#backgroundDiv').show();
+	    $('#topDiv').show();
+	}
+
+	var editCommentOf = function(id) {
+		var newComment = $('#newComment').val();
+		console.log(newComment)
+		$.post('/users/editCommentOf/'+id+'/'+newComment, function(data) {
+			if(data.edited=="true") {
+				$('#'+id).find('.commentClass').text(newComment);
+				$('#backgroundDiv').hide();
+	    		$('#topDiv').hide();
+			} else {
+				alert("not updated!")
+			}
+		});
+	}
+	$(document).mouseup(function (e) {
+	    var container = $("#reviewDiv");
+	    if (!container.is(e.target) 
+	        && container.has(e.target).length === 0) {
+	        container.hide();
+	        $('#backgroundDiv').hide();
+	        $('#topDiv').hide();
+	    }
+	});
+
+	$(document).keyup(function(e) {
+	  if (e.keyCode === 27) {
+			$('#backgroundDiv').hide();
+			$('#topDiv').hide();
+	  }
+	});
 </script>
+
+<style type="text/css">
+	.reviewClass:hover, .commentClass:hover {
+		cursor: pointer;
+		color: #18BC9C;
+		text-decoration: underline;
+	}
+</style>

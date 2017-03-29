@@ -52,9 +52,20 @@
               <p class="help-block text-danger"></p>
           </div>
         </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 controls" style="font-size: 1.5em;">
+            <br>
+            <label for="sel1">Select a type:</label>
+            <select class="form-control" id="userType" name="type" required>
+              <option value="" disabled selected style="display:none;">choose</option>
+              <option value="student">Student</option>
+              <option value="club">Club</option>
+            </select>
+          </div>
+        </div> 
+        <hr> 
         <div class="row control-group" id="birthdateDiv">
           <div class="form-group col-xs-12 controls" style="font-size: 1.5em;" id="birthdateDivChlid">
-            <br>
             <label for="sel2">Birthdate:</label>
             <input type="date" id= "birthdateInput" name="birthdate" class="form-control" required data-validation-required-message="Please enter your birthdate.">
           </div>
@@ -62,7 +73,6 @@
         <hr>
         <div class="row control-group" id="majorDiv">
           <div class="form-group col-xs-12 controls" style="font-size: 1.5em;">
-            <br>
             <label for="sel2">Select a major:</label>
             <select class="form-control" id="major" name="major" required>
               <option value="" disabled selected style="display:none;">choose</option>
@@ -74,16 +84,20 @@
           </div>
         </div>
         <hr>
-        <div class="row control-group">
+        <div class="row control-group" id="yearDiv">
           <div class="form-group col-xs-12 controls" style="font-size: 1.5em;">
-            <label for="sel1">Select a type:</label>
-            <select class="form-control" id="userType" name="type" required>
+            <label for="sel2">Select a year:</label>
+            <select class="form-control" name="year" id="yearInput">
               <option value="" disabled selected style="display:none;">choose</option>
-              <option value="student">Student</option>
-              <option value="club">Club</option>
+              <option value="1st">1st</option>
+              <option value="2nd">2nd</option>
+              <option value="3rd">3rd</option>
+              <option value="4th">4th</option>
+              <option value="5th">5th</option>
             </select>
           </div>
-        </div>                       
+        </div>
+        <hr>                     
         <br>
         <div class="row">
           <div class="form-group col-xs-12">
@@ -108,8 +122,11 @@
     var type = this.value;
     if(type==="club") {
       $('#majorDiv').next().hide();
+      $('#yearDiv').slideUp();
+      $('#yearDiv').next().hide();
       $('#majorDiv').slideUp();
       $('#idDiv').slideUp();
+      $('#birthdateDiv').next().hide();
       $('#birthdateDiv').slideUp();
       $('#inputGUCID').next().remove();
       $('#inputGUCID').remove();
@@ -120,12 +137,16 @@
       firstChange = false;
       $('#majorDiv').next().show();
       $('#majorDiv').slideDown();
+      $('#yearDiv').next().show();
+      $('#yearDiv').slideDown();
       var idHTML = '<input type="text" id=\"inputGUCID\" class=\"form-control\" placeholder=\"ex: 34-5862\" name=\"gucid\" required autofocus data-validation-required-message=\"Please enter your GUC-ID.\"><p class=\"help-block text-danger\"></p>';
       var birthdateHTML = '<input type=\"date\" id=\"birthdateInput\" name=\"birthdate\" class=\"form-control\" required data-validation-required-message=\"Please enter your birthdate.\">';
       $('#idDivChild').append(idHTML);
       $('#birthdateDivChlid').append(birthdateHTML);
+      $('#birthdateDiv').next().show();
       $('#idDiv').slideDown();
-      $('#birthdateDiv').slideDown();    }
+      $('#birthdateDiv').slideDown();    
+    }
   });
 </script>
 

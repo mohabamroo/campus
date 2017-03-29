@@ -204,6 +204,7 @@ router.post('/signup', function(req, res) {
 	var type = req.body.type;
 	var gucid = req.body.gucid;
 	var major = req.body.major || "none";
+	var year = req.body.year;
 	var birthdate = req.body.birthdate;
 	console.log(type);
 	req.checkBody('name', 'Name is empty!').notEmpty();
@@ -245,6 +246,7 @@ router.post('/signup', function(req, res) {
 					summary: "No summary.", 
 					phone: "No phone",
 					major: major,
+					year: year,
 					profilephoto: "default-photo.jpeg",
 					organizations: [],
 					verificationCode: rand,
@@ -628,6 +630,25 @@ router.post('/getOrganizations/:userID', function(req, res) {
 		} else {
 			res.json([]);
 		}
+	});
+});
+
+router.post('/editCommentOf/:memberID/:newComment', ensureAuthenticated, function(req, res) {
+	var memberID = req.params.memberID;
+	var newComment = req.params.newComment;
+	console.log("memberID: "+memberID)
+	var jsonData = {};
+	jsonData.edited = "false";
+	Member.update({_id: memberID}, {$set: {comment: newComment}} ,function(err, updateRes) {
+		printError(err);
+		printResult(updateRes);
+		jsonData.edited = "false";
+		if(updateRes.nModified!=0) {
+			jsonData.edited = "true";
+			jsonData.comment = newComment;
+		}
+		res.json(jsonData);
+
 	});
 });
 

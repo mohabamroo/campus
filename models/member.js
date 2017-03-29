@@ -40,6 +40,9 @@ var memberSchema = mongoose.Schema({
 	},
 	subDepartmentID: {
 		type: String
+	},
+	comment: {
+		type: String
 	}
 });
 

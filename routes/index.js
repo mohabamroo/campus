@@ -10,8 +10,7 @@ router.get('/', function(req, ress) {
 			var str = person.name.toString();
 			var pstr;
 			if(person.profilephoto)
-				pstr = person.profilephoto.toString();			
-
+				pstr = person.profilephoto.toString();
 			if(person.usertype!="developer") {
 				var link = ""; var photolink = "";
 				if(person.links!=null && person.links.length>0)
@@ -19,7 +18,6 @@ router.get('/', function(req, ress) {
 				if(person.photos!=null && person.photos.length>0)
 					photolink = person.photos[0].name;
 				person = {name: str, id: person.id, photo: pstr, link: link, photolink: photolink};
-				//console.log(person);
 				people.push(person);
 			}
 		});

@@ -19,7 +19,7 @@
 
 	<title><%= pagetitle %></title>
 </head>
-<body style="font-family: Montserrat; font-weight: bold; background-color: #fff;">
+<body style="font-family: Montserrat; font-weight: bold; background-color: #fff; word-wrap: break-word; margin: 0;">
 
 
         <!-- Navigation -->
@@ -30,7 +30,7 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand" href="/">Dashboard</a>
+                <a class="navbar-brand" id="a" href="/">Dashboard</a>
             </div>
             <form class="navbar-form navbar-left" method="POST" action="/users/search">
               <div class="form-group">
@@ -38,7 +38,7 @@
               </div>
             </form>
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse navbar-left" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse navbar-left" id="bs-example-navbar-collapse-1" style="font-size: 10px;">
                 <ul class="nav navbar-nav">
                   <li>
                     <a class="navbar-brand" href="/clubs">Clubs</a>
@@ -75,12 +75,13 @@
         </div>
         <!-- /.container-fluid -->
     </nav>
-    <div id="backgroundDiv" style="position: fixed; z-index: 8; background-color: black; width: 100%;height: 100%; opacity: 0.95; display: none;"> 
+    <div id="backgroundDiv" style="position: fixed; z-index: 8; background-color: black; width: 100%;height: 100%; opacity: 0.95; display: none; margin-top: -50px;"> 
     </div>
-<div class="jumbotron container" style="margin-top:50px; min-height: 100%; max-width: 1300px; background-color: #fff; min-height:100vh;">
+<div class="jumbotron container" style="margin-top:90px; background-color: #fff; min-height:100vh; width: 100%; padding: 0; font-family: Montserrat;">
 
       <div class="row container">
-        <div class="col-lg-12">
+
+        <div class="col-lg-12" style="margin-left: 25%;">
           <% if (success_msg!=null && success_msg!="") { %>
             <div class="alert alert-success"><%= success_msg %></div>
           <% } %>
@@ -94,3 +95,9 @@
           <% } %>          
         </div>
       </div>
+
+      <style type="text/css">
+        #a:hover {
+          color: #18BC9C;
+        }
+      </style>

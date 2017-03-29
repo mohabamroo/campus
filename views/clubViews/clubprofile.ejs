@@ -15,20 +15,21 @@
                     <div class="intro-text">
                         <h1 class="name">This is <%= dude.name%>!</h1>
                         <hr class="star-light">
-                        <span class="skills">Web Developer - Graphic Artist - User Experience Designer</span>
-                        <span>Username: <%= dude.username%></span>
+                        <br>
 			 	   		<br>
-				 	   	<span>Email:
+			 	   		<div style="text-align: center; align-self: center; ">
+			 	   			<span>Email:
 				 	   		<span class="email">
 				 	   			<%= dude.email%>
 				 	   		</span>
-				 	   	</span>
-				 	   	<br>
-				 	   	<span>Phone: <%= dude.phone %></span>
-				 	   	<br>
-				 	   	<span>Summary:
-				 	   		<p><%= dude.summary%></p>
-				 	   	</span>
+					 	   	</span>
+					 	   	<br>
+					 	   	<br>
+					 	   	<span>Summary:
+					 	   		<p><%= dude.summary%></p>
+					 	   	</span>
+			 	   		</div>
+				 	   	
 					    <div class="row">
 					    	<div class="col-sm-4">
 						   		<a href="/clubs/viewAllMembers/<%= club.id %>" class="btn btn-lg btnOnGreen">View All Members</a>
@@ -38,7 +39,7 @@
 								    	<a href="/clubs/editStructre/<%= user.id %>" class="btn btn-lg btnOnGreen">Edit Structre</a>
 							    	</div>
 							    	<div class="col-sm-4">
-								   		<a href="/clubs/addEvent" class="btn btn-lg btnOnGreen">Add Event</a>
+								   		<a href="/events/addEvent" class="btn btn-lg btnOnGreen">Add Event</a>
 							    	</div>
 						    <% } %>   
 					    </div>
@@ -48,15 +49,17 @@
         </div>
     </header>
 
-	<div class="container container-fluid structure" style="padding-top: 50px; align-self: center; background-color: #333333; color: white;">
-		<div class="row row-eq-height" style="margin-left: 37%; color: white;">
+	<div class="container container-fluid structure" style="padding-top: 100px; align-self: center; width: 100%; color: white; background-color: #666; min-height: 100vh;">
+		<div class="row row-eq-height" style="color: white;">
+		<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
+		</div>
 			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
 				<% if(president!=null && club.logo!="") { %>
-				 	<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185">
+				 	<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185" style="align-self: center;">
 				<% } else { %>
-				 	<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
+				 	<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185" style="align-self: center;">
 				<% } %>
-				
+					<h3 style="text-align: center;">President</h3>
 					<h4 <%if(president.profileId!="none") { %> 
 							class="clickableh2" id="<%= president.profileId %>"
 							style="cursor:pointer; text-align: center;" 
@@ -64,15 +67,18 @@
 						style=" text-align: center;"
 						<% } %>
 						>		
-						<%= president.name %>
+						<%= president.name || "no preisdent!"%>
 					</h4>
 				
 			</div>
+			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
+			</div>
 		</div>
-
+		<br>
+		<br>
 		<div class="row row-eq-height">
 			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; ">
-				<button id="scrollLeft" style="height: 300px; background-color: #333; border: none;">
+				<button id="scrollLeft" style="height: 300px; border: none; background-color: inherit;">
 					<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
 				</button>
 			</div>
@@ -107,7 +113,7 @@
 				<%  }); %>
 			</div>
 			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0;">
-				<button id="scrollRight" style="height: 300px; background-color: #333; border: none;">
+				<button id="scrollRight" style="height: 300px; background-color: inherit; border: none;">
 					<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
 				</button>
 			</div>
@@ -150,7 +156,7 @@
 												
 							 	   		</div>
 										<div class="">
-											<img class="img-circle" src="/club_uploads/<%= event.logo %>" alt="Generic placeholder image" width="150" height="150" style="float: right; margin-right: 0px;">
+											<img class="img-circle" src="/club_uploads/events/<%= event.photo %>" alt="Generic placeholder image" width="150" height="150" style="float: right; margin-right: 0px;">
 										</div>							
 	       						</div>
 			    					
@@ -214,7 +220,7 @@
 				$('#topDiv').html(html);
 				$('#topDiv').show();
 			}
-			var html = '<div id=\"membersTable\" class=\"container\" style=\"width:50%;margin-left25%; float:left; margin-top:100px; border: solid white;\">'
+			var html = '<div id=\"membersTable\" class=\"container\" style=\"margin-left25%; float:left; margin-top:100px; border: solid white;\">'
   				+ '<h2>Members of '+data.name+'</h2>'
 				+ '<table class=\"table\">'
     			+ '<thead><tr>'
@@ -226,13 +232,19 @@
       			+ '</tr></thead>'
  				+ '<tbody>';
 			data.members.forEach(function(member, index) {
-				if(member!=null)
-					html += '<tr><td>#'+index+'</td>'
-					+ '<td>'+member.name+'</td>'
-					+ '<td>'+member.role+'</td>'
+				if(member!=null) {
+					
+					html += '<tr><td>#'+index+'</td>';
+					if(member.exists=="true") {
+						html += '<td><a href=\"/users/viewprofile/'+member.profileId+'\">'+member.name+'</a></td>'
+					} else {
+						html += '<td>'+member.name+'</td>'
+					}
+					html += '<td>'+member.role+'</td>'
 					+ '<td>'+member.rating+'</td>'
 					+ '<td>'+member.review+'</td>'
 					+ '</tr>';
+				}
 			});
 			html += '</tbody></table></div>';
 			$('#backgroundDiv').show();
@@ -335,5 +347,8 @@
 
 	$('#scrollRight').click(function() {
     	$('#depsDiv').animate( { scrollLeft: '+=400' }, 300, 'easeOutQuad' );
+	});
+	$('#scrollLeft').click(function() {
+    	$('#depsDiv').animate( { scrollLeft: '-=400' }, 300, 'easeOutQuad' );
 	});
 </script>

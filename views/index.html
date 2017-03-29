@@ -2,14 +2,18 @@
 <% include layout/header %>
 
 <% if(people!=null && people.length>0) { %>
-	<div class="row" style="padding: 20px;">
+	<div class="row col-lg-2">
+	</div>
+	<div class="row col-lg-10" style="align-self: center; padding-right: 20px; padding-left: 20px; padding-top: 0;">
 		<% people.forEach(function(person) { %>
 	        <div class="col-lg-2" style="margin-top: 40px; max-width: 190px; margin-right: 25px;">
 	 	   		<img class="img-circle" src="/user_uploads/<%= person.photo %>" alt="Generic placeholder image" width="150" height="150" >
-				<h2 class="clickableh2" id="<%= person.id %>" style="cursor:pointer; color:gray; text-align: center;"><%= person.name %></h2>
+				<h2 class="clickableh2" id="<%= person.id %>" style="cursor:pointer; color:gray; align-self: center; overflow-wrap: break-word;"><%= person.name %></h2>
 	        </div>
 
 		<% });  %>    
+	</div>
+	<div class="row col-lg-2">
 	</div>
 <% } else { %>
 	<h1>no users!</h1>

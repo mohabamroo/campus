@@ -15,55 +15,53 @@ var Member = require('../models/member');
 var Permission = require('../models/permission');
 var Rating = require('../models/rating');
 var multer  = require('multer');
-var storagetype = "logo";
-var clubStorage = multer.diskStorage({
+
+var logoStorage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, './public/club_uploads');
   },
   filename: function (req, file, callback) {
   	console.log(file.originalname);
-  	console.log
   	var filename = file.originalname;
   	var arr = filename.split(".");
   	var filetype = arr[arr.length-1];
   	var newfilename = req.user.username + '-' + Date.now()+'.'+filetype;
     callback(null, newfilename);
     var title = req.body.photoName || newfilename;
-    if(storagetype==="logo") {
-	    Club.update({userid: req.user.id}, {$set: {logo: newfilename}}, function(err, res) {
-	    	if(err) {
-	    		console.log("Error:\n" + err);
-	    		throw err;
-	    	} else {
-	    		console.log(JSON.stringify(res));
-	    	}
-	    });
-	    User.update({_id: req.user.id}, {$set: {profilephoto: newfilename}}, function(err, res) {
-	    	if(err) {
-	    		console.log("Error:\n" + err);
-	    		throw err;
-	    	} else {
-	    		console.log("user profile photo update: "+JSON.stringify(res));
-	    	}
-	    });	
-    } else {
-    	if(storagetype==="galleryPhoto") {
-    		Club.update({userid: req.user.id}, {$push: {photos: {name: title, src: newfilename}}}, function(err, res) {
-		    	if(err) {
-		    		console.log("Error:\n" + err);
-		    		throw err;
-		    	} else {
-		    		console.log(JSON.stringify(res));
-		    	}
-	    	});
-    	}
-    }
-    
+	Club.update({userid: req.user.id}, {$set: {logo: newfilename}}, function(err, res) {
+    	printError(err);
+    	printResult(res);
+	    User.update({_id: req.user.id}, {$set: {profilephoto: newfilename}}, function(err1, res1) {
+	    	printError(err1);
+	    	printResult(res1);
+	    });	   
+  	});
   }
 });
-var clubUpload = multer({ storage : clubStorage}).single('userPhoto');
+var logoUpload = multer({storage: logoStorage}).single('userPhoto');
 
-function ensureAuthenticated(req, res, next) {	
+var galleryStorage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/club_uploads');
+  },
+  filename: function (req, file, callback) {
+  	console.log(file.originalname);
+  	var filename = file.originalname;
+  	var arr = filename.split(".");
+  	var filetype = arr[arr.length-1];
+  	var newfilename = req.user.username + '-' + Date.now()+'.'+filetype;
+    callback(null, newfilename);
+    var title = req.body.photoName || newfilename;
+    Club.update({userid: req.user.id}, {$push: {photos: {name: title, src: newfilename}}}, function(err, res) {
+    	printError(err);
+    	printResult(res);
+	});
+  }
+});
+
+var galleryUpload = multer({storage: galleryStorage}).single('userPhoto');
+
+function ensureAuthenticated(req, res, next) {
 	if(req.isAuthenticated()){
 		return next();
 	} else {
@@ -96,7 +94,6 @@ function printResult(result) {
 
 router.post('/ensureAuthenticatedClub/:userID', ensureAuthenticated, function(req, res) {
 	var userID = req.params.userID;
-	console.log("sssss")
 	Club.getClubByUserId(userID, function(err, club) {
 		printError(err);
 		var jsonData = {};
@@ -247,7 +244,7 @@ function getEventsAndDepartmentsEdit(club, presidentRes, req, res) {
 				if(eventRes!=null)
 					events.push(eventRes);
 				if(i>=club.events.length)
-					getDepartmentsEdit(club, departments, events, req, res);	
+					getDepartmentsEdit(club, presidentRes, events, req, res);	
 			});
 		});
 	} else {
@@ -408,7 +405,6 @@ router.get('/editStructre/:id', ensureAuthenticated, function(req, res) {
 });
 
 router.post('/search', function(req, res) {
-	// res.send(req.body.searchusername);
 	User.getUserbyUsername(req.body.searchusername, function(err, user) {
 		if(err)
 			console.log('err: '+err);
@@ -429,7 +425,6 @@ router.post('/search', function(req, res) {
 router.post('/addpresident', ensureAuthenticated, function(req, res) {
 	var presidentName = req.body.presidentName;
 	var presidentID = req.body.presidentID;
-
 	Club.getClubByUserId(req.user.id, function(err, club) {
 		printError(err);
 		var newMember = new Member({
@@ -678,8 +673,7 @@ router.post('/addSubDepartment/:depID', ensureAuthenticated, function(req, res) 
 });
 
 router.post('/updateLogo', ensureAuthenticated, function(req, res) {
-	storagetype = "logo";
-    clubUpload(req, res, function(err) {
+    logoUpload(req, res, function(err) {
         if(err) {
             return res.end("Error uploading file.\n"+err);
         }
@@ -835,6 +829,22 @@ router.post("/rateMember/:memberID/:rating", ensureAuthenticated, function(req, 
 	});
 });
 
+router.post("/editReview/:memberID/:review", ensureAuthenticated, function(req, res) {
+	var memberID = req.params.memberID;
+	var review = req.params.review;
+	Member.update({_id: memberID}, {$set: {review:review}}, function(err, updateRes) {
+		printError(err);
+		printResult(updateRes);
+		var jsonData = {};
+		jsonData.edited = "false";
+		if(updateRes.nModified!=0) {
+			jsonData.edited = "true";
+			jsonData.review = review;
+		}
+		res.json(jsonData);
+	});
+});
+
 router.get("/rateMember/:depID/:subDepID/:memberID/:objID/:rating", ensureAuthenticated, function(req, res) {
 	var departmentID = req.params.depID;
 	var subdepartmentID = req.params.subDepID;
@@ -869,57 +879,8 @@ router.get("/rateMember/:depID/:subDepID/:memberID/:objID/:rating", ensureAuthen
 	res.redirect('/clubs/editStructre/'+req.user.id)
 });
 
-router.get('/addEvent', ensureAuthenticated, function(req, res) {
-	res.render('clubViews/addEvent.html');
-});
-
-router.post('/addEvent', ensureAuthenticated, function(req, res) {
-	var name = req.body.name;
-	var fromDate = req.body.fromDate;
-	var fromTime = req.body.fromTime;
-	var toDate = req.body.toDate;
-	var toTime = req.body.toTime;
-	var description = req.body.description;
-	var location = req.body.location;
-	var type = req.body.type || "public";
-	var target = req.body.target || "general";
-	console.log(fromTime);
-	var newEvent = new Event({
-		name: name,
-		fromDate: fromDate,
-		fromTime: fromTime,
-		toDate: toDate,
-		toTime: toTime,
-		location: location,
-		description: description,
-		type: type,
-		logo: "event-default.jpg",
-		organizer: req.user.name
-	});
-	Event.createEvent(newEvent, function(err, eventres) {
-		if(err) {
-			console.log(err);
-			throw err;
-		} else {
-			console.log(eventres);
-			Club.update({userid: req.user.id}, {$push: {events: eventres._id}},
-				function(err2, pushRes) {
-					if(err2) {
-						console.log(err2);
-						throw err2;
-					} else {
-						console.log("push res: "+JSON.stringify(pushRes));
-					}
-			});
-		}
-	});
-	res.redirect('/clubs/viewClub/'+req.user.id);
-
-});
-
 router.post('/addPhoto', ensureAuthenticated, function(req,res) {
-	storagetype = "galleryPhoto";
-    clubUpload(req, res, function(err) {
+    galleryUpload(req, res, function(err) {
         if(err) {
             return res.end("Error uploading file.\n"+err);
         }

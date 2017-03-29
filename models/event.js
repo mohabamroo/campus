@@ -23,9 +23,6 @@ var eventSchema = mongoose.Schema({
 	description: {
 		type: String
 	},
-	logo: {
-		type: String
-	},
 	photos: [
 		{
 			type: String
@@ -38,6 +35,9 @@ var eventSchema = mongoose.Schema({
 		type: String
 	},
 	target: {
+		type: String
+	},
+	photo: {
 		type: String
 	}
 

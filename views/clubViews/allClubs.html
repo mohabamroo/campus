@@ -1,27 +1,26 @@
 <% include ../layout/header %>
 
-
-	<div class="clubsDiv" style="margin-top: 40px; min-height: 490px;">
+<div style="margin-top: 40px;">
+	<div class="col-lg-1"></div>
+	<div class="row col-lg-10" style="padding: 50px; align-self: center;">
 		<% clubs.forEach(function(club) { %>
-			<div class="col-lg-2" style=" max-width: 190px; margin-right: 25px;">
-	 	   		<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="150" height="150" >
-				<h2 class="clickableh2" id="<%= club.userid %>" style="cursor:pointer; color:gray; text-align: center;"><%= club.name %></h2>
+			<div class="col-lg-3 portfolio-item" style="padding: 10px;">
+	 	   		<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="180" style="align-self: center;">
+				<h2 style="text-align: center;"><a href="/clubs/viewClub/<%= club.userid %>"><%= club.name %></a>
+				</h2>
 	        </div>
 
 		<% }); %>
 	</div>
 
-
-
+</div>
 <% include ../layout/footer %>
 
-<script type="text/javascript">
-	var h2s = document.getElementsByClassName('clickableh2');
-
-	Array.prototype.forEach.call(h2s, function(el) {
-	    el.onclick=function(){
-		window.location = "/clubs/viewClub/"+el.id;
+<style type="text/css">
+	a {
+		color: gray;
 	}
-	});
-
-</script>
+	a:hover {
+		color: #2C3E50;
+	}
+</style>

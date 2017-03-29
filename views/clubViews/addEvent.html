@@ -1,62 +1,89 @@
 <% include ../layout/header %>
 <div class="container">
-    
-    <form method="post" action="/clubs/addEvent" style="width: 50%; margin-left: 25%;">
-    	<h2 class="form-event-heading">Add Event form</h2>
-        <br>
-        <label for="inputName" class="eventLabel">Name</label>
-        <input type="text" id="inputName" class="form-control" placeholder="ex: oscars night" name="name" required autofocus>
-        <br>
-
-        <label for="inputLocation" class="eventLabel">Location</label>
-        <input type="text" id="inputLocation" class="form-control" placeholder="ex: platform" name="location" required>
-		<br>
-
-        <label for="inputFromDate" class="eventLabel">From</label>
-        <br>
-        <div style="margin-left: 10%;">
-	        <label>Day:</label>
-	        <input type="date" id="inputFromDate" class="form-control" name="fromDate" required style="width: 80%; float: right;">
-	        <br>
-	        <br>
-	        <label>Time:</label>
-	        <input type="time" id="inputFromTime" class="form-control" name="fromTime" required style="width: 80%; float: right;">	
+  <div class="row">
+    <div class="col-lg-12 text-center">
+      <br>
+      <h2>Add Event</h2>
+      <hr class="star">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+      <form method="post" enctype="multipart/form-data" action="/events/addEvent">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputName" class="eventLabel" style="font-size: 20px;">Name</h1>
+            <input type="text" id="inputName" class="form-control" placeholder="ex: oscars night" name="name" required autofocus>
+            <p class="help-block text-danger"></p>
+          </div>
         </div>
-        <br>
-        <br>
-        <label for="inputToDate" class="eventLabel">To</label>
-		<div style="margin-left: 10%;">
-	        <label>Day:</label>
-	        <input type="date" id="inputToDate" class="form-control" name="toDate" required style="width: 80%; float: right;">
-	        <br>
-	        <br>
-	        <label>Time:</label>
-	        <input type="time" id="inputToTime" class="form-control" name="toTime" required style="width: 80%; float: right;">	
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputLocation" class="eventLabel" style="font-size: 20px;">Location</h1>
+            <input type="text" id="inputLocation" class="form-control" placeholder="ex: platform" name="location" required>
+            <p class="help-block text-danger"></p>
+          </div>
         </div>
+        
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputDate" class="eventLabel" style="font-size: 20px;">From</h1>
+            <input type="date" id="" class="form-control" name="fromDate" required>
+            <input type="time" id="" class="form-control" name="fromTime" required>  
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputDate" class="eventLabel" style="font-size: 20px;">To</h1>
+            <input type="date" id="" class="form-control" name="toDate" required>
+            <input type="time" id="" class="form-control" name="toTime" required>  
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputDescription" class="eventLabel" style="font-size: 20px;">Description</h1>
+            <input type="text" id="inputDescription" class="form-control" placeholder="ex: giving the oscars to the winners" name="description" required>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputTarget" class="eventLabel" style="font-size: 20px;">Target</h1>
+            <input type="text" id="inputTarget" class="form-control" placeholder="ex: cinemaholics" name="target" required>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div> 
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+                <h1 for="sel1" class="eventLabel" style="font-size: 20px;">Select a type:</h1>
+                <br>
+                <select class="form-control" id="eventType" name="type">
+                    <option value="" disabled selected style="display:none;">choose</option>
+                    <option value="private">Internal</option>
+                    <option value="public">External</option>
+                </select>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>                        
         <br>
-
-        <label for="inputDescription" class="eventLabel">Description</label>
-        <input type="text" id="inputDescription" class="form-control" placeholder="ex: giving the oscars to the winners" name="description" required>
-        <br>
-
-        <label for="inputTarget" class="eventLabel">Target</label>
-        <input type="text" id="inputTarget" class="form-control" placeholder="ex: cinemaholics" name="target" required>
-        <br>
-
-        <div class="form-group">
-	  		<label for="sel1" class="eventLabel">Select a type:</label>
-	  		<select class="form-control" id="eventType" name="type">
-	        	<option value="" disabled selected style="display:none;">choose</option>
-	  		    <option value="private">Internal</option>
-	  		    <option value="public">External</option>
-	  		</select>
-  		</div>
-  		<br>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
-    </form>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputImage" class="eventLabel" style="font-size: 20px;">Photo</h1>
+            <input type="file" class="form-control btn" name="eventPhoto" style="margin-top: 4px;">
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-xs-12">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-
 
 
 <% include ../layout/footer %>

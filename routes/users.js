@@ -195,7 +195,7 @@ router.get('/signup', function(req, res) {
 
 });
 
-router.post("/signup", function(req, res) {
+router.post('/signup', function(req, res) {
 	var name = req.body.name;
 	var email = req.body.email;
 	var password = req.body.password;
@@ -204,6 +204,7 @@ router.post("/signup", function(req, res) {
 	var type = req.body.type;
 	var gucid = req.body.gucid;
 	var major = req.body.major || "none";
+	var birthdate = req.body.birthdate;
 	console.log(type);
 	req.checkBody('name', 'Name is empty!').notEmpty();
 	req.checkBody('email', 'Email is empty!').notEmpty();
@@ -239,6 +240,7 @@ router.post("/signup", function(req, res) {
 					username: username,
 					password: password,
 					usertype: type,
+					birthdate: birthdate,
 					links: [],
 					summary: "No summary.", 
 					phone: "No phone",

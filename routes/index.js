@@ -8,7 +8,7 @@ var sendmail = require('sendmail')();
 router.get('/', function(req, ress) {
 	sendmail({
 	    from: 'mohabamr1@gmail.com',
-	    to: 'mohabamr1@gmail.com',
+	    to: 'mohab.abdelmeguid@student.guc.edu.eg',
 	    subject: 'test sendmail',
 	    html: 'Mail of test sendmail ',
 	  }, function(err, reply) {

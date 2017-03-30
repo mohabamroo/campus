@@ -259,8 +259,10 @@
 		$.post('/clubs/getUserPermissionForDepartment/'+departmentID, function(data) {
 			console.log(data)
 			if(data=="true") {
-				var editMembersBtn = '<a class="btn btn-success btn-lg" href=\"/clubs/editMembersOfDepartment/'+departmentID+'\" style=\"margin-top:40vh; margin-left:50px; float: left; position: fixed;\">Edit Members</a>';
+				var editMembersBtn = '<a class="btn btn-success btn-lg" href=\"/clubs/editMembersOfDepartment/'+departmentID+'\" id=\"editMembersBtn\" style=\"margin-top:40vh; margin-left:50px; float: left; position: fixed;\">Edit Members</a>';
 				$('#tableTopDiv').after(editMembersBtn);
+			} else {
+				$('#editMembersBtn').remove();
 			}
 		});
 	}

@@ -52,9 +52,16 @@
 	  	var memberID = fieldset.parent().parent().parent().attr('id');
 	  	console.log(memberID)
 		$.post('/clubs/rateMember/'+memberID+'/'+rating, function(data) {
-			myelement.val(data);
-			console.log("new rating: "+data)
-			fieldset.parent().attr('rating', data);
+			console.log("new rating: "+data);
+			if(data==="Not authorized!") {
+				alert("You are not authorized");
+				var alertError = '<div class=\"alert alert-danger\">You are note Authorized!</div>';
+				$('#alertDiv').append(alertError)
+
+			} else {
+				myelement.val(data);
+				fieldset.parent().attr('rating', data);
+			}
 		});
 	});
 	$("fieldset").each(function(i) {

@@ -58,7 +58,6 @@ var galleryStorage = multer.diskStorage({
 	});
   }
 });
-
 var galleryUpload = multer({storage: galleryStorage}).single('userPhoto');
 
 function ensureAuthenticated(req, res, next) {
@@ -68,6 +67,30 @@ function ensureAuthenticated(req, res, next) {
 		req.flash('error_msg','You are not logged in');
 		res.redirect('/users/signin');
 	}
+}
+
+function ensureHeadOfMember(memberID, req, res, next) {
+	console.log('ensureHead')
+	if(req.isAuthenticated())
+		Member.getMemberByID(memberID, function(err, member) {
+			printError(err);
+			if(member!=null)
+				Permission.findOne({profileId: req.user.id, departmentID: member.departmentID},
+					function(err1, permissionRes) {
+						printError(err1);
+						if(permissionRes!=null) {
+							printResult(permissionRes);
+							return;
+						} else {
+							res.end('Not authorized!');
+						}
+				});
+		});
+	else {
+		req.flash('error_msg','You are not logged in');
+		res.redirect('/users/signin');
+	}
+
 }
 
 router.get('/', function(req, res) {
@@ -518,7 +541,6 @@ router.post('/getUserPermissionForDepartment/:departmentID', ensureAuthenticated
 	var profileID = req.user.id;
 	Permission.findOne({departmentID: departmentID, profileId: profileID}, function(err, permission) {
 		printError(err);
-		console.log("per: "+permission);
 		if(permission!=null && permission.permission==="true")
 			res.json("true");
 		else
@@ -703,7 +725,6 @@ router.post('/deleteDepartment/:depID', ensureAuthenticated, function(req, res) 
     res.redirect('/clubs/editStructre/'+req.user.id);
 });
 
-
 function updateMembersHelper(counterObject, limit, req, res) {
 	counterObject.i++;
 	if(counterObject.i>=limit)
@@ -759,6 +780,7 @@ function updateSingleMember(member, userRes, counterObject, limit, req, res) {
 		}
 	});
 }
+
 router.post('/updateMembers/:clubID', ensureAuthenticated, function(req, res) {
 	var clubID = req.params.clubID;
 	Member.getMembersByClubID(clubID, function(err, members) {
@@ -801,8 +823,9 @@ function updateMemberRating(memberID, req, res) {
 	});
 }
 
-router.post("/rateMember/:memberID/:rating", ensureAuthenticated, function(req, res) {
+router.post("/rateMember/:memberID/:rating", function(req, res) {
 	var memberID = req.params.memberID;
+	ensureHeadOfMember(memberID, req, res);
 	var rating = req.params.rating;
 	Rating.find({raterID: req.user.id, memberID: memberID}, function(err, ratingRes) {
 		printError(err);
@@ -843,40 +866,6 @@ router.post("/editReview/:memberID/:review", ensureAuthenticated, function(req, 
 		}
 		res.json(jsonData);
 	});
-});
-
-router.get("/rateMember/:depID/:subDepID/:memberID/:objID/:rating", ensureAuthenticated, function(req, res) {
-	var departmentID = req.params.depID;
-	var subdepartmentID = req.params.subDepID;
-	var memberID = req.params.memberID;
-	var memberobjID = req.params.objID;
-	var rating = req.params.rating;
-
-	Department.find({subDepartments: {$elemMatch: {'members._id': memberobjID}}},
-		function(err, depRes) {
-		printError(err);
-		if(depRes!=null) {
-			//console.log(depRes[0].subDepartments[0].members[0].rating);	
-			var index;
-			depRes[0].subDepartments[0].members.some(function( obj, idx ) {
-			    if( obj._id == memberobjID ) {
-			        index = idx;
-			        return true;
-			    }
-			});
-			console.log('index is: ', index);
-			var update = { "$set": { } };
-			update["$set"]["subDepartments.0.members."+index+".rating"] = rating;
-			console.log("update str: " + JSON.stringify(update));
-			// Then update as normal
-			Department.update({'subDepartments.members._id': memberobjID}, update,
-				function(err, updateRes) {
-					printError(err);
-					printResult(updateRes);
-			});
-		}
-	});
-	res.redirect('/clubs/editStructre/'+req.user.id)
 });
 
 router.post('/addPhoto', ensureAuthenticated, function(req,res) {

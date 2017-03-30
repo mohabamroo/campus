@@ -2,8 +2,19 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
 var Club = require('../models/club');
+var sendmail = require('sendmail')();
+ 
 
 router.get('/', function(req, ress) {
+	sendmail({
+	    from: 'mohabamr1@gmail.com',
+	    to: 'mohabamr1@gmail.com',
+	    subject: 'test sendmail',
+	    html: 'Mail of test sendmail ',
+	  }, function(err, reply) {
+	    console.log(err && err.stack);
+	    console.dir(reply);
+	});
 	var people = [];
 	User.find(function(err, res) {
 		res.forEach(function(person) {

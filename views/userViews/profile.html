@@ -3,27 +3,38 @@
 <div id="topDiv" style="position: fixed; z-index: 9; width: 100%; height: 80%; display: none; color: white; align-self: center; font-size: 20px; overflow-y: scroll;">
 </div>
 
-<div class="editProfile">
+<div class="editProfile" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
 			<div class="jumbotron" >
 				<div class="container">
-					<h1 style="float: left; padding-top: 40px;">Hello, <%= user.name%>!</h1>
-			 	   	<img class="img-circle" src="/user_uploads/<%= user.profilephoto %>" alt="Generic placeholder image" width="300" height="300" style="float: right; margin: 10px;">
+					<h1 style="padding-top: 40px; color: black; float: left;">Hello, <%= user.name%>!
+						<hr style="color: black; border: 2px solid black;">
+					</h1>
+					
+					<div style="float: right;">
+						
+						<div class="img-edit" style="max-width: 300px; max-height: 250px;">
+					 	   	<img class="img-circle hover" src="/user_uploads/<%= user.profilephoto %>" alt="Generic placeholder image" width="300" height="250" >
+	 						<p class="text">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
+						</div>
 
-					<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/users/updateProfilePhoto" style="margin-top: 150px;">
-							<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px; max-width: 400px;">
-							<button type="submit" value="Upload Image" class="btn btn-success" style="margin: 10px;">Update profile photo</button>	
-					</form>
+						<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/users/updateProfilePhoto" style="align-self: center;">
+								<input type="file" id="fileUpload" class="form-control btn" name="userPhoto" style="display: none;">
+								<button type="submit" value="Upload Image" class="btn btn-success" style="margin-left: 20%;margin-right: auto; align-self: center;">Update profile photo</button>	
+						</form>
+					</div>
 					<br>
-					<form style="width: 400px;" method="post" action="/users/saveChanges">
-				 	   		<input type="email" name="email" class="form-control" placeholder="ex: mohab@gmail.com" style="max-width: 250px;" value="<%= user.email %>">
+					<div style="">
+
+					<form style="width: 200px;" method="post" action="/users/saveChanges">
+				 	   		<input type="email" name="email" class="form-control" placeholder="ex: mohab@gmail.com" value="<%= user.email %>">
 				 	   		<br>
 				 	   		<% if(user.phone==="no phone") { %>
-				 	   			<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012" style="max-width: 150px;">
+				 	   			<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012">
 				 	   		<% } else { %>
-				 	   			<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012" style="max-width: 150px;" value="<%= user.phone %>">
+				 	   			<input type="text" name="phone" class="form-control" placeholder="ex: 01064911012" value="<%= user.phone %>">
 				 	   		<% } %>
 				 	   	 	<br>
-				 	   	 	<input type="date" name="birthdate" class="form-control" value="<%= user.birthdate %>">
+				 	   	 	<input type="date" name="birthdate" class="form-control"	 value="<%= user.birthdate %>">
 				 	   	 	<br>
 				 	   	 	<select class="form-control" name="gender" required>
 					        	<option value="<%= user.gender %>" selected style="display:none;"><%= user.gender || "choose gender" %></option>
@@ -47,7 +58,7 @@
 					  		    <option value="5th">5th</option>
 					  		</select>
 					  		<br>
-				 	   		<div class="form-control" onkeyup="updatehidden()" style="min-width: 500px; min-height: 150px;" id='faketxt' contenteditable>
+				 	   		<div class="form-control" onkeyup="updatehidden()" style="width: 350px; min-height: 150px;" id='faketxt' contenteditable>
 				 	   	 		<% if(user.summary!=null && user.summary!="") { %>
 				 	   	 		<%= user.summary %>
 				 	   	 		<% } else { %>
@@ -59,6 +70,7 @@
 				 	   		<input type="submit" class="btn btn-success" value="Save Changes" style=" position: relative;">
 				 	   		<a href="/users/viewprofile/<%=user.id%>" class="btn btn-">Cancel</a>
 				 	</form>
+				 	</div>
 				 	<br>
 				</div>
 			 	   
@@ -267,6 +279,11 @@
 			}
 		});
 	}
+
+	$('.img-edit').click(function() {
+		$('#fileUpload').click();
+		})
+
 	$(document).mouseup(function (e) {
 	    var container = $("#reviewDiv");
 	    if (!container.is(e.target) 
@@ -290,5 +307,26 @@
 		cursor: pointer;
 		color: #18BC9C;
 		text-decoration: underline;
+	}
+	.img-edit:hover img {
+		cursor: pointer;
+		filter: blur(5px);
+		filter: brightness(50%);
+
+	}
+	.img-edit .text {
+		position:relative;
+		visibility:hidden;
+		bottom: 150px;
+		cursor: pointer;
+		font-family: arial;
+		font-weight: bold;
+		font-size: 30px;
+		color: white;
+		text-align: center;
+	}
+
+	.img-edit:hover .text {
+		visibility:visible;
 	}
 </style>

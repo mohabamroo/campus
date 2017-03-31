@@ -3,9 +3,6 @@ sperate 34 from 5862
 club gallery
 ensure permissions and validation
 organization from and to
-
-email verification guc
-
 search view:
 name, qualification, cv, best club name, role, review, rating
 
@@ -13,7 +10,6 @@ offers, list of name and summary of offer
 clickable, description and location
 
 all ratings are stars
-
 https
 
 done:
@@ -40,6 +36,8 @@ sign up details
 remove major when club
 birthdate when student
 student write comment
+email verification guc
+nice photo change
 
 
 

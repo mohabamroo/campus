@@ -3,18 +3,35 @@ var router = express.Router();
 var User = require('../models/user');
 var Club = require('../models/club');
 var sendmail = require('sendmail')();
- 
-
+var mailer = require('express-mailer');
+var app = require('../app.js');
+console.log("my app")
+console.log(app)
+mailer.extend(app, {
+  from: 'mohabamr1@gmail.com',
+  host: 'smtp.gmail.com', // hostname 
+  secureConnection: true, // use SSL 
+  port: 465, // port for secure SMTP 
+  transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts 
+  auth: {
+    user: 'mohabamr1@gmail.com',
+    pass: 'mohab.abdelmeguid1830'
+  }
+});
 router.get('/', function(req, ress) {
-	sendmail({
-	    from: 'mohabamr1@gmail.com',
-	    to: 'mohab.abdelmeguid@student.guc.edu.eg',
-	    subject: 'test sendmail',
-	    html: 'Mail of test sendmail ',
-	  }, function(err, reply) {
-	    console.log(err && err.stack);
-	    console.dir(reply);
-	});
+	app.mailer.send('email', {
+      to: 'mohabamr1@gmail.com, mohab.abdelmeguid@student.guc.edu.eg', // REQUIRED. This can be a comma delimited string just like a normal email to field.  
+      subject: 'final', // REQUIRED. 
+      otherProperty: 'Other Property' // All additional properties are also passed to the template as local variables. 
+    }, function (err) {
+      if (err) {
+        // handle error 
+        console.log(err);
+        console.log('There was an error sending the email');
+        return;
+      }
+      console.log('Email Sent');
+    });
 	var people = [];
 	User.find(function(err, res) {
 		res.forEach(function(person) {

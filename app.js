@@ -18,13 +18,15 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://mohabamroo:ghostrider1@ds127260.mlab.com:27260/communitydb');
 // mongoose.connect('mongodb://localhost/communitydb');
 var db = mongoose.connection;
+var mailer = require('express-mailer');
+var app = express();
+
+module.exports = app;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var clubs = require('./routes/clubs');
 var events = require('./routes/events');
-
-var app = express();
 
 
 app.set("views", path.resolve(__dirname, "views"));
@@ -78,11 +80,15 @@ app.use(function (req, res, next) {
   res.locals.pagetitle = 'Home Page';
   next();
 });
+ 
 
 app.use('/', routes);
 app.use('/users', users);
 app.use('/clubs', clubs);
 app.use('/events', events);
 app.listen(process.env.PORT||3000, function() {
+
 	console.log("Express app started on port 3000.");
-}); 
+});
+console.log('before export')
+console.log('after export')

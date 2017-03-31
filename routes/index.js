@@ -8,14 +8,14 @@ var app = require('../app.js');
 console.log("my app")
 console.log(app)
 mailer.extend(app, {
-  from: 'mohabamr1@gmail.com',
+  from: 'communityguc@gmail.com',
   host: 'smtp.gmail.com', // hostname 
   secureConnection: true, // use SSL 
   port: 465, // port for secure SMTP 
   transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts 
   auth: {
-    user: 'mohabamr1@gmail.com',
-    pass: 'mohab.abdelmeguid1830'
+    user: 'communityguc@gmail.com',
+    pass: 'community1234567890'
   }
 });
 router.get('/', function(req, ress) {
@@ -32,6 +32,15 @@ router.get('/', function(req, ress) {
       }
       console.log('Email Sent');
     });
+    sendmail({
+	    from: 'communityguc@gmail.com',
+	    to: 'mohabamr1@gmail.com, mohab.abdelmeguid@student.guc.edu.eg',
+	    subject: 'test sendmail without pass',
+	    html: 'Mail of test sendmail ',
+	  }, function(err, reply) {
+	    console.log(err && err.stack);
+	    console.dir(reply);
+	});
 	var people = [];
 	User.find(function(err, res) {
 		res.forEach(function(person) {

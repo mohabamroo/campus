@@ -19,3 +19,7 @@ tasks:
 5- rate head and president?
 6- club add Events
 7- timeline of events (orderd by date)
+
+
+communityguc@gmail.com
+community1234567890

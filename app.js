@@ -87,8 +87,6 @@ app.use('/users', users);
 app.use('/clubs', clubs);
 app.use('/events', events);
 app.listen(process.env.PORT||3000, function() {
-
 	console.log("Express app started on port 3000.");
 });
-console.log('before export')
-console.log('after export')
+

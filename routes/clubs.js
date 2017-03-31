@@ -3,7 +3,6 @@ var router = express.Router();
 var request = require('request');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var fs = require('fs');
 var path = require("path");
 var flash = require('connect-flash');
 var clubUploadsPath = path.resolve(__dirname, "club_uploads");

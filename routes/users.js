@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var fs = require('fs');
 var path = require("path");
 var userUploadsPath = path.resolve(__dirname, "user_uploads");
 var User = require('../models/user');
@@ -10,7 +9,8 @@ var Club = require('../models/club');
 var Tag = require('../models/tag');
 var Member = require('../models/member');
 var multer  = require('multer');
-// var nodemailer = require("nodemailer");
+var mailer = require('express-mailer');
+var app = require('../app.js');
 var randomstring = require("randomstring");
 var storagetype = "screenshot";
 var storage = multer.diskStorage({
@@ -58,14 +58,18 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage : storage}).single('userPhoto');
 
-// var smtpTransport = nodemailer.createTransport({
-//     service: "gmail",
-//     host: "smtp.gmail.com",
-//     auth: {
-//         user: "mohabamr1",
-//         pass: "mohab.abdelmeguid1830"
-//     }
-// });
+mailer.extend(app, {
+  from: 'communityguc@gmail.com',
+  host: 'smtp.gmail.com', // hostname 
+  secureConnection: true, // use SSL 
+  port: 465, // port for secure SMTP 
+  transportMethod: 'SMTP', // default is SMTP. Accepts anything that nodemailer accepts 
+  auth: {
+    user: 'communityguc@gmail.com',
+    pass: 'community1234567890'
+  }
+});
+
 function printError(err) {
 	if(err) {
 		console.log(JSON.stringify(err));
@@ -76,30 +80,6 @@ function printError(err) {
 function printResult(result) {
 	console.log("Result: " + JSON.stringify(result));
 }
-// router.get('/send', function(req,res) {
-//     var rand = randomstring.generate();
-//     var host = req.get('host');
-//     var link = "http://"+req.get('host')+"/verify/"+req.user.id+"/"+rand;
-//     var mailOptions = {
-//     	from: '"Community" <mohabamr1@gmail.com>"',
-//         to : "mohabamr1@gmail.com",
-//         subject : "Email Verification @Community",
-//         text : "verification: "+link,
-//         html: '<h1>Hi, Mohab!</h1><br>'
-//         + '<h3>Please click the following link to verify your account:</h3><br>'
-// 		+ link // html body
-//     }
-//     console.log(mailOptions);
-//     smtpTransport.sendMail(mailOptions, function(error, info){
-//     	if(error) {
-//         	console.log(error);
-//         	res.end("error");
-// 	    } else {
-// 	       	console.log("Message sent: " + info.response);
-// 	   		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
-// 	    }
-// 	});
-// });
 
 function ensureAuthenticated(req, res, next){	
 	if(req.isAuthenticated()){
@@ -110,26 +90,21 @@ function ensureAuthenticated(req, res, next){
 	}
 }
 
-// function ensureVerification(req, res, next) {
-// 	console.log("he")
-// 	User.getUserById(req.user.id, function(err, resuser) {
-// 		if(resuser.verificationCode==="XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe") {
-// 			return next();
-// 		} else {
-// 			req.flash('error_msg','You are not verified!');
-// 			res.redirect('/users/signin');
-// 		}
-// 	});
-// }
+function ensureAuthenticated(req, res, next){	
+	if(req.isAuthenticated()) {
+		console.log("code: "+req.user.verificationCode)
+		if(req.user.verificationCode==="XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe") {
+			return next();
+		} else {
+			req.flash('error_msg','You are not verified!');
+			res.redirect('/users/signin');
+		}
+	} else {
+		req.flash('error_msg','You are not logged in!');
+		res.redirect('/users/signin');
+	}
+}
 
-// function ensureAuthenticated(req, res, next){	
-// 	if(req.isAuthenticated()){
-// 		ensureVerification(req, res, next);
-// 	} else {
-// 		req.flash('error_msg','You are not logged in!');
-// 		res.redirect('/users/signin');
-// 	}
-// }
 router.get('/profile/:id', ensureAuthenticated, function(req, res) {
 	if(req.isAuthenticated() && req.user.id == req.params.id) {
 		res.render('userViews/profile.html');
@@ -148,7 +123,6 @@ passport.use(new LocalStrategy(
    		if(!user) {
    			return done(null, false, {message: 'Unknown User'});
    		}
-
    	User.validatePassword(password, user.password, function(err, res){
    		if(err)
    			throw err;
@@ -255,27 +229,21 @@ router.post('/signup', function(req, res) {
 
 				User.createUser(newUser, function(err, user) {
 					printError(err);
-					 //    var host = req.get('host');
-					 //    var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
-					 //    var mailOptions = {
-					 //    	from: '"Community" <mohabamr1@gmail.com>"',
-					 //        to : email,
-					 //        subject : "Email Verification @Community",
-					 //        text : "verification: "+link,
-					 //        html: '<h1>Hi, '+username+'!</h1><br>'
-					 //        + '<h3>Please click the following link to verify your account:</h3><br>'
-					 //        + link // html body
-					 //    }
-					 //    console.log(mailOptions);
-					 //    smtpTransport.sendMail(mailOptions, function(error, info){
-					 //    	if(error) {
-					 //        	console.log(error);
-					 //        	res.end("error");
-						//     } else {
-						//        	console.log("Message sent: " + info.response);
-						//    		res.end("Sent: " + info.response +"\nmsgID: "+info.messageId) ;
-						//     }
-						// });
+    				var host = req.get('host');
+    				var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
+					app.mailer.send('email', {
+				      to: email,
+				      subject: 'Community-<DON\'T REPLY> Email Verification',
+				      link: link,
+				      name: username
+				    }, function (errEmail) {
+				      if (err) {
+				      	console.log('There was an error sending the email');
+				        printError(errEmail);
+				      } else {
+				      	console.log('Email Sent');
+				      }
+				    });
 					if(type=="club") {
 						var newClub = new Club({
 							name: name,
@@ -317,11 +285,10 @@ router.get('/signout', function(req, res){
 	if(req.isAuthenticated()){
 		req.logout();
 	} else {
-		//req.flash('error_msg','You are not logged in');
+		req.flash('error_msg','You are not logged in');
 	}
 
 	req.flash('success_msg', 'You are signed out');
-
 	res.redirect('/users/signin');
 
 });
@@ -366,9 +333,7 @@ router.post('/addlink', ensureAuthenticated, function(req, res) {
 	} else {
 		req.flash("error_msg", "Fill all the fields!")
 	}
-	
 	res.redirect('/users/profile/'+req.user.id);
-	
 	res.send(res.locals.user.username);
 
 });
@@ -402,10 +367,9 @@ router.post('/addTags', ensureAuthenticated, function(req, res) {
 					}
 				});
 			});
-			
 		});	
 	} else {
-		// req.flash("error_msg", "Fill all the fields!")
+		req.flash("error_msg", "Fill all the fields!")
 	}
 	res.redirect('/users/profile/'+req.user.id);	
 
@@ -584,6 +548,7 @@ router.post('/deleteOrganization/:memberID', ensureAuthenticated, function(req, 
 		printResult(deleteRes);
 		res.json("ok");
 	});
+
 });
 
 router.post('/addOrganization', ensureAuthenticated, function(req, res) {
@@ -619,6 +584,7 @@ router.post('/addOrganization', ensureAuthenticated, function(req, res) {
 		printResult(createRes);
 		res.redirect('/users/profile/'+req.user.id);
 	});
+
 });
 
 router.post('/getOrganizations/:userID', function(req, res) {
@@ -631,6 +597,7 @@ router.post('/getOrganizations/:userID', function(req, res) {
 			res.json([]);
 		}
 	});
+
 });
 
 router.post('/editCommentOf/:memberID/:newComment', ensureAuthenticated, function(req, res) {
@@ -650,6 +617,7 @@ router.post('/editCommentOf/:memberID/:newComment', ensureAuthenticated, functio
 		res.json(jsonData);
 
 	});
+
 });
 
 module.exports = router;

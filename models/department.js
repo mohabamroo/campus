@@ -35,7 +35,13 @@ var departmentSchema = mongoose.Schema({
 				}
 			],
 		}
-	]
+	],
+	clubID: {
+		type: String
+	},
+	clubName: {
+		type: String
+	}
 });
 
 var Department = module.exports = mongoose.model('Department', departmentSchema);

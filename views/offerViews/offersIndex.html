@@ -1,42 +1,18 @@
 
 <% include ../layout/header %>
-<div id="topDiv" style="position: fixed; z-index: 9; width: 100%; height: 80%; display: none; color: white; align-self: center; font-size: 20px; overflow-y: scroll;">
-</div>
-
-
-<div class="container" style="margin-top: 50px;">
-	<div class="row" style="align-self: center; text-align: center; font-size: 20px;">
-		<div class="col-lg-4 eventTitle" id="oldBtn"><span>What You Missed!</span></div>
-		<div class="col-lg-4 eventTitle" id="nowBtn" style="color: #18BC9C;"><span>Happening Now</span></div>
-		<div class="col-lg-4 eventTitle" id="comingBtn"><span>Coming..</span></div>
+	<div id="topDiv" style="position: fixed; z-index: 9; width: 100%; height: 80%; display: none; color: white; align-self: center; font-size: 20px; overflow-y: scroll;">
 	</div>
-	<hr>
-	<div class="row row-eq-height" style="width: 100%;">
-		<div class="col-lg-2"></div>
-		<img class="img col-lg-3 portfolio-item" src="/club_uploads/events/<%= event.photo %>" alt="Generic placeholder image" width="200" height="220" style="align-self: center; margin-top: 1%;">
-		<div class="col-lg-3" style="text-align: left;">
-		<h2 id="<%= event._id %>">
-			<span class="eventTitle" onclick="showEventDetails(<%=JSON.stringify(event)%>)"><%= event.name %></span>
-			<br>
-			<br>
-			<p style="font-size: 10px;">
-			by: <%= event.organizer %>
-						<br>
-						<br>
-						location: <%= event.location %>
-						<br>
-						<br>
-						from: <%= event.fromDate %>
-						<br>
-						<br>
-						to: <%= event.toDate %>
-					</p>
-				</h2>
-			</div>
-			<div class="col-lg-2"></div>
-		    <hr style="width: 80%">
-	    </div>
-</div>
+	<div class="row" style="align-self: center; text-align: center; font-size: 20px; margin-top: 50px; padding: 20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+		<div class="col-lg-4 eventTitle typeBtn" offersType="featured"><span>Featured</span></div>
+		<div class="col-lg-4 eventTitle typeBtn" offersType="entertainment"><span>Entertainment</span></div>
+		<div class="col-lg-4 eventTitle typeBtn" offersType="food"><span>Food</span></div>
+		<div class="col-lg-4 eventTitle typeBtn" offersType="sports"><span>Sports</span></div>
+		<hr>
+	</div>
+
+	<div class="container" id="eventsContainer">
+
+	</div>
 <script type="text/javascript">
 
 	var showEventDetails = function(event) {
@@ -60,6 +36,68 @@
 	    $('#topDiv').show();
 	}
 
+	var updateEventsContainer = function(events) {
+		var max;
+		var html = "";
+		if(events!=null && events.length>0) {
+			events.forEach(function(event, index) {
+				max = index;
+				if(index<=2) {
+					html += '<div class=\"row row-eq-height\" style=\"width: 100%;\">';
+				} else {
+					html += '<div class=\"row row-eq-height\" style=\"width: 100%; display: none;\">';
+				}
+			    html += '<div class=\"col-lg-2\"></div>'
+					+	'<img class=\"img col-lg-3 portfolio-item\" src=\"/offers_uploads/'+event.photo+'\" alt=\"Generic placeholder image\" width=\"200\" height=\"220\" style=\"align-self: center; margin-top: 1%;\">'
+			 	   	+	'<div class=\"col-lg-3\" style=\"text-align: left;\">'
+				 	+   '<h2 id=\"'+event._id+'\">'
+					+	'<span class=\"eventTitle\" onclick=\"showEventDetails(\''+event._id+'\')\">'+event.company
+					+	'</span><br><br>'
+					+	'<p style=\"font-size: 10px;\">'
+					+	'by: '+event.summary
+					+	'<br><br>'
+					+	'location: '+event.location
+					+	'<br><br>'
+					+	'from: '+event.from
+					+	'<br><br>'
+					+	'to: '+event.to+'</p>'
+					+	'</h2></div>'
+					+	'<div class=\"col-lg-2\"></div>'
+				    +	'<hr style=\"width: 80%\"></div>';
+			});
+			if(max>2) {
+				html += '<div class=\"row col-lg-12\" id=\"seeMoreDiv\" style=\"width: 100%\">'
+					+	'<div class=\"col-lg-4\"></div>'
+				 	+	'<div class=\"col-lg-4\" style=\"text-align: center;\">'
+					+ 	'<h4 class=\"eventTitle\" id=\"seeMoreBtn\">'
+					+	'See More</h4></div>'
+					+	'<div class=\"col-lg-4\"></div>'
+					+	'<hr style=\"width: 80%\"></div>';
+			}
+		} else {
+			html += '<h1 style=\"text-align:center;\">no curent events!</h1>';
+		}
+		$('#eventsContainer').slideUp('fast', function() {
+		   	$('#eventsContainer').html(html);
+		   	updateSeeMore();
+			$('#eventsContainer').slideDown();
+		});	
+	}
+	var updateSeeMore = function() {
+		$('#seeMoreBtn').click(function() {
+			$('#seeMoreDiv').remove();
+			$('.row').slideDown();
+		});
+	}
+	$('.typeBtn').click(function() {
+		console.log($(this).attr('offersType'));
+		var type = $(this).attr('offersType');
+		$.get('/offers/viewOffers/'+type, function(offers) {
+			console.log(offers)
+			updateEventsContainer(offers);
+		});
+	})
+
 	$(document).keyup(function(e) {
 		if (e.keyCode === 27) {
 			$('#backgroundDiv').hide();
@@ -82,13 +120,6 @@
 		$('.row').slideDown();
 	});
 
-	$('#oldBtn').click(function() {
-		window.location = '/events/old';
-	});
-
-	$('#comingBtn').click(function() {
-		window.location = '/events/coming';
-	});
 </script>
 
 <style type="text/css">

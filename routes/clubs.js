@@ -514,7 +514,78 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 		});
 	});
 });
+router.post('/addMemberAjax/:departmentID/:memberID/:memberName', ensureAuthenticated, function(req, res) {
+	console.log('query: '+req.params.departmentID);
+	var departmentID = req.params.departmentID;
+	var memberName = req.params.memberName;
+	var memberID = req.params.memberID;
+	
+	Club.getClubByUserId(req.user.id, function(err, club) {
+		printError(err);
+		Department.getDepartmentById(departmentID, function(err2, department) {
+			printError(err2);
+			var newMember = new Member({
+				name: memberName,
+				gucid: memberID,
+				profileId: "none",
+				exists: "false",
+				rating: "0",
+				review: "no review",
+				profilephoto: "default-photo.jpeg",
+				role: " member",
+				departmentName: department.name,
+				club: department.clubName,
+				clubID: department.clubID,
+				departmentID: department._id
+			});
+			console.log(newMember)
+			Member.createMember(newMember, function(err3, newMemberRes) {
+				Department.update({_id: departmentID}, {$push: {members: newMemberRes._id}}, function(err4, pushRes) {
+					printError(err4);
+					printResult(pushRes);
+					res.json(newMemberRes);
+				});
+			});
+		});
+	});
+});
 
+router.post('/addMemberAjax/:departmentID/:subDepartmentID/:memberID/:memberName', ensureAuthenticated, function(req, res) {
+	var departmentID = req.params.departmentID;
+	var subdepartmentID = req.params.subDepartmentID;
+	var memberName = req.params.memberName;
+	var memberID = req.params.memberID;
+	Department.getDepartmentById(departmentID, function(err2, department) {
+		printError(err2);
+		var newMember = new Member({
+			name: memberName,
+			gucid: memberID,
+			profileId: "none",
+			exists: "false",
+			rating: "0",
+			review: "no review",
+			profilephoto: "default-photo.jpeg",
+			role: "member",
+			departmentName: department.name,
+			club: department.clubName,
+			clubID: department.clubID,
+			departmentID: department._id
+		});
+		console.log(newMember)
+		Member.createMember(newMember, function(err3, newMemberRes) {
+			Department.update({'subDepartments._id': subdepartmentID},
+				{$push: {
+			 		'subDepartments.$.members': newMemberRes._id
+				},
+			}, function(err, pushRes) {
+				printError(err);
+				printResult(pushRes);
+				res.json(newMemberRes);
+			});
+		});
+	});
+	
+});
 // Note: not updated
 router.post('/addMember/:departmentID/:subDepartmentID', ensureAuthenticated, function(req, res) {
 	var departmentID = req.params.departmentID;
@@ -567,8 +638,7 @@ router.get('/editMembersOfDepartment/:departmentID', ensureAuthenticated, functi
 	request(url, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			var jsonObj = JSON.parse(body);
-			console.log(jsonObj)
-			res.render('clubViews/editMembers.html', {members: jsonObj.members, name: jsonObj.name}); // Print the body of response.
+			res.render('clubViews/editMembers.html', {members: jsonObj.members, name: jsonObj.name, department: jsonObj.department, subID:""}); // Print the body of response.
 	  	}
 	});
 });
@@ -582,7 +652,7 @@ router.get('/editMembersOfSubDepartment/:departmentID/:subDepartmentID', ensureA
 		if (!error && response.statusCode == 200) {
 			var jsonObj = JSON.parse(body);
 			console.log(jsonObj)
-			res.render('clubViews/editMembers.html', {members: jsonObj.members, name: jsonObj.name}); // Print the body of response.
+			res.render('clubViews/editMembers.html', {members: jsonObj.members, name: jsonObj.name, department: jsonObj.department, subID: subDepartmentID}); // Print the body of response.
 	  	}
 	});
 });
@@ -623,7 +693,9 @@ router.post('/addDepartmentNew', ensureAuthenticated, function(req, res, next) {
 					name: departmentName, 
 					head: newHead._id,
 					members: [],
-					subDepartments: []
+					subDepartments: [],
+					clubID: clubRes._id,
+					clubName: clubRes.name
 				});
 				Department.createDepartment(newDepartment, function(err1, createRes) {
 					printError(err1);
@@ -681,6 +753,7 @@ router.post('/addSubDepartment/:depID', ensureAuthenticated, function(req, res) 
 					}}, function(err4, pushRes) {
 						printError(err4);
 						printResult(pushRes);
+						console.log(department.subDepartments[department.subDepartments.length-1])
 						console.log("ahooo: "+department.subDepartments[department.subDepartments.length-1]._id);
 						Member.update({_id: newSubHead._id}, {$set: {departmentID: department.subDepartments[department.subDepartments.length-1]._id}}, function(err5, updateRes) {
 							printError(err5);
@@ -908,6 +981,7 @@ router.get('/membersOfSingleDepartment/:departmentID', function(req, res) {
 	Department.getDepartmentById(departmentID, function(err, department) {
 		printError(err);
 		if(department!=null) {
+			jsonData.department = department;
 			jsonData.name = department.name;
 			if(department.public==="true") {
 				jsonData.public = "true";
@@ -921,7 +995,7 @@ router.get('/membersOfSingleDepartment/:departmentID', function(req, res) {
 						department.members.forEach(function(memberID) {
 							Member.getMemberByID(memberID, function(err2, member) {
 								i++;
-								if(member!=null && member.length>0)
+								if(member!=null)
 									membersArr.push(member);
 								if(i>=department.members.length) {
 									jsonData.members = membersArr;
@@ -947,11 +1021,13 @@ router.get('/membersOfNestedDepartment/:departmentID/:subDepartmentID', function
 	var flag = "false";
 	Department.getDepartmentById({_id: departmentID}, function(err, department) {
 		printError(err);
+		jsonData.department = department;
 		department.subDepartments.forEach(function(subDepartment) {
 			if(subDepartment._id.toString()==subDepartmentID) {
 				flag = "true";
 				jsonData.name = department.name+"/"+subDepartment.name;
 				if(department.public==="true") {
+					jsonData.subID = subDepartmentID;
 					jsonData.public = "true";
 					Member.getMemberByID(subDepartment.head, function(err1, head) {
 						printError(err1);
@@ -964,7 +1040,7 @@ router.get('/membersOfNestedDepartment/:departmentID/:subDepartmentID', function
 							subDepartment.members.forEach(function(memberID) {
 								Member.getMemberByID(memberID, function(err2, member) {
 									i++;
-									if(member!=null && member.length>0)
+									if(member!=null)
 										membersArr.push(member);
 									if(i>=subDepartment.members.length) {
 										jsonData.members = membersArr;

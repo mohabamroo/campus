@@ -1,17 +1,20 @@
-hide department
 sperate 34 from 5862
 club gallery
 ensure permissions and validation
 organization from and to
 search view:
 name, qualification, cv, best club name, role, review, rating
+edit structre view
+delete member
 
 offers, list of name and summary of offer
 clickable, description and location
 
 all ratings are stars
 https
-
+gender, phone in signup
+no phone
+summary about, organization name
 done:
 NEW DESIGN (working)
 all members view

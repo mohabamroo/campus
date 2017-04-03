@@ -1,0 +1,90 @@
+<% include ../layout/header %>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12 text-center">
+      <br>
+      <h2>Add Offer</h2>
+      <hr class="star">
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+      <form method="post" enctype="multipart/form-data" action="/offers/addOffer">
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputName" class="eventLabel" style="font-size: 20px;">Company Name</h1>
+            <input type="text" id="inputName" class="form-control" placeholder="ex: Friends Cafe" name="name" required autofocus>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputLocation" class="eventLabel" style="font-size: 20px;">Summary</h1>
+            <input type="text" id="inputLocation" class="form-control" placeholder="ex: 50% off breakfeast" name="location" required>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputDate" class="eventLabel" style="font-size: 20px;">From</h1>
+            <input type="date" id="" class="form-control" name="fromDate" required>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputDate" class="eventLabel" style="font-size: 20px;">To</h1>
+            <input type="date" id="" class="form-control" name="toDate" required>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputDescription" class="eventLabel" style="font-size: 20px;">Description</h1>
+            <input type="text" id="inputDescription" class="form-control" placeholder="ex: get yourself a sandwich and a cup of tea for only 10 L.E. now!" name="description" required>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputTarget" class="eventLabel" style="font-size: 20px;">Target</h1>
+            <input type="text" id="inputTarget" class="form-control" placeholder="ex: all GUCians" name="target" required>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>            
+        <br>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+                <h1 for="sel1" class="eventLabel" style="font-size: 20px;">Select a type:</h1>
+                <br>
+                <select class="form-control" id="type" name="type">
+                    <option value="" disabled selected style="display:none;">choose</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="food">Food</option>
+                    <option value="health">Health</option>
+                    <option value="sports">Sports</option>
+                </select>
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>                        
+        <br>
+        <div class="row control-group">
+          <div class="form-group col-xs-12 floating-label-form-group controls">
+            <h1 for="inputImage" class="eventLabel" style="font-size: 20px;">Photo</h1>
+            <input type="file" class="form-control btn" name="offerPhoto" style="margin-top: 4px;">
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-xs-12">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Add</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<% include ../layout/footer %>

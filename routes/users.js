@@ -81,9 +81,15 @@ function printResult(result) {
 	console.log("Result: " + JSON.stringify(result));
 }
 
-function ensureAuthenticated(req, res, next){	
-	if(req.isAuthenticated()){
-		return next();
+function ensureAdmin(req, res, next) {
+	if(req.isAuthenticated()) {
+		console.log("code: "+req.user.verificationCode)
+		if(req.user.verificationCode==="X3PpQxaOJ0k95CjnlmgAx2DXm8yHkAR") {
+			return next();
+		} else {
+			req.flash('error_msg','You are not verified!');
+			res.redirect('/users/signin');
+		}
 	} else {
 		req.flash('error_msg','You are not logged in');
 		res.redirect('/users/signin');
@@ -496,13 +502,21 @@ router.get('/viewprofile/:id', function(req,res) {
 			   	});
 			} else {
 				if(resuser.usertype=="club") {
-					console.log("viewd")
 					res.redirect('/clubs/viewClub/'+req.params.id);
+				} else {
+					if(resuser.usertype==="admin") {
+						console.log("admin")
+						res.redirect('/users/admin');
+					}
 				}
 			}
 		}			
 	});
     
+});
+
+router.get('/admin', ensureAdmin, function(req, res) {
+	res.render('admin.ejs');
 });
 
 router.post('/updateProfilePhoto', ensureAuthenticated, function(req, res) {

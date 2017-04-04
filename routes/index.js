@@ -30,6 +30,20 @@ router.get('/', function(req, ress) {
 	
 });
 
+function printError(err) {
+	if(err) {
+		console.log(JSON.stringify(err));
+		throw err;
+	}
+}
+router.get('/search/:term', function(req, res) {
+	var term = req.params.term;
+	User.find({usertype: "student", $or: [{username: term}, {name: term}]}, function(err, data){
+		printError(err);
+		res.json(data);
+	});
+});
+
 function ensureAuthenticated(req, res, next) {	
 	if(req.isAuthenticated()){
 		return next();

@@ -68,8 +68,8 @@ function ensureAuthenticated(req, res, next) {
 	}
 }
 
-function ensureHeadOfMember(memberID, req, res, next) {
-	console.log('ensureHead')
+function ensureHeadOfMember(req, res, next) {
+	var memberID = req.params.memberID;
 	if(req.isAuthenticated())
 		Member.getMemberByID(memberID, function(err, member) {
 			printError(err);
@@ -79,7 +79,7 @@ function ensureHeadOfMember(memberID, req, res, next) {
 						printError(err1);
 						if(permissionRes!=null) {
 							printResult(permissionRes);
-							return;
+							next();
 						} else {
 							res.end('Not authorized!');
 						}
@@ -909,9 +909,8 @@ function updateMemberRating(memberID, req, res) {
 	});
 }
 
-router.post("/rateMember/:memberID/:rating", function(req, res) {
+router.post("/rateMember/:memberID/:rating", ensureHeadOfMember, function(req, res) {
 	var memberID = req.params.memberID;
-	ensureHeadOfMember(memberID, req, res);
 	var rating = req.params.rating;
 	Rating.find({raterID: req.user.id, memberID: memberID}, function(err, ratingRes) {
 		printError(err);
@@ -938,7 +937,7 @@ router.post("/rateMember/:memberID/:rating", function(req, res) {
 	});
 });
 
-router.post("/editReview/:memberID/:review", ensureAuthenticated, function(req, res) {
+router.post("/editReview/:memberID/:review", ensureHeadOfMember, function(req, res) {
 	var memberID = req.params.memberID;
 	var review = req.params.review;
 	Member.update({_id: memberID}, {$set: {review:review}}, function(err, updateRes) {
@@ -952,6 +951,66 @@ router.post("/editReview/:memberID/:review", ensureAuthenticated, function(req, 
 		}
 		res.json(jsonData);
 	});
+});
+
+router.post('/dismissMember/:departmentID/:memberID', ensureHeadOfMember, function(req, res) {
+	var departmentID = req.params.departmentID;
+	var memberID = req.params.memberID;
+	Department.update({_id: departmentID}, {$pull: {members: memberID}}, function(err, updateRes) {
+		printError(err);
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth();
+		var dateInput = year+'/'+month;
+		Member.update({_id: memberID}, {$set: {to: dateInput}}, function(err1, removeRes) {
+			printError(err1);
+			res.json("Dismissed Member");
+		});
+	});	
+});
+
+router.post('/dismissMember/:departmentID/:subDepartmentID/:memberID', ensureHeadOfMember, function(req, res) {
+	var departmentID = req.params.departmentID;
+	var memberID = req.params.memberID;
+	var subDepartmentID = req.params.subDepartmentID;
+	Department.update({"subDepartments._id": subDepartmentID}, {$pull: {"subDepartments.$.members": memberID}}, function(err, updateRes) {
+		printError(err);
+		console.log(updateRes);
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth();
+		var dateInput = year+'/'+month;
+		Member.update({_id: memberID}, {$set: {to: dateInput}}, function(err1, updateRes) {
+			printError(err1);
+			res.json("Dismissed Member");
+		});
+	});
+});
+
+router.post('/deleteMember/:departmentID/:memberID', ensureHeadOfMember, function(req, res) {
+	var departmentID = req.params.departmentID;
+	var memberID = req.params.memberID;
+	Department.update({_id: departmentID}, {$pull: {members: memberID}}, function(err, updateRes) {
+		printError(err);
+		Member.remove({_id: memberID}, function(err1, removeRes) {
+			printError(err1);
+			res.json("Deleted Member");
+		});
+	});	
+});
+
+router.post('/deleteMember/:departmentID/:subDepartmentID/:memberID', ensureHeadOfMember, function(req, res) {
+	var departmentID = req.params.departmentID;
+	var memberID = req.params.memberID;
+	var subDepartmentID = req.params.subDepartmentID;
+	Department.update({"subDepartments._id": subDepartmentID}, {$pull: {"subDepartments.$.members": memberID}}, function(err, updateRes) {
+		printError(err);
+		console.log(updateRes);
+		Member.remove({_id: memberID}, function(err1, removeRes) {
+			printError(err1);
+			res.json("Deleted Member");
+		});
+	});	
 });
 
 router.post('/addPhoto', ensureAuthenticated, function(req,res) {

@@ -41,15 +41,15 @@
 				<td class="reviewElement">
 					<p class="reviewClass" onclick="editReview('<%=member.name%>', '<%=member._id%>', '<%=member.review%>')" style="text-overflow: ellipsis; max-width: 100px;white-space: nowrap;overflow: hidden;"><%= member.review %></p>
 				</td>
-				<td>
+				<td style="max-width: 90px;">
 					<%= member.email || "no email" %>
 					<br>
 					<br>
 					<%= member.phone || "no phone" %>
 				</td>
 				<td>
-					<button class="btn btn-primary" style="margin-bottom: 5px; width: 100%;" onclick="dismissMember('<%=member._id%>')">Dismiss</button>
-					<button class="btn btn-danger" style="width: 100%;" onclick="deleteMember('<%=member._id%>')">Delete</button>
+					<button class="btn btn-primary" style="margin-bottom: 5px; width: 100%;" onclick="dismissMember('<%= department.nestedType %>','<%= department._id %>', '<%= subID %>', '<%=member._id%>')">Dismiss</button>
+					<button class="btn btn-danger" style="width: 100%;" onclick="deleteMember('<%= department.nestedType %>','<%= department._id %>', '<%= subID %>', '<%=member._id%>')">Delete</button>
 				</td>
 			</tr>
 		<% }) %>
@@ -112,6 +112,7 @@
 	    appendCancelEvent();
 	    appendHover();
 	}
+
 	var appendCancelEvent = function() {
 		$('.cancelBtn').click(function() {
 			$('#addMemberDiv').hide();
@@ -120,7 +121,6 @@
 			$('#backgroundDiv').hide();	
 		});
 	}
-
 
 	var editReviewOf = function(id) {
 		var newReview = $('#newReview').val();
@@ -160,6 +160,7 @@
 			}
 		});
 	}
+
 	var addMember = function(departmentID) {
 		var memberName = $('#addMemberDiv').find('input[name="memberName"]').val();
 		var memberID = $('#addMemberDiv').find('input[name="memberID"]').val();
@@ -173,6 +174,7 @@
 			}
 		});
 	}
+
 	var addMemberSub = function(departmentID, subDepartmentID) {
 		var memberName = $('#addMemberDiv').find('input[name="memberName"]').val();
 		var memberID = $('#addMemberDiv').find('input[name="memberID"]').val();
@@ -186,6 +188,7 @@
 			}
 		});
 	}
+
 	var appendNewMember = function(member) {
 		var length = $('#membersBody').children().length + 1;
 		var html = '<tr id=\"'+member._id+'\">'
@@ -218,6 +221,7 @@
 		$('#membersBody').append(html);
 		ratingClick();
 	}
+
 	var getUserPermissionSub = function(departmentID, subDepartmentID) {
 		$.post('/clubs/getUserPermissionForDepartment/'+subDepartmentID, function(data) {
 			console.log(data)
@@ -250,7 +254,36 @@
 		}
 	}
 
-
+	var deleteMember = function(nestedType, departmentID, subDepartmentID, memberID) {
+		var url = '/clubs/deleteMember/'+departmentID+'/';
+		if(nestedType==="false") {
+			url += memberID;
+		} else {
+			url += subDepartmentID+'/'+memberID;
+		}
+		$.post(url, function(data) {
+			if(data=="Deleted Member") {
+				$('#'+memberID).slideUp();
+			} else {
+				alert("Member wasn't dismissed!");
+			}
+		});
+	}
+	var dismissMember = function(nestedType, departmentID, subDepartmentID, memberID) {
+		var url = '/clubs/dismissMember/'+departmentID+'/';
+		if(nestedType==="false") {
+			url += memberID;
+		} else {
+			url += subDepartmentID+'/'+memberID;
+		}
+		$.post(url, function(data) {
+			if(data=="Dismissed Member") {
+				$('#'+memberID).slideUp();
+			} else {
+				alert("Member wasn't dismissed!");
+			}
+		});
+	}
 	var mouse_is_inside = false;
 	var appendHover = function() {
 		$('#addMemberDiv, #reviewDiv').hover(function(){ 
@@ -260,6 +293,7 @@
 	        mouse_is_inside=false; 
 	    });
 	}
+
 	$(document).ready(function() {    
 	    $("body").mouseup(function(){ 
 	        if(! mouse_is_inside) {

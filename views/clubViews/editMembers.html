@@ -9,10 +9,11 @@
     <thead>
       <tr>
         	<th style="width: 10%;"></th>
-			<th style="width: 20%;">Name</th>
-			<th style="width: 20%;">Role</th>
-			<th style="width: 20%;">Rating</th>
-			<th style="width: 20%;">Review</th>
+			<th style="width: 10%;">Name</th>
+			<th style="width: 10%;">Role</th>
+			<th style="width: 25%;">Rating</th>
+			<th style="width: 15%;">Review</th>
+			<th style="width: 20%;">Info.</th>
 			<th style="width: 10%">Action</th>
       </tr>
     </thead>
@@ -20,8 +21,14 @@
       	<% members.forEach(function(member, index) { %>
 			<tr id="<%= member._id %>">
 				<td>#<%= index+1 %></td>
-				<td>
-				<%= member.name %>
+				<td style="max-width: 90px;">
+				<% if(member.profileId!="none") { %>
+				<a href="/users/viewprofile/<%= member.profileId %>">
+					<%= member.name %>
+				</a>
+				<% } else { %>
+					<%= member.name %>
+				<% } %>
 				</td>
 				<td>
 				<%= member.role %>
@@ -35,8 +42,14 @@
 					<p class="reviewClass" onclick="editReview('<%=member.name%>', '<%=member._id%>', '<%=member.review%>')" style="text-overflow: ellipsis; max-width: 100px;white-space: nowrap;overflow: hidden;"><%= member.review %></p>
 				</td>
 				<td>
-					<button class="btn" style="margin-bottom: 5px; width: 100%;" onclick="dismissMember('<%=member._id%>')">Dismiss</button>
-					<button class="btn" style="width: 100%;" onclick="deleteMember('<%=member._id%>')">Delete</button>
+					<%= member.email || "no email" %>
+					<br>
+					<br>
+					<%= member.phone || "no phone" %>
+				</td>
+				<td>
+					<button class="btn btn-primary" style="margin-bottom: 5px; width: 100%;" onclick="dismissMember('<%=member._id%>')">Dismiss</button>
+					<button class="btn btn-danger" style="width: 100%;" onclick="deleteMember('<%=member._id%>')">Delete</button>
 				</td>
 			</tr>
 		<% }) %>
@@ -127,11 +140,13 @@
 		$.post('/clubs/getUserPermissionForDepartment/'+departmentID, function(data) {
 			console.log(data)
 			if(data=="true") {
-				var html = '<div class=\"addmember\" style=\"position: fixed; align-self: center; margin-top: 100px; margin-left: 30%; width: 400px; height: 300px; border: 2px solid white;\" id=\"addMemberDiv\">'
+				var html = '<div class=\"addmember\" style=\"position: fixed; align-self: center; margin-top: 100px; margin-left: 30%; width: 400px; height: 420px; border: 2px solid white;\" id=\"addMemberDiv\">'
 									+ '<div style=\"max-width: 400px; padding:10px;\">'
 									+ '<h2>Add Member</h2><hr>'
 									+	'<input type=\"text\" name=\"memberID\" class=\"form-control\" placeholder=\"34-5862\"><br>'
-									+	'<input type=\"text\" name=\"memberName\" class=\"form-control\" placeholder=\"mohab amr\">'
+									+	'<input type=\"text\" name=\"memberName\" class=\"form-control\" placeholder=\"mohab amr\"><br>'
+									+	'<input type=\"text\" name=\"memberEmail\" class=\"form-control\" placeholder=\"member@gmail.com\"><br>'
+									+	'<input type=\"text\" name=\"memberPhone\" class=\"form-control\" placeholder=\"01073988635\">'
 									+	'<button " class=\"btn btn-success btn-lg\" onclick=\"addMember(\''+departmentID+'\')\" style=\"margin-top: 30px; color: white;\">Add Member</button>'
 									+	'</div>'
 									+	'</div>';
@@ -192,8 +207,14 @@
 				+ '</fieldset>'
 				+ '</div></td>'
 				+ '<td class=\"reviewElement\">'
-				+ '<p class=\"reviewClass\" onclick=\"editReview(\''+member.name+'\', \''+member._id+'\', \''+member.review+'\')\" style=\"text-overflow: ellipsis; max-width: 100px;white-space: nowrap;overflow: hidden;\">'+member.review+'</p>';
-				+ '</td></tr>';
+				+ '<p class=\"reviewClass\" onclick=\"editReview(\''+member.name+'\', \''+member._id+'\', \''+member.review+'\')\" style=\"text-overflow: ellipsis; max-width: 100px;white-space: nowrap;overflow: hidden;\">'+member.review+'</p>'
+				+ '</td>'
+				+ '<td>'+(member.email || "no email")
+				+	'<br><br>'
+				+	(member.phone || "no phone") +'</td>'
+				+ '<td><button class="btn btn-primary" style="margin-bottom: 5px; width: 100%;" onclick=\"dismissMember(\''+member._id+'\')\">Dismiss</button>'
+				+	'<button class="btn btn-danger" style="width: 100%;" onclick="deleteMember(\''+member._id+'\')">Delete</button></td></tr>';
+				console.log(html)
 		$('#membersBody').append(html);
 		ratingClick();
 	}
@@ -205,8 +226,9 @@
 									+ '<div style=\"max-width: 400px; padding:10px;\">'
 									+ '<h2>Add Member</h2><hr>'
 									+	'<input type=\"text\" name=\"memberID\" class=\"form-control\" placeholder=\"34-5862\"><br>'
-									+	'<input type=\"text\" name=\"memberName\" class=\"form-control\" placeholder=\"mohab amr\">'
-									+	'<button " class=\"btn btn-success btn-lg\" onclick=\"addMemberSub(\''+departmentID+'\',\''+subDepartmentID+'\')\" style=\"margin-top: 30px; color: white;\">Add Member</button>'
+									+	'<input type=\"text\" name=\"memberName\" class=\"form-control\" placeholder=\"mohab amr\"><br>'
+									+	'<input type=\"text\" name=\"memberEmail\" class=\"form-control\" placeholder=\"member@gmail.com\"><br>'
+									+	'<input type=\"text\" name=\"memberPhone\" class=\"form-control\" placeholder=\"01073988635\">'+	'<button " class=\"btn btn-success btn-lg\" onclick=\"addMemberSub(\''+departmentID+'\',\''+subDepartmentID+'\')\" style=\"margin-top: 30px; color: white;\">Add Member</button>'
 									+	'</div>'
 									+	'</div>';
 				$('#backgroundDiv').show();

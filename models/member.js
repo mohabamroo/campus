@@ -49,6 +49,12 @@ var memberSchema = mongoose.Schema({
 	},
 	to: {
 		type: String
+	},
+	phone: {
+		type: String
+	},
+	email: {
+		type: String
 	}
 });
 

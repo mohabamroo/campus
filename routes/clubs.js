@@ -486,7 +486,8 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 	var departmentID = req.params.departmentID;
 	var memberName = req.body.memberName;
 	var memberID = req.body.memberID;
-	
+	var memberEmail =req.body.memberEmail;
+	var memberPhone = req.body.memberPhone;
 	Club.getClubByUserId(req.user.id, function(err, club) {
 		printError(err);
 		Department.getDepartmentById(departmentID, function(err2, department) {
@@ -505,7 +506,9 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 				clubID: club._id,
 				departmentID: department._id,
 				from: (new Date()).getFullYear(),
-				to: "Present"
+				to: "Present",
+				email: memberEmail,
+				phone: memberPhone
 			});
 			console.log(newMember)
 			Member.createMember(newMember, function(err3, newMemberRes) {
@@ -833,7 +836,9 @@ function updateSingleMember(member, userRes, counterObject, limit, req, res) {
 		exists: "true",
 		profileId: userRes._id,
 		profilephoto: userRes.profilephoto,
-		name: userRes.name
+		name: userRes.name,
+		phone: userRes.phone,
+		email: userRes.email
 	}}, function(err2, setRes) {
 			printError(err2);
 			if(member.role==="Head") {
@@ -865,6 +870,7 @@ router.post('/updateMembers/:clubID', ensureAuthenticated, function(req, res) {
 	var clubID = req.params.clubID;
 	Member.getMembersByClubID(clubID, function(err, members) {
 		printError(err);
+		console.log(members)
 		if(members!=null && members.length>0) {
 			var counterObject = {i: 0};
 			members.forEach(function(member) {

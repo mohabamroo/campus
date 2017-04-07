@@ -2,19 +2,21 @@ sperate 34 from 5862
 club gallery
 ensure permissions and validation
 organization from and to
-search view:
-name, qualification, cv, best club name, role, review, rating
 edit structre view
-delete member
-
 offers, list of name and summary of offer
 clickable, description and location
 
 all ratings are stars
 https
 gender, phone in signup
-no phone
-summary about, organization name
+gyms/workout - trips - student supplies - cafe and restauta- courses/pro
+no featured
+delete member/dismiss
+no rating not 0 stars
+
+email/phone in member
+
+
 done:
 NEW DESIGN (working)
 all members view
@@ -41,6 +43,14 @@ birthdate when student
 student write comment
 email verification guc
 nice photo change
+name, qualification, cv, best club name, role, review, rating
+signup fix
+search view
+hide target in offer
+hide phone in profile
+summary about, organization name
+
+
 
 
 

@@ -72,7 +72,7 @@
         </div>
         <hr>
         <div class="row control-group" id="majorDiv">
-          <div class="form-group col-xs-12 controls" style="font-size: 1.5em;">
+          <div class="form-group col-xs-12 controls" style="font-size: 1.5em;"  id="majorDivChild">
             <label for="sel2">Select a major:</label>
             <select class="form-control" id="major" name="major" required>
               <option value="" disabled selected style="display:none;">choose</option>
@@ -130,6 +130,7 @@
       $('#birthdateDiv').slideUp();
       $('#inputGUCID').next().remove();
       $('#inputGUCID').remove();
+      $('#major').remove();
       $('#birthdateInput').remove();
       firstChange = false;
     }
@@ -141,6 +142,14 @@
       $('#yearDiv').slideDown();
       var idHTML = '<input type="text" id=\"inputGUCID\" class=\"form-control\" placeholder=\"ex: 34-5862\" name=\"gucid\" required autofocus data-validation-required-message=\"Please enter your GUC-ID.\"><p class=\"help-block text-danger\"></p>';
       var birthdateHTML = '<input type=\"date\" id=\"birthdateInput\" name=\"birthdate\" class=\"form-control\" required data-validation-required-message=\"Please enter your birthdate.\">';
+      var majorHTML = '<select class="form-control" id="major" name="major" required>'
+              + '<option value="" disabled selected style="display:none;">choose</option>'
+              + '<option value="met">MET</option>'
+              + '<option value="iet">IET</option>'
+              + '<option value="mecha">Mechatronics</option>'
+              + '<option value="production">Production</option>'
+            + '</select>';
+      $('#majorDivChild').append(majorHTML);
       $('#idDivChild').append(idHTML);
       $('#birthdateDivChlid').append(birthdateHTML);
       $('#birthdateDiv').next().show();

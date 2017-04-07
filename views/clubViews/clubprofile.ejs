@@ -25,7 +25,7 @@
 					 	   	</span>
 					 	   	<br>
 					 	   	<br>
-					 	   	<span>Summary:
+					 	   	<span>About:
 					 	   		<p><%= dude.summary%></p>
 					 	   	</span>
 			 	   		</div>
@@ -49,10 +49,10 @@
         </div>
     </header>
 
-	<div class="container container-fluid structure" style="padding-top: 100px; align-self: center; width: 100%; color: white; background-color: #666; min-height: 100vh;">
-		<div class="row row-eq-height" style="color: white;">
-		<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
-		</div>
+	<div class="container container-fluid structure" style="padding-top: 100px; align-self: center; width: 100%; color: white; background-color: #fff; min-height: 100vh;">
+		<div class="row row-eq-height" style="color: #333;">
+			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
+			</div>
 			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
 				<% if(president!=null && club.logo!="") { %>
 				 	<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185" style="align-self: center;">
@@ -77,12 +77,12 @@
 		<br>
 		<br>
 		<div class="row row-eq-height">
-			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; ">
+			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; color: #333;">
 				<button id="scrollLeft" style="height: 300px; border: none; background-color: inherit;">
 					<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
 				</button>
 			</div>
-			<div class="deps" id="depsDiv" style="display: flex; width: 90%; text-align: center; color: white;">
+			<div class="deps" id="depsDiv" style="display: flex; width: 90%; text-align: center; color: #333;">
 				<% departments.forEach(function(department) { %>
 					<div class="singleDepartment " style="margin-bottom: 40px;">
 						<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
@@ -112,7 +112,7 @@
 					</div>
 				<%  }); %>
 			</div>
-			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0;">
+			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; color: #333;">
 				<button id="scrollRight" style="height: 300px; background-color: inherit; border: none;">
 					<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
 				</button>

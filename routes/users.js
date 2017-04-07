@@ -250,7 +250,9 @@ router.post('/signup', function(req, res) {
 				      	console.log('Email Sent');
 				      }
 				    });
+				   	console.log('before club')
 					if(type=="club") {
+						console.log("inside if")
 						var newClub = new Club({
 							name: name,
 							password: user.password,
@@ -268,6 +270,7 @@ router.post('/signup', function(req, res) {
 						newClub.save(function(err, clubRes) {
 							printError(err);
 							printResult(clubRes);
+							console.log("saved ")
 							res.locals.pagetitle = 'Sign In';
 							req.flash('success_msg','You signed up successfully!');
 							res.redirect('/users/signin');

@@ -25,7 +25,7 @@
 		<br>
 		<h1>Search</h1>
 		<br>
-		<input type="text" class="form-control" name="searchTerm" placeholder="mohab amr" style="height: 60px; float: left; width: 80%;" id="searchInput">
+		<input type="text" class="form-control" name="searchTerm" placeholder="search by name, username or skill" style="height: 60px; float: left; width: 80%;" id="searchInput">
 		<button class="btn btn-success btn-lg" style="float: right; height: 60px; width: 20%;" id="searchBtn">Seacrh</button>
 	</div>
 	<div style="margin-top: 150px; font-size: 20px;x">
@@ -33,16 +33,17 @@
 			<thead>
 				<tr>
 					<th style="width: 10%;">#</th>
-					<th style="width: 20%;">name</th>
+					<th style="width: 20%;">username</th>
 					<th style="width: 30%;">Skills</th>
 					<th style="width: 20%;">Club</th>
-					<th style="width: 20%;">Avg. Rating</th>
+					<th style="width: 20%;">Rating</th>
 				</tr>
 			</thead>
 			<tbody id="studentsBody">
 				
 			</tbody>
 		</table>
+		<h3 id="searchMsg" style="width: 100%; color: #777; display: none;">No students found matching your search!</h3>
 	</div>
 </div>
 <% include layout/footer %>
@@ -86,28 +87,33 @@
 		getSearchResult(searchTerm);
 	});
 	var getSearchResult = function(searchTerm) {
-		$.get('/search/'+searchTerm, function(data) {
-			console.log(JSON.stringify(data));
+		if(searchTerm==""){
+			$('#searchMsg').show();
+			return;
+		}
+		$.get('/search/students/'+searchTerm, function(data) {
+			// console.log(JSON.stringify(data));
 			$('#studentsBody').html("");
 			var html = "";
 			if(data==null || data.length==0) {
-				html += "<h3 style=\"width: 100%;\">No students found matching your search!</h3>";
-				$('thead').after(html);
+				$('#searchMsg').show();
 				return;
 			} else {
 				data.forEach(function(student, index) {
 					html += '<tr><td  style=\"width: 10%;\">'+(index+1)+'</td>'
-						+ '<td style=\"width: 20%;\">'+student.name+'</td>'
+						+ '<td style=\"width: 20%;\"><a href="/users/viewprofile/'+student.user._id+'">'+student.user.username+'</a></td>'
 						+ '<td  style=\"width: 30%;\">';
-						student.tags.forEach(function(tag, index) {
+						student.user.tags.forEach(function(tag, index) {
 							html += tag;
-							if(index<student.tags.length-1)
+							if(index<student.user.tags.length-1)
 								html += ' - ';
 						});
-						html += '</td>';
+						html += '</td>'
+							+ '<th style="width: 20%;">'+student.member.club+'</th>'
+							+ '<th style="width: 20%;">'+student.member.rating+'</th>';
 				});
 			}
-			
+			$('#searchMsg').hide();
 			$('#studentsBody').append(html);
 		});
 	}

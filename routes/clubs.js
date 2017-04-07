@@ -459,7 +459,9 @@ router.post('/addpresident', ensureAuthenticated, function(req, res) {
 			profilephoto: "default-photo.jpeg",
 			role: "President",
 			club: club.name,
-			clubID: club._id
+			clubID: club._id,
+			from: (new Date()).getFullYear(),
+			to: "Present"
 		});
 		Member.createMember(newMember, function(err2, newPresident) {
 			printError(err2);
@@ -501,7 +503,9 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 				departmentName: department.name,
 				club: club.name,
 				clubID: club._id,
-				departmentID: department._id
+				departmentID: department._id,
+				from: (new Date()).getFullYear(),
+				to: "Present"
 			});
 			console.log(newMember)
 			Member.createMember(newMember, function(err3, newMemberRes) {
@@ -536,7 +540,9 @@ router.post('/addMemberAjax/:departmentID/:memberID/:memberName', ensureAuthenti
 				departmentName: department.name,
 				club: department.clubName,
 				clubID: department.clubID,
-				departmentID: department._id
+				departmentID: department._id,
+				from: (new Date()).getFullYear(),
+				to: "Present"
 			});
 			console.log(newMember)
 			Member.createMember(newMember, function(err3, newMemberRes) {
@@ -569,7 +575,9 @@ router.post('/addMemberAjax/:departmentID/:subDepartmentID/:memberID/:memberName
 			departmentName: department.name,
 			club: department.clubName,
 			clubID: department.clubID,
-			departmentID: department._id
+			departmentID: department._id,
+			from: (new Date()).getFullYear(),
+			to: "Present"
 		});
 		console.log(newMember)
 		Member.createMember(newMember, function(err3, newMemberRes) {

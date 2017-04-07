@@ -94,12 +94,8 @@ function ensureHeadOfMember(req, res, next) {
 
 router.get('/', function(req, res) {
 	Club.find(function(err, clubs) {
-		if(err) {
-			console.log(err);
-			throw err;
-		} else {
-			res.render('clubViews/allClubs.html', {clubs: clubs});
-		}
+		printError(err);
+		res.render('clubViews/allClubs.html', {clubs: clubs});
 	});
 });
 
@@ -130,7 +126,6 @@ router.post('/ensureAuthenticatedClub/:userID', ensureAuthenticated, function(re
 function getDepartmentsEdit(club, presidentRes, events, req, res) {
 	var departments = [];
 	var i = 0;
-	console.log(club.newDepartments.length)
 	if(club.newDepartments!=null && club.newDepartments.length>0) {
 		club.newDepartments.forEach(function(departmentid) {
 			Department.getDepartmentById(departmentid, function(err2, departmentres) {
@@ -428,18 +423,13 @@ router.get('/editStructre/:id', ensureAuthenticated, function(req, res) {
 
 router.post('/search', function(req, res) {
 	User.getUserbyUsername(req.body.searchusername, function(err, user) {
-		if(err)
-			console.log('err: '+err);
-		else {
-			console.log(req.url);
-			//req.url = req.headers.host;
-			console.log(req.url);
-			res.render('searchresults.html', {
-				'usersearchedfor': user
-			});
-		}
-			
-
+		printError(err);
+		console.log(req.url);
+		//req.url = req.headers.host;
+		console.log(req.url);
+		res.render('searchresults.html', {
+			'usersearchedfor': user
+		});
 	});
 
 });
@@ -482,7 +472,6 @@ router.post('/addpresident', ensureAuthenticated, function(req, res) {
 });
 
 router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) {
-	console.log('query: '+req.params.departmentID);
 	var departmentID = req.params.departmentID;
 	var memberName = req.body.memberName;
 	var memberID = req.body.memberID;
@@ -510,7 +499,6 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 				email: memberEmail,
 				phone: memberPhone
 			});
-			console.log(newMember)
 			Member.createMember(newMember, function(err3, newMemberRes) {
 				Department.update({_id: departmentID}, {$push: {members: newMemberRes._id}}, function(err4, pushRes) {
 					printError(err4);
@@ -521,12 +509,11 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 		});
 	});
 });
+
 router.post('/addMemberAjax/:departmentID/:memberID/:memberName', ensureAuthenticated, function(req, res) {
-	console.log('query: '+req.params.departmentID);
 	var departmentID = req.params.departmentID;
 	var memberName = req.params.memberName;
 	var memberID = req.params.memberID;
-	
 	Club.getClubByUserId(req.user.id, function(err, club) {
 		printError(err);
 		Department.getDepartmentById(departmentID, function(err2, department) {
@@ -547,7 +534,6 @@ router.post('/addMemberAjax/:departmentID/:memberID/:memberName', ensureAuthenti
 				from: (new Date()).getFullYear(),
 				to: "Present"
 			});
-			console.log(newMember)
 			Member.createMember(newMember, function(err3, newMemberRes) {
 				Department.update({_id: departmentID}, {$push: {members: newMemberRes._id}}, function(err4, pushRes) {
 					printError(err4);
@@ -582,7 +568,6 @@ router.post('/addMemberAjax/:departmentID/:subDepartmentID/:memberID/:memberName
 			from: (new Date()).getFullYear(),
 			to: "Present"
 		});
-		console.log(newMember)
 		Member.createMember(newMember, function(err3, newMemberRes) {
 			Department.update({'subDepartments._id': subdepartmentID},
 				{$push: {
@@ -634,7 +619,6 @@ router.post('/getUserPermissionForSubDepartment/:subDepartmentID', ensureAuthent
 	var profileID = req.user.id;
 	Permission.findOne({departmentID: subDepartmentID, profileId: profileID}, function(err, permission) {
 		printError(err);
-		console.log("per: "+permission);
 		if(permission!=null && permission.permission==="true")
 			res.json("true");
 		else
@@ -662,7 +646,6 @@ router.get('/editMembersOfSubDepartment/:departmentID/:subDepartmentID', ensureA
 	request(url, function (error, response, body) {
 		if (!error && response.statusCode == 200) {
 			var jsonObj = JSON.parse(body);
-			console.log(jsonObj)
 			res.render('clubViews/editMembers.html', {members: jsonObj.members, name: jsonObj.name, department: jsonObj.department, subID: subDepartmentID}); // Print the body of response.
 	  	}
 	});
@@ -764,8 +747,6 @@ router.post('/addSubDepartment/:depID', ensureAuthenticated, function(req, res) 
 					}}, function(err4, pushRes) {
 						printError(err4);
 						printResult(pushRes);
-						console.log(department.subDepartments[department.subDepartments.length-1])
-						console.log("ahooo: "+department.subDepartments[department.subDepartments.length-1]._id);
 						Member.update({_id: newSubHead._id}, {$set: {departmentID: department.subDepartments[department.subDepartments.length-1]._id}}, function(err5, updateRes) {
 							printError(err5);
 							printResult("pushed sub ID: "+JSON.stringify(updateRes));
@@ -788,7 +769,6 @@ router.post('/updateLogo', ensureAuthenticated, function(req, res) {
 
 router.post('/deleteDepartment/:depID', ensureAuthenticated, function(req, res) {
 	var depID = req.params.depID;
-	console.log(depID);
 	Club.update({userid: req.user.id},
 		{
 			$pull: {
@@ -798,7 +778,6 @@ router.post('/deleteDepartment/:depID', ensureAuthenticated, function(req, res) 
 		   	printError(err);
 		   	printResult(pullRes);
 			req.flash('success_msg', 'Deleted Department successfully!');
-			console.log("Success:" + req.success_msg); 	
 	});
 	// Note: remove it from the database?
 	Department.remove({_id: depID}, function(err, removeRes) {
@@ -842,9 +821,6 @@ function updateSingleMember(member, userRes, counterObject, limit, req, res) {
 	}}, function(err2, setRes) {
 			printError(err2);
 			if(member.role==="Head") {
-				console.log("head")
-				console.log(member.departmentName)
-				console.log(member.departmentID)
 				Permission.find({profileId: userRes._id, departmentID: member.departmentID}, function(err3, permissionRes) {
 					if(permissionRes!=null&&permissionRes.length>0) {
 						pushOrganization(member, userRes._id, counterObject, limit, req, res);
@@ -870,7 +846,6 @@ router.post('/updateMembers/:clubID', ensureAuthenticated, function(req, res) {
 	var clubID = req.params.clubID;
 	Member.getMembersByClubID(clubID, function(err, members) {
 		printError(err);
-		console.log(members)
 		if(members!=null && members.length>0) {
 			var counterObject = {i: 0};
 			members.forEach(function(member) {
@@ -975,7 +950,6 @@ router.post('/dismissMember/:departmentID/:subDepartmentID/:memberID', ensureHea
 	var subDepartmentID = req.params.subDepartmentID;
 	Department.update({"subDepartments._id": subDepartmentID}, {$pull: {"subDepartments.$.members": memberID}}, function(err, updateRes) {
 		printError(err);
-		console.log(updateRes);
 		var date = new Date();
 		var year = date.getFullYear();
 		var month = date.getMonth();
@@ -1005,7 +979,6 @@ router.post('/deleteMember/:departmentID/:subDepartmentID/:memberID', ensureHead
 	var subDepartmentID = req.params.subDepartmentID;
 	Department.update({"subDepartments._id": subDepartmentID}, {$pull: {"subDepartments.$.members": memberID}}, function(err, updateRes) {
 		printError(err);
-		console.log(updateRes);
 		Member.remove({_id: memberID}, function(err1, removeRes) {
 			printError(err1);
 			res.json("Deleted Member");
@@ -1024,10 +997,8 @@ router.post('/addPhoto', ensureAuthenticated, function(req,res) {
 });
 
 router.post('/updateSummary', ensureAuthenticated, function(req, res) {
-	console.log(req.body.userDesc);
 	User.update({_id:req.user.id}, {$set:{summary:req.body.userDesc}}, function(err, res) {
-		if(err)
-			console.log(err);
+		printError(err);
 	});
 	res.redirect('/users/profile/'+req.user.id);
 
@@ -1037,11 +1008,9 @@ router.post('/updateSummary', ensureAuthenticated, function(req, res) {
 router.get('/viewAllMembers/:clubID', function(req, res) {
 	var members = [];
 	var clubID = req.params.clubID;
-	console.log(clubID)
 	Club.getClubById(clubID, function(err, clubRes) {
 		printError(err);
 		Member.find({clubID: clubID}, function(err, membersRes) {
-			console.log(membersRes)
 			res.render('clubViews/viewAllMembers.html', {members: membersRes, club: clubRes});
 		});
 	});

@@ -15,11 +15,15 @@ var userUploadsPath = path.resolve(__dirname, "user_uploads");
 var publicPath = path.join(__dirname, 'public');
 var mongo = require('mongodb');
 var mongoose = require('mongoose');
-// mongoose.connect('mongodb://mohabamroo:ghostrider1@ds127260.mlab.com:27260/communitydb');
-mongoose.connect('mongodb://localhost/communitydb');
+mongoose.connect('mongodb://mohabamroo:ghostrider1@ds127260.mlab.com:27260/communitydb');
+// mongoose.connect('mongodb://localhost/communitydb');
 var db = mongoose.connection;
 var mailer = require('express-mailer');
 var app = express();
+
+// cfenv provides access to your Cloud Foundry environment
+// for more info, see: https://www.npmjs.com/package/cfenv
+var cfenv = require('cfenv');
 
 module.exports = app;
 
@@ -88,7 +92,17 @@ app.use('/users', users);
 app.use('/clubs', clubs);
 app.use('/events', events);
 app.use('/offers', offers);
-app.listen(process.env.PORT||3000, function() {
-	console.log("Express app started on port 3000.");
-});
 
+// app.listen(process.env.PORT||3000, function() {
+// 	console.log("Express app started on port 3000.");
+// });
+
+// get the app environment from Cloud Foundry
+var appEnv = cfenv.getAppEnv();
+
+// start server on the specified port and binding host
+app.listen(appEnv.port, appEnv.bind, function() {
+
+  // print a message when the server starts listening
+  console.log("server starting on " + appEnv.url);
+});

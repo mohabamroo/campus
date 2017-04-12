@@ -1,7 +1,6 @@
 sperate 34 from 5862
 club gallery
 ensure permissions and validation
-organization from and to
 edit structre view
 offers, list of name and summary of offer
 clickable, description and location
@@ -11,10 +10,8 @@ https
 gender, phone in signup
 gyms/workout - trips - student supplies - cafe and restauta- courses/pro
 no featured
-delete member/dismiss
 no rating not 0 stars
 
-email/phone in member
 push organization in updating members is redundant
 
 done:
@@ -49,6 +46,12 @@ search view
 hide target in offer
 hide phone in profile
 summary about, organization name
+organization from and to
+delete member/dismiss
+email/phone in member
+
+
+
 
 
 

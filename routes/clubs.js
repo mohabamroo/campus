@@ -92,6 +92,26 @@ function ensureHeadOfMember(req, res, next) {
 
 }
 
+function ensureHeadOfDep(req, res, next) {
+	var departmentID = req.params.departmentID;
+	if(req.isAuthenticated()) {
+		Permission.findOne({profileId: req.user.id, departmentID: departmentID},
+			function(err1, permissionRes) {
+				printError(err1);
+				if(permissionRes!=null) {
+					printResult(permissionRes);
+					next();
+				} else {
+					res.end('Not authorized!');
+				}
+		});
+	}
+	else {
+		req.flash('error_msg','You are not logged in');
+		res.redirect('/users/signin');
+	}
+}
+
 router.get('/', function(req, res) {
 	Club.find(function(err, clubs) {
 		printError(err);
@@ -471,7 +491,7 @@ router.post('/addpresident', ensureAuthenticated, function(req, res) {
 
 });
 
-router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) {
+router.post('/addMember/:departmentID', ensureHeadOfDep, function(req, res) {
 	var departmentID = req.params.departmentID;
 	var memberName = req.body.memberName;
 	var memberID = req.body.memberID;
@@ -510,10 +530,12 @@ router.post('/addMember/:departmentID', ensureAuthenticated, function(req, res) 
 	});
 });
 
-router.post('/addMemberAjax/:departmentID/:memberID/:memberName', ensureAuthenticated, function(req, res) {
+router.post('/addMemberAjax/:departmentID/:memberID/:memberName/:email/:phone', ensureHeadOfDep, function(req, res) {
 	var departmentID = req.params.departmentID;
 	var memberName = req.params.memberName;
 	var memberID = req.params.memberID;
+	var memberEmail =req.params.email;
+	var memberPhone = req.params.phone;
 	Club.getClubByUserId(req.user.id, function(err, club) {
 		printError(err);
 		Department.getDepartmentById(departmentID, function(err2, department) {
@@ -532,7 +554,9 @@ router.post('/addMemberAjax/:departmentID/:memberID/:memberName', ensureAuthenti
 				clubID: department.clubID,
 				departmentID: department._id,
 				from: (new Date()).getFullYear(),
-				to: "Present"
+				to: "Present",
+				email: memberEmail,
+				phone: memberPhone
 			});
 			Member.createMember(newMember, function(err3, newMemberRes) {
 				Department.update({_id: departmentID}, {$push: {members: newMemberRes._id}}, function(err4, pushRes) {
@@ -545,11 +569,13 @@ router.post('/addMemberAjax/:departmentID/:memberID/:memberName', ensureAuthenti
 	});
 });
 
-router.post('/addMemberAjax/:departmentID/:subDepartmentID/:memberID/:memberName', ensureAuthenticated, function(req, res) {
+router.post('/addMemberAjax/:departmentID/:subDepartmentID/:memberID/:memberName/:email/:phone', ensureHeadOfDep, function(req, res) {
 	var departmentID = req.params.departmentID;
 	var subdepartmentID = req.params.subDepartmentID;
 	var memberName = req.params.memberName;
 	var memberID = req.params.memberID;
+	var memberEmail =req.params.email;
+	var memberPhone = req.params.phone;
 	Department.getDepartmentById(departmentID, function(err2, department) {
 		printError(err2);
 		var newMember = new Member({
@@ -566,7 +592,9 @@ router.post('/addMemberAjax/:departmentID/:subDepartmentID/:memberID/:memberName
 			clubID: department.clubID,
 			departmentID: department._id,
 			from: (new Date()).getFullYear(),
-			to: "Present"
+			to: "Present",
+			email: memberEmail,
+			phone: memberPhone
 		});
 		Member.createMember(newMember, function(err3, newMemberRes) {
 			Department.update({'subDepartments._id': subdepartmentID},
@@ -582,8 +610,9 @@ router.post('/addMemberAjax/:departmentID/:subDepartmentID/:memberID/:memberName
 	});
 	
 });
+
 // Note: not updated
-router.post('/addMember/:departmentID/:subDepartmentID', ensureAuthenticated, function(req, res) {
+router.post('/addMember/:departmentID/:subDepartmentID', ensureHeadOfDep, function(req, res) {
 	var departmentID = req.params.departmentID;
 	var subdepartmentID = req.params.subDepartmentID;
 	var memberName = req.body.memberName;
@@ -626,7 +655,7 @@ router.post('/getUserPermissionForSubDepartment/:subDepartmentID', ensureAuthent
 	})
 });
 
-router.get('/editMembersOfDepartment/:departmentID', ensureAuthenticated, function(req, res) {
+router.get('/editMembersOfDepartment/:departmentID', ensureHeadOfDep, function(req, res) {
 	var host = req.headers.host;
 	var departmentID = req.params.departmentID;
 	var url = "http://"+host+"/clubs/membersOfSingleDepartment/"+departmentID;
@@ -638,7 +667,7 @@ router.get('/editMembersOfDepartment/:departmentID', ensureAuthenticated, functi
 	});
 });
 
-router.get('/editMembersOfSubDepartment/:departmentID/:subDepartmentID', ensureAuthenticated, function(req, res) {
+router.get('/editMembersOfSubDepartment/:departmentID/:subDepartmentID', ensureHeadOfDep, function(req, res) {
 	var host = req.headers.host;
 	var departmentID = req.params.departmentID;
 	var subDepartmentID = req.params.subDepartmentID;

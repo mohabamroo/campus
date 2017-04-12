@@ -1,6 +1,8 @@
 var express = require("express");
 var path = require("path");
 var http = require("http");
+var https = require('https');
+var fs = require('fs');
 var ejs = require("ejs");
 var publicPath = path.resolve(__dirname, "public");
 var cookieParser = require('cookie-parser');
@@ -20,7 +22,11 @@ mongoose.connect('mongodb://mohabamroo:ghostrider1@ds127260.mlab.com:27260/commu
 var db = mongoose.connection;
 var mailer = require('express-mailer');
 var app = express();
-
+var sslOptions = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem'),
+  passphrase: 'ghostrider'
+};
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
 var cfenv = require('cfenv');
@@ -101,8 +107,10 @@ app.use('/offers', offers);
 var appEnv = cfenv.getAppEnv();
 
 // start server on the specified port and binding host
-app.listen(appEnv.port, appEnv.bind, function() {
+// app.listen(appEnv.port, appEnv.bind, function() {
+//   console.log("server starting on " + appEnv.url);
+// });
 
-  // print a message when the server starts listening
+https.createServer(sslOptions, app).listen(appEnv.port, appEnv.bind, function() {
   console.log("server starting on " + appEnv.url);
 });

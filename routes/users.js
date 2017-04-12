@@ -175,7 +175,43 @@ router.get('/signup', function(req, res) {
 
 });
 
-router.post('/signup', function(req, res) {
+function ensureUniqueUsername(req, res, next) {
+	var username = req.body.username;
+	User.getUserbyUsername(username, function(err, findRes) {
+		if(findRes!=null) {
+				req.flash('error_msg', 'Duplicate Username!\nUse different username.');
+				res.redirect('/users/signup');
+			} else {
+				next();
+			}
+	});
+}
+
+function ensureUniqueEmail(req, res, next) {
+	var email = req.body.email;
+	User.findOne({email: email}, function(err, findRes) {
+		if(findRes!=null) {
+				req.flash('error_msg', 'Duplicate Email!\nUse different email.');
+				res.redirect('/users/signup');
+			} else {
+				next();
+			}
+	});
+}
+
+function ensureUniqueID(req, res, next) {
+	var gucid = req.body.gucid;
+	User.findOne({gucid: gucid}, function(err, findRes) {
+		if(findRes!=null) {
+				req.flash('error_msg', 'Duplicate ID!\nUse different ID.');
+				res.redirect('/users/signup');
+			} else {
+				next();
+			}
+	});
+}
+
+router.post('/signup', ensureUniqueUsername, ensureUniqueEmail, ensureUniqueID, function(req, res) {
 	var name = req.body.name;
 	var email = req.body.email;
 	var password = req.body.password;
@@ -186,7 +222,6 @@ router.post('/signup', function(req, res) {
 	var major = req.body.major || "none";
 	var year = req.body.year;
 	var birthdate = req.body.birthdate;
-	console.log(type);
 	req.checkBody('name', 'Name is empty!').notEmpty();
 	req.checkBody('email', 'Email is empty!').notEmpty();
 	req.checkBody('password', 'Password is empty!').notEmpty();
@@ -205,87 +240,74 @@ router.post('/signup', function(req, res) {
 			errors: errors
 		});
 	} else {
-		User.getUserbyUsername(username, function(err, findRes) {
-			printError(err);
-			console.log("inside get")
-			if(findRes!=null) {
-				console.log('found username')
-				req.flash('error_msg', 'Duplicate Username!');
-				res.redirect('/users/signup');
-			} else {
-				var rand = randomstring.generate();
-				var newUser = new User({
-					name: name,
-					email: email,
-					gucid: gucid,
-					username: username,
-					password: password,
-					usertype: type,
-					birthdate: birthdate,
-					links: [],
-					summary: "No summary.", 
-					phone: "No phone",
-					major: major,
-					year: year,
-					profilephoto: "default-photo.jpeg",
-					organizations: [],
-					verificationCode: rand,
-					tags: []
-				});
-
-				User.createUser(newUser, function(err, user) {
-					printError(err);
-    				var host = req.get('host');
-    				var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
-					app.mailer.send('email', {
-				      to: email,
-				      subject: 'Community-<DON\'T REPLY> Email Verification',
-				      link: link,
-				      name: username
-				    }, function (errEmail) {
-				      if (err) {
-				      	console.log('There was an error sending the email');
-				        printError(errEmail);
-				      } else {
-				      	console.log('Email Sent');
-				      }
-				    });
-				   	console.log('before club')
-					if(type=="club") {
-						console.log("inside if")
-						var newClub = new Club({
-							name: name,
-							password: user.password,
-							userid: user.id,
-							alias: '',
-							email: email,
-							photos: [],
-							summary: 'no summary',
-							logo: '',
-							phone: '',
-							president: "",
-							newDepartments: [],
-							events: []
-						});
-						newClub.save(function(err, clubRes) {
-							printError(err);
-							printResult(clubRes);
-							console.log("saved ")
-							res.locals.pagetitle = 'Sign In';
-							req.flash('success_msg','You signed up successfully!');
-							res.redirect('/users/signin');
-						})
-					} else {
-						res.locals.pagetitle = 'Sign In';
-						req.flash('success_msg','You signed up successfully!');
-						res.redirect('/users/signin');
-					}
-						
-				});
-			}
+		var rand = randomstring.generate();
+		var newUser = new User({
+			name: name,
+			email: email,
+			gucid: gucid,
+			username: username,
+			password: password,
+			usertype: type,
+			birthdate: birthdate,
+			links: [],
+			summary: "No summary.", 
+			phone: "No phone",
+			major: major,
+			year: year,
+			profilephoto: "default-photo.jpeg",
+			organizations: [],
+			verificationCode: rand,
+			tags: []
 		});
-		
-			
+
+		User.createUser(newUser, function(err, user) {
+			printError(err);
+			var host = req.get('host');
+			var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
+			app.mailer.send('email', {
+		      to: email,
+		      subject: 'Community-<DON\'T REPLY> Email Verification',
+		      link: link,
+		      name: username
+		    }, function (errEmail) {
+		      if (err) {
+		      	console.log('There was an error sending the email');
+		        printError(errEmail);
+		      } else {
+		      	console.log('Email Sent');
+		      }
+		    });
+			if(type=="club") {
+				console.log("inside if")
+				var newClub = new Club({
+					name: name,
+					password: user.password,
+					userid: user.id,
+					alias: '',
+					email: email,
+					photos: [],
+					summary: 'no summary',
+					logo: '',
+					phone: '',
+					president: "",
+					newDepartments: [],
+					events: []
+				});
+				newClub.save(function(err, clubRes) {
+					printError(err);
+					printResult(clubRes);
+					console.log("saved ")
+					res.locals.pagetitle = 'Sign In';
+					req.flash('success_msg','You signed up successfully!');
+					res.redirect('/users/signin');
+				})
+			} else {
+				res.locals.pagetitle = 'Sign In';
+				req.flash('success_msg','You signed up successfully!');
+				res.redirect('/users/signin');
+			}
+				
+		});	
 	}
 
 });

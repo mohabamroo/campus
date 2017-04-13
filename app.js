@@ -22,11 +22,11 @@ mongoose.connect('mongodb://mohabamroo:ghostrider1@ds127260.mlab.com:27260/commu
 var db = mongoose.connection;
 var mailer = require('express-mailer');
 var app = express();
-var sslOptions = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem'),
-  passphrase: 'ghostrider'
-};
+// var sslOptions = {
+//   key: fs.readFileSync('key.pem'),
+//   cert: fs.readFileSync('cert.pem'),
+//   passphrase: 'ghostrider'
+// };
 // cfenv provides access to your Cloud Foundry environment
 // for more info, see: https://www.npmjs.com/package/cfenv
 var cfenv = require('cfenv');
@@ -107,10 +107,12 @@ app.use('/offers', offers);
 var appEnv = cfenv.getAppEnv();
 
 // start server on the specified port and binding host
-// app.listen(appEnv.port, appEnv.bind, function() {
-//   console.log("server starting on " + appEnv.url);
-// });
-
-https.createServer(sslOptions, app).listen(appEnv.port, appEnv.bind, function() {
+app.listen(appEnv.port, appEnv.bind, function() {
+  // print a message when the server starts listening
   console.log("server starting on " + appEnv.url);
 });
+
+// https.createServer(sslOptions, app).listen(appEnv.port, appEnv.bind, function() {
+//   console.log("Started server on: "+appEnv.url);
+//   console.log("host: "+appEnv.bind);
+// });

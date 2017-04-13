@@ -12,13 +12,14 @@ instructions:
 
 
 tasks:
-1- rate memeber
-2- review member
-3- show organizations in user (name, role, rating, review)
-4- delete member (also delet organization from his profile)
-5- rate head and president?
-6- club add Events
-7- timeline of events (orderd by date)
+
+	1- rate memeber
+	2- review member
+	3- show organizations in user (name, role, rating, review)
+	4- delete member (also delet organization from his profile)
+	5- rate head and president?
+	6- club add Events
+	7- timeline of events (orderd by date)
 
 
 communityguc@gmail.com

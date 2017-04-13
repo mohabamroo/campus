@@ -7,7 +7,7 @@ Array.prototype.forEach.call(h2s, function(el) {
 });
 
 $("label").click(function() {
-$(this).parent().find("input").nextAll().css({"color": "#ddd"});
+	$(this).parent().find("input").nextAll().css({"color": "#ddd"});
 	$(this).css({"color": "#FFD700"});
 	$(this).nextAll().css({"color": "#FFD700"});
 
@@ -67,6 +67,10 @@ $(".checkboxNested").click(function() {
 		$(this).parent().find('.checkboxVal').val('false');
 		$(this).parent().find('.checkboxVal').attr('value', 'false');
 	}
+});
+
+$('#logoEdit').click(function() {
+
 });
 
 $(document).ready(function() {

@@ -1,14 +1,11 @@
 sperate 34 from 5862
 club gallery
-ensure permissions and validation
 edit structre view
 offers, list of name and summary of offer
 clickable, description and location
 
 all ratings are stars
-https
 gender, phone in signup
-gyms/workout - trips - student supplies - cafe and restauta- courses/pro
 no rating not 0 stars
 
 push organization in updating members is redundant
@@ -49,3 +46,7 @@ organization from and to
 delete member/dismiss
 email/phone in member
 no featured
+ensure permissions and validation
+https
+sign in error messages
+gyms/workout - trips - student supplies - cafe and restauta- courses/pro

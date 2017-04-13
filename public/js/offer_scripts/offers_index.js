@@ -76,12 +76,14 @@ var updateSeeMore = function() {
 
 $('.typeBtn').click(function() {
 	console.log($(this).attr('offersType'));
+	$('.typeBtn').css('color', 'black');
+	$(this).css('color', '#18BC9C');
 	var type = $(this).attr('offersType');
 	$.get('/offers/viewOffers/'+type, function(offers) {
 		console.log(offers)
 		updateEventsContainer(offers);
 	});
-})
+});
 
 $(document).keyup(function(e) {
 	if (e.keyCode === 27) {
@@ -103,4 +105,8 @@ $(document).mouseup(function (e) {
 $('#seeMoreBtn').click(function() {
 	$('#seeMoreDiv').remove();
 	$('.row').slideDown();
+});
+
+$(document).ready(function() {
+	$('.typeBtn[offersType="entertainment"]').click();
 });

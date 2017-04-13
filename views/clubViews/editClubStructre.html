@@ -10,7 +10,7 @@
 			</form>
 		</h1>
 		<div style="float: right;">	
-			<div class="img-edit" style="max-width: 300px; max-height: 250px;">
+			<div class="img-edit" style="max-width: 300px; max-height: 250px;" id="logoEdit">
 		 	   	<img class="img-circle hover" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="300" height="250" >
 				<p class="text">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
 			</div>
@@ -190,11 +190,13 @@
 			<%  }) %>
 			
 		<div class="singleDepartment col-xs-4">
-				<form method="POST" action="/clubs/addDepartmentNew" style="max-width: 200px; margin-left: auto;margin-right: auto;">
-					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
-					<br>
-					<br>
-					<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; margin-left: 30px;">New Deartment</h4>
+				<form method="POST" action="/clubs/addDepartmentNew" style="max-width: 200px; margin-left: auto;margin-right: auto; text-align: left;">
+					<div class="img-edit" style="max-width: 300px; height: 160px;margin-left: auto; margin-right: auto;">
+				 	   	<img class="img-circle hover" src="/user_uploads/default-photo.jpeg" alt="Generic placeholder image" width="180" height="160">
+						<p class="anotherText">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
+					</div>
+					<h4 style="cursor:pointer; color:gray; margin-left: 30px;">New Deartment</h4>
+					<input type="file" name="departmentPhoto" style="display: none;" id="newDepPhoto">
 					<input type="text" name="departmentName" class="form-control" placeholder="Media">
 					<input type="text" name="headID" class="form-control" placeholder="34-5862">
 					<input type="text" name="departmentHead" class="form-control" placeholder="mohab amr">
@@ -212,15 +214,11 @@
 				</form>
 		</div>
 		</div>
-
 	</div>
-
-
 	<br>
 	<br>
+
 	<div class="row">
-	   	
-
 	    <div class="col-xs-8 col-sm-12" style="border: 2px solid grey; border-radius: 5px; max-width: 800px; margin-left: auto;margin-right: auto;">
 	    	<h3>Gallery</h3>
 	    	<br>
@@ -279,7 +277,22 @@
 		text-align: center;
 	}
 
+	.img-edit .anotherText {
+		position:relative;
+		visibility:hidden;
+		bottom: 100px;
+		cursor: pointer;
+		font-family: arial;
+		font-weight: bold;
+		font-size: 30px;
+		color: white;
+		text-align: center;
+	}
+
 	.img-edit:hover .text {
+		visibility:visible;
+	}
+	.img-edit:hover .anotherText {
 		visibility:visible;
 	}
 </style>

@@ -24,13 +24,6 @@
             <p class="help-block text-danger"></p>
           </div>
         </div>
-        <div class="row control-group" id="idDiv">
-          <div class="form-group col-xs-12 floating-label-form-group controls" id="idDivChild">
-            <label for="inputGUCID" class="">GUC ID</label>
-            <input type="text" id="inputGUCID" class="form-control" placeholder="ex: 34-5862" name="gucid" required autofocus data-validation-required-message="Please enter your GUC-ID.">
-            <p class="help-block text-danger"></p>
-          </div>
-        </div>
         <div class="row control-group">
           <div class="form-group col-xs-12 floating-label-form-group controls">
             <label for="inputUsername" class="">Username</label>
@@ -62,10 +55,18 @@
               <option value="club">Club</option>
             </select>
           </div>
-        </div> 
-        <hr> 
+        </div>
+        <hr>
+        <div class="row control-group" id="idDiv">
+          <div class="form-group col-xs-12 floating-label-form-group controls" id="idDivChild">
+            <label for="inputGUCID" class="">GUC ID</label>
+            <input type="text" id="inputGUCID" class="form-control" placeholder="ex: 34-5862" name="gucid" required autofocus data-validation-required-message="Please enter your GUC-ID.">
+            <p class="help-block text-danger"></p>
+          </div>
+        </div>
         <div class="row control-group" id="birthdateDiv">
           <div class="form-group col-xs-12 controls" style="font-size: 1.5em;" id="birthdateDivChlid">
+            <br>
             <label for="sel2">Birthdate:</label>
             <input type="date" id= "birthdateInput" name="birthdate" class="form-control" required data-validation-required-message="Please enter your birthdate.">
           </div>

@@ -122,24 +122,24 @@ router.get('/profile/:id', ensureAuthenticated, function(req, res) {
 });
 
 passport.use(new LocalStrategy(
-  function(username, password, done) {
-    User.getUserbyUsername(username, function(err, user) {
-   		if(err)
-   			throw err;
-   		if(!user) {
-   			return done(null, false, {message: 'Unknown User'});
-   		}
-   	User.validatePassword(password, user.password, function(err, res){
-   		if(err)
-   			throw err;
-   		if(res==true){
-   			return done(null, user);
-   		} else {
-   			return done(null, false, {message: 'Invalid password'});
-   		}
-   	});
+	function(username, password, done) {
+		User.getUserbyUsername(username, function(err, user) {
+			if(err)
+				throw err;
+			if(!user) {
+				return done(null, false, {message: 'Unknown User'});
+			}
+		User.validatePassword(password, user.password, function(err, res){
+			if(err)
+				throw err;
+			if(res==true){
+				return done(null, user);
+			} else {
+				return done(null, false, {message: 'Invalid password'});
+			}
+		});
    });
-  }));
+}));
 
 passport.serializeUser(function(user, done) {
 	// saves user in req
@@ -148,18 +148,22 @@ passport.serializeUser(function(user, done) {
 });
 
 passport.deserializeUser(function(id, done) {
-  User.getUserById(id, function(err, user) {
-    done(err, user);
-  });
+	User.getUserById(id, function(err, user) {
+		done(err, user);
+	});
 
 });
 
-router.post('/signin', passport.authenticate('local', {
-  	successRedirect: '/',
-    failureRedirect: '/users/signin'
-	}), function(req, res) {
+router.post('/signin',
+	passport.authenticate('local', {successRedirect: '/', failureRedirect: '/users/failSignIn'}),
+	function(req, res, next) {
+	}
+);
 
-});
+router.get('/failSignIn', function(req, res) {
+	req.flash("error_msg", "Invalid username/password!");
+	res.redirect('/users/signin');
+})
 
 router.get('/signin', function(req, res) {
 	res.locals.pagetitle = 'Sign In';

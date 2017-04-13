@@ -3,6 +3,7 @@ $('#searchBtn').click(function() {
 	getSearchResult(searchTerm);
 
 });
+
 $.fn.enterKey = function(fnc) {
     return this.each(function () {
         $(this).keypress(function (ev) {
@@ -13,10 +14,13 @@ $.fn.enterKey = function(fnc) {
         })
     })
 }
+
 $("#searchInput").enterKey(function() {
+	$('#wholeTable').slideDown();
     var searchTerm = $('#searchInput').val();
 	getSearchResult(searchTerm);
 });
+
 var getSearchResult = function(searchTerm) {
 	if(searchTerm==""){
 		$('#searchMsg').show();

@@ -5,58 +5,65 @@
 		<h1 style="padding-top: 40px; color: black; float: left;">
 			Hello, <%= club.name%>!
 			<hr style="color: black; border: 2px solid black;">
-			<form method="POST" action="/clubs/updateMembers/<%= club._id %>" style="max-width: 200px;">
-				<button type="submit" class="btn form-control btn-success btn-lg" style="height: 60px;">Update Members</button	
-			</form>
+			
 		</h1>
 		<div style="float: right;">	
 			<div class="img-edit" style="max-width: 300px; max-height: 250px;" id="logoEdit">
 		 	   	<img class="img-circle hover" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="300" height="250" >
 				<p class="text">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
 			</div>
-
-			<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/clubs/updateLogo" style="align-self: center;">
-				<input type="file" id="fileUpload" class="form-control btn" name="userPhoto" style="display: none;">
-				<button type="submit" value="Upload Image" class="btn btn-success" style="margin-left: 35%;margin-right: auto; align-self: center;">Update logo</button>	
-			</form>
+			<div>
+			   	<form id="logoUploadForm" enctype="multipart/form-data" method="POST" action="/clubs/updateLogo" style="align-self: center;">
+					<input type="file" id="fileUpload" class="form-control btn" name="logoPhoto" style="display: none;">
+					<button type="submit" id="submitBtn" class="btn btn-success" style="margin-left: 35%; margin-right: auto; align-self: center;">Update logo</button>	
+				</form> 	
+		    </div>
 		</div>	
 	</div>
+
+
 	<hr>
 	<div class="container-fluid"  style="margin-left: auto;margin-right: auto;">
 
 		<div class="row row-eq-height">
 			<div class="singleDepartment col-xs-4" style="margin-left: auto;margin-right: auto;">
-			<h3 style="text-align: center;">
-			Structre
-			<br>
-			<br>
-			<div style="margin-left: auto;margin-right: auto; max-width: 300px; text-align: center;">
-						Prisedent
-						<br>
-						<% if(club.president!=null && club.logo!="") { %>
-				 	   		<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185">
-
+				<h3 style="text-align: center;">
+				Structre
+				<br>
+				<br>
+				<div style="margin-left: auto;margin-right: auto; max-width: 300px; text-align: center;">
+					<br>
+					<div class="img-edit" style="max-width: 300px; max-height: 200px;" id="presEdit">
+				 	   	<% if(president!=null) { %>
+				 	   		<img class="img-circle hover" src="/club_uploads/<%= president.profilephoto %>" alt="Generic placeholder image" width="200" height="185">
 						<% } else { %>
-				 	   		<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185">
+				 	   		<img class="img-circle hover" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185">
 						<% } %>
+						<p class="text">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
+					</div>
+					President
+		 	   		<h4><% if(president.profileId!="none") { %>
+		 	   		<a href="/users/viewprofile/<%= president.profileId  %>">
+		 	   		<% } %><%= president.name %></a></h4>
 
-						<h4 <%if(club.president.profileId!="none") { %> 
-								class="clickableh2" id="<%= club.president.profileId %>"
-								style="cursor:pointer; color:gray; margin-left: 30px;" 
-							<% } else { %>
-							style="color:gray; margin-left: 30px;"
-							<% } %>
-							>		
-							<%= club.president.name %>
-						</h4>
-						<div class="container president" style="min-width: 220px;">
-							<form method="POST" action="/clubs/addpresident" >
-								<input type="text" name="presidentID" class="form-control" placeholder="34-5862">
-								<input type="text" name="presidentName" class="form-control" placeholder="mohab amr">
-								<input type="submit" class="btn" style="margin: 10px;" value="Add President">	
-							</form>
-						</div>
-			</div>
+					<h4 <%if(club.president.profileId!="none") { %> 
+							class="clickableh2" id="<%= club.president.profileId %>"
+							style="cursor:pointer; color:gray; margin-left: 30px;" 
+						<% } else { %>
+						style="color:gray; margin-left: 30px;"
+						<% } %>
+						>		
+						<%= club.president.name %>
+					</h4>
+					<div class="container president" style="min-width: 220px;">
+						<form method="POST" enctype="multipart/form-data" action="/clubs/addpresident" >
+							<input type="text" name="presidentID" class="form-control" placeholder="34-5862">
+							<input type="text" name="presidentName" class="form-control" placeholder="mohab amr">
+							<input type="file" id="presFile" class="form-control btn" name="presidentPhoto" style="display: none;">
+							<input type="submit" class="btn" style="margin: 10px;" value="Add President">	
+						</form>
+					</div>
+				</div>
 			</div>
 			</h3>
 			<br>
@@ -67,21 +74,8 @@
 			<%  departments.forEach(function(department) { %>
 				<div class="singleDepartment col-xs-4" name="<%= department.name %>" id="<%= department._id %>" >
 				<div style="margin-left: auto;margin-right: auto; max-width: 300px;" >
-					<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
+					<img class="img-circle" src="/club_uploads/<%= department.head.profilephoto %>" alt="Generic placeholder image" width="180" height="160">
 					<h4 style="color:gray; margin-left: 30px;"><%= department.name %></h4>
-					<div style="vertical-align: top; margin-left: 30px;" class="nameRating">
-						<h4 <%if(department.head.profileId!="none") { %> 
-								class="clickableh2" id="sssx"
-								style="cursor:pointer; color:gray;" 
-							<% } else { %>
-							style="color:gray;"
-							<% } %>
-							>		
-							<%= department.head.name %>
-						</h4>
-						<!-- <% include ../layout/rating %> -->
-		
-					</div>
 					
 					<div class="deleteDiv">
 						<form method="post" action="/clubs/deleteDepartment/<%= department._id %>">
@@ -94,19 +88,6 @@
 							<div class="singleDepartment">
 								<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
 								<h4 style="color:gray; margin-left: 30px;"><%= subdepartment.name %></h4>
-								<div style="vertical-align: top; margin-left: 30px;" class="nameRating">
-									<h4 <%if(subdepartment.head.profileId!="none") { %> 
-											class="clickableh2" id="sssx"
-											style="cursor:pointer; color:gray;" 
-										<% } else { %>
-										style="color:gray;"
-										<% } %>
-										>		
-										<%= subdepartment.head.name %>
-									</h4>
-									<!-- <% include ../layout/rating %> -->
-					
-								</div>
 								<br>
 								<br>
 								<div id="<%= subdepartment._id %>">
@@ -142,11 +123,12 @@
 						  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Sub Dep.
 						</button>
 						<div class="singleDepartment" style="display: none;">
-							<form method="POST" action="/clubs/addSubDepartment/<%= department.id %>" style="max-width: 200px;">
-								<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="160" height="140">
-								<br>
-								<br>
-								<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; color:gray; margin-left: 30px;">New SubDeartment</h4>
+							<form method="POST" action="/clubs/addSubDepartment/<%= department.id %>" enctype="multipart/form-data"style="max-width: 200px;">
+								<div class="img-edit" style="max-width: 300px; height: 160px;margin-left: auto; margin-right: auto;">
+							 	   	<img class="img-circle hover subChange" src="/user_uploads/default-photo.jpeg" alt="Generic placeholder image" width="160" height="140" style="margin-left: auto;margin-right: auto;">
+									<p class="anotherText subChange" style="font-size: 20px; text-align: center;">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
+								</div>
+								<h4 style="cursor:pointer; color:gray;">New SubDepartment</h4>
 								<input type="text" name="subdepartmentName" class="form-control" placeholder="Media">
 								<input type="text" name="subheadID" class="form-control" placeholder="34-5862">
 								<input type="text" name="subdepartmentHead" class="form-control" placeholder="mohab amr">
@@ -155,6 +137,7 @@
 									<input type="checkbox" class="checkbox form-control" style="max-width: 25px; max-height: 25; float: right;" checkboxVal="false">
 									<input type="text" class="checkboxVal" name="subdepartmentPublic" style="display: none;" checkboxVal="false" value="false">
 								</div>
+								<input type="file" id="subDepFile" class="form-control btn" name="subPhoto" >
 								<input type="submit" class="btn" style="margin: 10px;" value="Add SubDepartment">	
 							</form>
 						</div>
@@ -168,35 +151,18 @@
 						</div>					
 					<% } %>
 
-					<% department.members.forEach(function(member) { %>
-						<div style="vertical-align: top; margin-left: 30px; font-size: 10px;" class="nameRating">
-							<h4 <%if(member.profileId!="none") { %> 
-									class="clickableh2" id="<%= member.profileId %>"
-									style="cursor:pointer; color:gray;" 
-								<% } else { %>
-								style="color:gray;"
-								<% } %>
-								objid= "<%= member._id %>"
-								>
-								<%= member.name %>
-							</h4>
-							<div rating="<%= member.rating %>">
-							<!-- <% include ../layout/rating %> -->
-							</div>
-						</div>
-					<% }); %>
 				</div>
 				</div>
 			<%  }) %>
 			
 		<div class="singleDepartment col-xs-4">
-				<form method="POST" action="/clubs/addDepartmentNew" style="max-width: 200px; margin-left: auto;margin-right: auto; text-align: left;">
+					
+				<form method="POST" action="/clubs/addDepartmentNew" enctype="multipart/form-data" style="max-width: 200px; margin-left: auto;margin-right: auto; text-align: left;">
 					<div class="img-edit" style="max-width: 300px; height: 160px;margin-left: auto; margin-right: auto;">
-				 	   	<img class="img-circle hover" src="/user_uploads/default-photo.jpeg" alt="Generic placeholder image" width="180" height="160">
-						<p class="anotherText">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
+				 	   	<img class="img-circle hover headChange" src="/user_uploads/default-photo.jpeg" alt="Generic placeholder image" width="180" height="160">
+						<p class="anotherText headChange">Change<span class="glyphicon glyphicon-open" aria-hidden="true" style="margin-left: 10px;"></span></p>
 					</div>
-					<h4 style="cursor:pointer; color:gray; margin-left: 30px;">New Deartment</h4>
-					<input type="file" name="departmentPhoto" style="display: none;" id="newDepPhoto">
+					<h4 style=" color:gray; margin-left: 30px;">New Department</h4>
 					<input type="text" name="departmentName" class="form-control" placeholder="Media">
 					<input type="text" name="headID" class="form-control" placeholder="34-5862">
 					<input type="text" name="departmentHead" class="form-control" placeholder="mohab amr">
@@ -210,6 +176,7 @@
 						<input type="checkbox" class="checkboxNested form-control" style="max-width: 25px; max-height: 25; float: right;" checkboxVal="false">
 						<input type="text" class="checkboxVal" name="departmentNested" style="display: none;" checkboxVal="false" value="false">
 					</div>
+					<input type="file" id="depFile" class="form-control btn" name="headPhoto" style="display: none;">
 					<input type="submit" class="btn" style="margin: 10px;" value="Add Department">	
 				</form>
 		</div>
@@ -217,7 +184,12 @@
 	</div>
 	<br>
 	<br>
-
+ 	<div class="container">
+		<form method="POST" action="/clubs/updateMembers/<%= club._id %>" style="max-width: 200px;">
+			<button type="submit" class="btn form-control btn-success btn-lg" style="height: 60px;">Update Members</button	
+		</form>
+	</div>
+	<hr>
 	<div class="row">
 	    <div class="col-xs-8 col-sm-12" style="border: 2px solid grey; border-radius: 5px; max-width: 800px; margin-left: auto;margin-right: auto;">
 	    	<h3>Gallery</h3>
@@ -233,7 +205,7 @@
 		    			<form id="uploadForm" enctype="multipart/form-data" method="POST" action="/clubs/addPhoto" >
 							<input type="text" class="form-control" name="photoName" placeholder="catpic">
 							<input type="file" class="form-control btn" name="userPhoto" style="margin-top: 4px;">
-							<button type="submit" value="Upload Image" class="btn btn-success" style="margin: 10px;">Add Photo</button>	
+							<button type="submit" class="btn btn-success" style="margin: 10px;">Add Photo</button>	
 					   	</form>			    		
 		    		</div>
 	    		</tr>

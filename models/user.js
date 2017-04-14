@@ -14,7 +14,8 @@ var userSchema = mongoose.Schema({
 	},
 	gucid: {
 		type: String,
-		unique: true
+		unique: true,
+		sparse: true
 	},
 	major: {
 		type: String

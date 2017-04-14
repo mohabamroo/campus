@@ -8,7 +8,7 @@
     <header>
         <div class="container" id="maincontent" tabindex="-1">
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-12" style="margin-right: auto; margin-left: auto;">
                     <img class="img-responsive" src="/club_uploads/<%= dude.profilephoto %>" width="300" height="250" alt="">
                     <div class="intro-text">
                         <h1 class="name">This is <%= dude.name%>!</h1>
@@ -53,9 +53,9 @@
 			</div>
 			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
 				<% if(president!=null && club.logo!="") { %>
-				 	<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185" style="align-self: center;">
+				 	<img class="img-circle" src="/club_uploads/<%= president.profilephoto %>" alt="Generic placeholder image" width="200" height="185" style="align-self: center;">
 				<% } else { %>
-				 	<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="200" height="185" style="align-self: center;">
+				 	<img class="img-circle" src="/club_uploads/<%= club.logo %>" alt="Generic placeholder image" width="200" height="185" style="align-self: center;">
 				<% } %>
 					<h3 style="text-align: center;">President</h3>
 					<h4 <%if(president.profileId!="none") { %> 
@@ -67,7 +67,6 @@
 						>		
 						<%= president.name || "no preisdent!"%>
 					</h4>
-				
 			</div>
 			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
 			</div>
@@ -83,14 +82,14 @@
 			<div class="deps" id="depsDiv" style="display: flex; width: 90%; text-align: center; color: #333;">
 				<% departments.forEach(function(department) { %>
 					<div class="singleDepartment " style="margin-bottom: 40px;">
-						<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="180" height="160">
-						<h4 class="clickableh2" id="<%= department._id %>" style="cursor:pointer; text-align: center;"><%= department.name %></h4>
+						<img class="img-circle" src="/club_uploads/<%= department.photo %>" alt="Generic placeholder image" width="180" height="160">
+						<h4 class="clickableh2" id="<%= department._id %>" style="text-align: center;"><%= department.name %></h4>
 						
 						<% if(department.nestedType!=null && department.nestedType==="true") { %>
 						<div class="subDepartment" id="<% department._id %>" style="display: none;">
 							<% department.subDepartments.forEach(function(subDepartment) { %>
-								<img class="img-circle" src="/user_uploads/koushi-1487686809628.jpg" alt="Generic placeholder image" width="140" height="120">
-								<h4 class="clickableh2" id="<%= %>" style="cursor:pointer; text-align: center;"><%= subDepartment.name %></h4>
+								<img class="img-circle" src="/club_uploads/<%= subDepartment.photo %>" alt="Generic placeholder image" width="140" height="120">
+								<h4 style="text-align: center;"><%= subDepartment.name %></h4>
 								<h4 class="viewBtnNest" id="<%= subDepartment.id %>" style="cursor:pointer; color:gray;">View Memebers</h4>
 
 							<% }); %>

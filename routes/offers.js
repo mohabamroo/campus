@@ -95,5 +95,11 @@ router.post('/addOffer', ensureAdmin, function(req, res) {
     });
 });
 
-
+router.get('/getOffer/:id', function(req, res) {
+	var offerID = req.params.id;
+	Offer.findById(offerID, function(err, offer) {
+		printError(err);
+		res.json(offer);
+	})
+})
 module.exports = router;

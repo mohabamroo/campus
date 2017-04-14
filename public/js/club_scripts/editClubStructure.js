@@ -70,7 +70,20 @@ $(".checkboxNested").click(function() {
 });
 
 $('#logoEdit').click(function() {
+	$('#fileUpload').click();
+});
 
+$('#presEdit').click(function() {
+	$('#presFile').click();
+});
+
+$('.headChange').click(function() {
+	$('#depFile').click();
+});
+
+$('.subChange').click(function() {
+	var file = $(this).parent().parent().find('#subDepFile');
+	file.click();
 });
 
 $(document).ready(function() {

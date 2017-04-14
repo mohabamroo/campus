@@ -205,14 +205,20 @@ function ensureUniqueEmail(req, res, next) {
 
 function ensureUniqueID(req, res, next) {
 	var gucid = req.body.gucid;
-	User.findOne({gucid: gucid}, function(err, findRes) {
-		if(findRes!=null) {
-				req.flash('error_msg', 'Duplicate ID!\nUse different ID.');
-				res.redirect('/users/signup');
-			} else {
-				next();
-			}
-	});
+	console.log("gucid: "+gucid);
+	if(gucid==""||gucid==undefined||gucid==null)
+		next();
+	else {
+		User.findOne({gucid: gucid}, function(err, findRes) {
+			if(findRes!=null) {
+					req.flash('error_msg', 'Duplicate ID!\nUse different ID.');
+					res.redirect('/users/signup');
+				} else {
+					next();
+				}
+		});	
+	}
+	
 }
 
 router.post('/signup', ensureUniqueUsername, ensureUniqueEmail, ensureUniqueID, function(req, res) {
@@ -270,7 +276,7 @@ router.post('/signup', ensureUniqueUsername, ensureUniqueEmail, ensureUniqueID, 
 			var link = "http://"+req.get('host')+"/users/verify/"+user.id+"/"+rand;
 			app.mailer.send('email', {
 		      to: email,
-		      subject: 'Community-<DON\'T REPLY> Email Verification',
+		      subject: 'Community <DON\'T REPLY> Email Verification',
 		      link: link,
 		      name: username
 		    }, function (errEmail) {
@@ -291,7 +297,7 @@ router.post('/signup', ensureUniqueUsername, ensureUniqueEmail, ensureUniqueID, 
 					email: email,
 					photos: [],
 					summary: 'no summary',
-					logo: '',
+					logo: 'club-logo.jpg',
 					phone: '',
 					president: "",
 					newDepartments: [],
@@ -300,14 +306,13 @@ router.post('/signup', ensureUniqueUsername, ensureUniqueEmail, ensureUniqueID, 
 				newClub.save(function(err, clubRes) {
 					printError(err);
 					printResult(clubRes);
-					console.log("saved ")
 					res.locals.pagetitle = 'Sign In';
-					req.flash('success_msg','You signed up successfully!');
+					req.flash('success_msg','You signed up successfully! Please, check and verify your email.');
 					res.redirect('/users/signin');
 				})
 			} else {
 				res.locals.pagetitle = 'Sign In';
-				req.flash('success_msg','You signed up successfully!');
+				req.flash('success_msg','You signed up successfully! Please, check and verify your email.');
 				res.redirect('/users/signin');
 			}
 				

@@ -20,6 +20,7 @@ var logoStorage = multer.diskStorage({
     callback(null, './public/club_uploads');
   },
   filename: function (req, file, callback) {
+  	console.log("file: "+file)
   	console.log(file.originalname);
   	var filename = file.originalname;
   	var arr = filename.split(".");
@@ -37,7 +38,7 @@ var logoStorage = multer.diskStorage({
   	});
   }
 });
-var logoUpload = multer({storage: logoStorage}).single('userPhoto');
+var logoUpload = multer({storage: logoStorage}).single('logoPhoto');
 
 var galleryStorage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -58,6 +59,190 @@ var galleryStorage = multer.diskStorage({
   }
 });
 var galleryUpload = multer({storage: galleryStorage}).single('userPhoto');
+
+var presidentStorage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/club_uploads');
+  },
+  filename: function (req, file, callback) {
+  	var filename = file.originalname;
+  	var arr = filename.split(".");
+  	var filetype = arr[arr.length-1];
+  	var newfilename = req.user.username + '-' + Date.now()+'.'+filetype;
+    callback(null, newfilename);
+    var presidentName = req.body.presidentName;
+	var presidentID = req.body.presidentID;
+	Club.getClubByUserId(req.user.id, function(err, club) {
+		printError(err);
+		var newMember = new Member({
+			name: presidentName,
+			gucid: presidentID,
+			profileId: "none",
+			exists: "false",
+			rating: "0",
+			review: "no review",
+			profilephoto: "default-photo.jpeg",
+			role: "President",
+			club: club.name,
+			clubID: club._id,
+			from: (new Date()).getFullYear(),
+			to: "Present",
+			departmentName: "Board"
+		});
+		Member.createMember(newMember, function(err2, newPresident) {
+			printError(err2);
+			printResult(newPresident);
+			if(newPresident!=null) {
+				Club.update({userid:req.user.id},
+					{$set: {president: newPresident._id}},
+						function(err3, updateRes) {
+							printError(err3);
+							printResult(updateRes);
+				});
+			}
+		});
+	});
+  }
+});
+var presidentUpload = multer({storage: presidentStorage}).single('presidentPhoto');
+
+var headStorgae = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/club_uploads');
+  },
+  filename: function (req, file, callback) {
+  	var filename = file.originalname;
+  	var arr = filename.split(".");
+  	var filetype = arr[arr.length-1];
+  	var newfilename = req.user.username + '-' + Date.now()+'.'+filetype;
+   	var departmentName = req.body.departmentName;
+	var headID = req.body.headID;
+	var departmentHead = req.body.departmentHead;
+	var departmentPublic = req.body.departmentPublic;
+	var departmentNested = req.body.departmentNested;
+	console.log(headID+" ahoo")
+	Club.getClubByUserId(req.user.id, function(err, clubRes) {
+		printError(err);
+		if(clubRes.president == null || clubRes.president==="") {
+			req.flash('error_msg','You have to add a president first!');
+			res.redirect('/clubs/editStructre/' + req.user.id);
+		} else {
+			var newMember = new Member({
+				name: departmentHead,
+				gucid: headID,
+				profileId: "none",
+				exists: "false", 
+				rating: "0",
+				review: "no review",
+				club: clubRes.name,
+				role: "Head",
+				departmentName: departmentName,
+				profilephoto: "default-photo.jpeg",
+				clubID: clubRes._id,
+				departmentID: "",
+			});
+			Member.createMember(newMember, function(err2, newHead) {
+				printError(err2);
+				printResult(newHead);
+				var newDepartment = new Department({
+					nestedType: departmentNested,
+					public: departmentPublic,
+					name: departmentName, 
+					head: newHead._id,
+					members: [],
+					subDepartments: [],
+					clubID: clubRes._id,
+					clubName: clubRes.name,
+					photo: newfilename
+				});
+				Department.createDepartment(newDepartment, function(err1, createRes) {
+					printError(err1);
+					Club.update({userid:req.user.id}, {$push:{newDepartments: createRes._id}}, function(err2, pushRes) {
+						printError(err2);
+						printResult(pushRes);
+						Member.update({_id: newHead._id}, {$set: {departmentID: createRes._id}}, function(err3, setRes) {
+							printError(err3);
+							printResult(setRes);
+							callback(null, newfilename);
+						});
+					});
+				});
+			});
+		}	
+	});
+  }
+});
+var headUpload = multer({storage: headStorgae}).single('headPhoto');
+
+var subStorage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './public/club_uploads');
+  },
+  filename: function (req, file, callback) {
+  	var filename = file.originalname;
+  	var arr = filename.split(".");
+  	var filetype = arr[arr.length-1];
+  	var newfilename = req.user.username + '-' + Date.now()+'.'+filetype;
+  	console.log(newfilename)
+   	var departmentName = req.body.departmentName;
+	var departmentID = req.params.depID;
+	var subdepartmentName = req.body.subdepartmentName;
+	var subheadID = req.body.subheadID;
+	var subdepartmentHead = req.body.subdepartmentHead;
+	var subdepartmentPublic = req.body.subdepartmentPublic;
+	Club.getClubByUserId(req.user.id, function(err, clubRes) {
+		printError(err);
+		Department.getDepartmentById(departmentID, function(err2, department) {
+			printError(err2);
+			var newMember = new Member({
+				name: subdepartmentHead,
+				gucid: subheadID,
+				profileId: "none",
+				exists: "false",
+				rating: "0",
+				review: "no review",
+				profilephoto: "default-photo.jpeg",
+				role: "Head",
+				departmentName: department.name + " - " + subdepartmentName,
+				club: clubRes.name,
+				clubID: clubRes._id,
+				departmentID: department._id,
+				subDepartmentID: ""
+			});
+			Member.createMember(newMember, function(err3, newSubHead) {
+				printError(err3);
+				console.log(newSubHead)
+				var newSubDepartment = {
+					public: subdepartmentPublic,
+					name: subdepartmentName, 
+					head: newSubHead._id,
+					members: [],
+					photo: newfilename
+				};
+				Department.update({_id: departmentID},
+					{$push: {
+						subDepartments: newSubDepartment
+					}}, function(err4, pushRes) {
+						printError(err4);
+						printResult(pushRes);
+						Department.findOne({_id: departmentID}, function(err6, depAfter) {
+							console.log("length: "+depAfter.subDepartments.length);
+							console.log("subs :"+depAfter.subDepartments)
+							console.log("new sub: "+depAfter.subDepartments[depAfter.subDepartments.length-1])
+							Member.update({_id: newSubHead._id}, {$set: {departmentID: depAfter.subDepartments[depAfter.subDepartments.length-1]._id}}, function(err5, updateRes) {
+								printError(err5);
+								printResult("pushed sub ID: "+JSON.stringify(updateRes));
+								callback(null, newfilename);
+							});
+						});
+				});
+			});
+		});	
+	});
+  }
+});
+var subUpload = multer({storage: subStorage}).single('subPhoto');
+
 
 function ensureAuthenticated(req, res, next) {
 	if(req.isAuthenticated()){
@@ -311,7 +496,7 @@ function getDepartments(club, presidentRes, events, resuser, req, res) {
 									club: club,
 									events: events,
 									departments: departments,
-									president: presidentRes
+									president: presidentRes,
 								});
 							}	
 						} else {
@@ -455,39 +640,12 @@ router.post('/search', function(req, res) {
 });
 
 router.post('/addpresident', ensureAuthenticated, function(req, res) {
-	var presidentName = req.body.presidentName;
-	var presidentID = req.body.presidentID;
-	Club.getClubByUserId(req.user.id, function(err, club) {
-		printError(err);
-		var newMember = new Member({
-			name: presidentName,
-			gucid: presidentID,
-			profileId: "none",
-			exists: "false",
-			rating: "0",
-			review: "no review",
-			profilephoto: "default-photo.jpeg",
-			role: "President",
-			club: club.name,
-			clubID: club._id,
-			from: (new Date()).getFullYear(),
-			to: "Present"
-		});
-		Member.createMember(newMember, function(err2, newPresident) {
-			printError(err2);
-			printResult(newPresident);
-			if(newPresident!=null) {
-				Club.update({userid:req.user.id},
-					{$set: {president: newPresident._id}},
-						function(err3, updateRes) {
-							printError(err3);
-							printResult(updateRes);
-				});	
-			}
-		});
-
-	});
-	res.redirect('/clubs/editStructre/'+req.user.id)
+	presidentUpload(req, res, function(err) {
+        if(err) {
+            return res.end("Error uploading file.\n"+err);
+        }
+		res.redirect('/clubs/editStructre/'+req.user.id)
+    });
 
 });
 
@@ -681,117 +839,30 @@ router.get('/editMembersOfSubDepartment/:departmentID/:subDepartmentID', ensureH
 });
 
 router.post('/addDepartmentNew', ensureAuthenticated, function(req, res, next) {
-	var departmentName = req.body.departmentName;
-	var headID = req.body.headID;
-	var departmentHead = req.body.departmentHead;
-	var departmentPublic = req.body.departmentPublic;
-	var departmentNested = req.body.departmentNested;
-
-	Club.getClubByUserId(req.user.id, function(err, clubRes) {
-		printError(err);
-		if(clubRes.president == null || clubRes.president==="") {
-			req.flash('error_msg','You have to add a president first!');
-			res.redirect('/clubs/editStructre/' + req.user.id);
-		} else {
-			var newMember = new Member({
-				name: departmentHead,
-				gucid: headID,
-				profileId: "none",
-				exists: "false", 
-				rating: "0",
-				review: "no review",
-				club: clubRes.name,
-				role: "Head",
-				departmentName: departmentName,
-				profilephoto: "default-photo.jpeg",
-				clubID: clubRes._id,
-				departmentID: ""
-			});
-			Member.createMember(newMember, function(err2, newHead) {
-				printError(err2);
-				printResult(newHead);
-				var newDepartment = new Department({
-					nestedType: departmentNested,
-					public: departmentPublic,
-					name: departmentName, 
-					head: newHead._id,
-					members: [],
-					subDepartments: [],
-					clubID: clubRes._id,
-					clubName: clubRes.name
-				});
-				Department.createDepartment(newDepartment, function(err1, createRes) {
-					printError(err1);
-					Club.update({userid:req.user.id}, {$push:{newDepartments: createRes._id}}, function(err2, pushRes) {
-						printError(err2);
-						printResult(pushRes);
-						Member.update({_id: newHead._id}, {$set: {departmentID: createRes._id}}, function(err3, setRes) {
-							printError(err3);
-							printResult(setRes);
-							res.redirect('/clubs/editStructre/' + req.user.id);
-						});
-					});
-				});
-			});
-		}	
-	});
+	headUpload(req, res, function(err) {
+        if(err) {
+            return res.end("Error uploading file.\n"+err);
+        }
+		res.redirect('/clubs/editStructre/'+req.user.id)
+    });
 });
 
 router.post('/addSubDepartment/:depID', ensureAuthenticated, function(req, res) {
-	var departmentID = req.params.depID;
-	var subdepartmentName = req.body.subdepartmentName;
-	var subheadID = req.body.subheadID;
-	var subdepartmentHead = req.body.subdepartmentHead;
-	var subdepartmentPublic = req.body.subdepartmentPublic;
-	Club.getClubByUserId(req.user.id, function(err, clubRes) {
-		printError(err);
-		Department.getDepartmentById(departmentID, function(err2, department) {
-			printError(err2);
-			var newMember = new Member({
-				name: subdepartmentHead,
-				gucid: subheadID,
-				profileId: "none",
-				exists: "false",
-				rating: "0",
-				review: "no review",
-				profilephoto: "default-photo.jpeg",
-				role: "Head",
-				departmentName: department.name + " - " + subdepartmentName,
-				club: clubRes.name,
-				clubID: clubRes._id,
-				departmentID: department._id,
-				subDepartmentID: ""
-			});
-			Member.createMember(newMember, function(err3, newSubHead) {
-				printError(err3);
-				var newSubDepartment = {
-					public: subdepartmentPublic,
-					name: subdepartmentName, 
-					head: newSubHead._id,
-					members: []
-				};
-				Department.update({_id: departmentID},
-					{$push: {
-						subDepartments: newSubDepartment
-					}}, function(err4, pushRes) {
-						printError(err4);
-						printResult(pushRes);
-						Member.update({_id: newSubHead._id}, {$set: {departmentID: department.subDepartments[department.subDepartments.length-1]._id}}, function(err5, updateRes) {
-							printError(err5);
-							printResult("pushed sub ID: "+JSON.stringify(updateRes));
-							res.redirect('/clubs/editStructre/'+req.user.id);
-						});
-				});
-			});
-		});	
-	});
+	subUpload(req, res, function(err) {
+        if(err) {
+            return res.end("Error uploading file.\n"+err);
+        }
+		res.redirect('/clubs/editStructre/'+req.user.id)
+    });
 });
 
 router.post('/updateLogo', ensureAuthenticated, function(req, res) {
+	console.log('before upload')
     logoUpload(req, res, function(err) {
         if(err) {
             return res.end("Error uploading file.\n"+err);
         }
+        console.log("before redirect")
         res.redirect('/clubs/editStructre/'+req.user.id);
     });
 });
@@ -1016,6 +1087,7 @@ router.post('/deleteMember/:departmentID/:subDepartmentID/:memberID', ensureHead
 });
 
 router.post('/addPhoto', ensureAuthenticated, function(req,res) {
+	console.log('before g up')
     galleryUpload(req, res, function(err) {
         if(err) {
             return res.end("Error uploading file.\n"+err);

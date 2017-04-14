@@ -34,12 +34,18 @@ var departmentSchema = mongoose.Schema({
 					type: String
 				}
 			],
+			photo: {
+				type: String
+			}
 		}
 	],
 	clubID: {
 		type: String
 	},
 	clubName: {
+		type: String
+	},
+	photo: {
 		type: String
 	}
 });

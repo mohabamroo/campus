@@ -1,22 +1,20 @@
-var showEventDetails = function(event) {
-	var html = '<div class=\"row row-eq-height container\" style=\"margin-top: 40px; margin-left: 10%; max-width: 70%; word-wrap: break-word;\">'
-		+	'<div class=\"col-lg-1\"></div>'
-	    +	'<div style=\"max-width: 100%; margin-left: 10%;\">'
-		+	'<img class=\"col-lg-6 portfolio-item img-\" src=\"/club_uploads/events/'+event.photo+'\" alt=\"Generic placeholder image\" style=\"align-self: center; margin-top: 1%; max-height: 60vh;\">'
-	 	+	'<div class=\"col-lg-6\" style=\"text-align: left;border: 2px white solid; font-weight: bolder;\">'
-		+	'<h2 id=\"'+event.id+'\">'
-		+	'<span class=\"eventTitle\">'+event.name+'</span>'
-		+	'<hr><p style=\"font-size: 15px;font-weight: bolder;\">'
-		+	'by:'+event.organizer
-		+	'<br><br>location:'+event.location+'<br><br>'
-		+	'from: '+event.fromDate+'<br>to: '+event.toDate+'<br><br>'
-		+	'type: '+event.type
-		+	'</p></h2><p style=\"overflow-wrap: break-word; font-size: 25px; max-width: 80%;\">Summary:'
-		+	'<br>'+event.Summary
-		+	'</p></div></div><div class=\"col-lg-1\"></div></div>';
-	$('#topDiv').html(html);
-	$('#backgroundDiv').show();
-    $('#topDiv').show();
+var showEventDetails = function(offerID) {
+	$.get('/offers/getOffer/'+offerID, function(offer) {
+		var html = '<div class=\"row row-eq-height container\" style=\"margin-top: 40px; margin-left: auto; margin-right:auto; max-width: 800px; word-wrap: break-word;\">'
+		    +	'<div style=\"max-width: 100%; margin-left: 10%;\">'
+			+	'<img class=\"col-lg-6 portfolio-item\" src=\"/offers_uploads/'+offer.photo+'\" alt=\"Generic placeholder image\" style=\"align-self: center;\">'
+		 	+	'<div class=\"col-lg-6\" style=\"text-align: left;border: 2px white solid; font-weight: bolder;\">'
+			+	'<h2 id=\"'+event.id+'\">'
+			+	'<span class=\"eventTitle\">'+offer.company+'</span>'
+			+	'<hr><p style=\"font-size: 15px;font-weight: bolder;\">'
+			+	'from: '+offer.from+'<br>to: '+offer.to+'<br><br>'
+			+	'</p></h2><p style=\"overflow-wrap: break-word; font-size: 25px; max-width: 80%;\">Summary:'
+			+	'<br>'+offer.description
+			+	'</p></div></div></div>';
+		$('#topDiv').html(html);
+		$('#backgroundDiv').show();
+	    $('#topDiv').show();
+	});
 }
 
 var updateEventsContainer = function(events) {
@@ -36,14 +34,8 @@ var updateEventsContainer = function(events) {
 			 	+   '<h2 id=\"'+event._id+'\">'
 				+	'<span class=\"eventTitle\" onclick=\"showEventDetails(\''+event._id+'\')\">'+event.company
 				+	'</span><br><br>'
-				+	'<p style=\"font-size: 10px;\">'
-				+	'by: '+event.summary
-				+	'<br><br>'
-				+	'location: '+event.location
-				+	'<br><br>'
-				+	'from: '+event.from
-				+	'<br><br>'
-				+	'to: '+event.to+'</p>'
+				+	'<p style=\"font-size: 20px;\">'
+				+	''+event.summary+'</p>'
 				+	'</h2></div>'
 				+	'<div class=\"col-lg-2\"></div>'
 			    +	'<hr style=\"width: 80%\"></div>';

@@ -19,6 +19,21 @@ var offerStorage = multer.diskStorage({
 
 var offerUpload = multer({storage : offerStorage}).single('offerPhoto');
 
+function ensureAuthenticated(req, res, next){	
+	if(req.isAuthenticated()) {
+		console.log("code: "+req.user.verificationCode)
+		if(req.user.verificationCode==="XwPp9xazJ0ku5CZnlmgAx2Dld8SHkAe") {
+			return next();
+		} else {
+			req.flash('error_msg','You are not verified!');
+			res.redirect('/users/signin');
+		}
+	} else {
+		req.flash('error_msg','You are not logged in!');
+		res.redirect('/users/signin');
+	}
+}
+
 function ensureAdmin(req, res, next) {
 	if(req.isAuthenticated()) {
 		console.log("code: "+req.user.verificationCode)
@@ -68,12 +83,12 @@ function createOfferHelper(req, newfilename, callback) {
 }
 
 
-router.get('/', function(req, res) {
+router.get('/', ensureAuthenticated, function(req, res) {
 	res.render('offerViews/offersIndex.html');
 
 });
 
-router.get('/viewOffers/:type', function(req, res) {
+router.get('/viewOffers/:type', ensureAuthenticated, function(req, res) {
 	var type = req.params.type;
 	Offer.find({type: type}, function(err, offers) {
 		printError(err);
@@ -95,11 +110,12 @@ router.post('/addOffer', ensureAdmin, function(req, res) {
     });
 });
 
-router.get('/getOffer/:id', function(req, res) {
+router.get('/getOffer/:id', ensureAuthenticated, function(req, res) {
 	var offerID = req.params.id;
 	Offer.findById(offerID, function(err, offer) {
 		printError(err);
 		res.json(offer);
-	})
-})
+	});
+});
+
 module.exports = router;

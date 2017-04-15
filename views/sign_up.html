@@ -12,15 +12,17 @@
       <form method="post" action="/users/signup">
         <div class="row control-group">
           <div class="form-group col-xs-12 floating-label-form-group controls">
-            <label for="inputName" class="">Name</label>
-            <input type="text" id="inputName" class="form-control" placeholder="Name" name="name" required data-validation-required-message="Please enter your email address.">
+              <label for="name">Full Name</label>
+              <input type="text" id="inputName" class="form-control" placeholder="Name" name="name" required data-validation-required-message="Please enter your email address.">
             <p class="help-block text-danger"></p>
           </div>
         </div>
         <div class="row control-group">
-          <div class="form-group col-xs-12 floating-label-form-group controls">
-            <label for="email">Email Address</label>
-            <input type="email" id="inputEmail" class="form-control" placeholder="Email Address" name="email" required data-validation-required-message="Please enter your email address.">
+          <div class="form-group floating-label-form-group controls row" style="width: 100%; height: 80px;">
+            <div class=" col-xs-8">
+              <input type="text" id="inputEmail" class="form-control"  placeholder="Email Address" name="email" required data-validation-required-message="Please enter your email address." style="margin-left: 15px; margin-top: 20px;">
+            </div>
+            <input  class="col-xs-4" value="@student.guc.edu.eg" disabled="true" style="text-align: right;">
             <p class="help-block text-danger"></p>
           </div>
         </div>

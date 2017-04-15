@@ -193,6 +193,7 @@ function ensureUniqueUsername(req, res, next) {
 
 function ensureUniqueEmail(req, res, next) {
 	var email = req.body.email;
+	email += "@student.guc.edu.eg";
 	User.findOne({email: email}, function(err, findRes) {
 		if(findRes!=null) {
 				req.flash('error_msg', 'Duplicate Email!\nUse different email.');
@@ -224,6 +225,7 @@ function ensureUniqueID(req, res, next) {
 router.post('/signup', ensureUniqueUsername, ensureUniqueEmail, ensureUniqueID, function(req, res) {
 	var name = req.body.name;
 	var email = req.body.email;
+	email += "@student.guc.edu.eg";
 	var password = req.body.password;
 	var confirmpassword = req.body.confirmpassword;
 	var username = req.body.username;

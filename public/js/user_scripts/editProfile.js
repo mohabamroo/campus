@@ -8,8 +8,24 @@ var redirectToLink = function(link) {
 }
 
 var updatehidden = function() {
-	document.getElementById('hiddentxt').innerText = document.getElementById('faketxt').innerText;
+	$('#hiddentxt').val(document.getElementById('faketxt').innerText)
+	console.log($('#hiddentxt').val());
+	// document.getElementById('hiddentxt').innerText = document.getElementById('faketxt').innerText;
 }
+
+$('#deleteTags').click(function(event) {
+    event.preventDefault();
+    console.log('ahoo');
+    $.post('/users/deleteTags', function(data) {
+    	if(data=="success") {
+    		$('#tags').slideUp();
+    	}
+    });
+});
+
+$(document).ready(function() {
+   $('#toIN').css('width', $('#fromIN').css('width')); 
+});
 
 var url = $(location).attr('href').split('/');
 var userID = url[url.length-1];
@@ -17,7 +33,11 @@ $.post('/users/getOrganizations/'+userID, function(myMembers) {
 	var html = "";
 	myMembers.forEach(function(memberObj, index) {
 	    html += '<tr id=\"'+memberObj._id+'\"><td>#'+index+'</td>'
-		    + '<td>'+memberObj.club+'</td>'
+		    + '<td>'+memberObj.club
+		    + '<br><span style="font-size: 10px;">From: '
+		    + memberObj.from +'</span>'
+		    + '<br><span style="font-size: 10px;">To: '
+		    + memberObj.to +'</span>'+'</td>'
 		    + '<td>'+memberObj.departmentName+'</td>'
 		    + '<td>'+memberObj.role+'</td>'
 		    + '<td>'+memberObj.rating+'</td>'

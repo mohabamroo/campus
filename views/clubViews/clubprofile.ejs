@@ -47,7 +47,7 @@
         </div>
     </header>
 
-	<div class="container container-fluid structure" style="padding-top: 100px; align-self: center; width: 100%; color: white; background-color: #fff; min-height: 100vh;">
+	<div class="container container-fluid structure" style="padding-top: 100px; align-self: center; color: white; background-color: #fff; min-height: 100vh;">
 		<div class="row row-eq-height" style="color: #333;">
 			<div class="singleDepartment col-xs-4" style="margin-bottom: 30px;">
 			</div>
@@ -75,7 +75,7 @@
 		<br>
 		<div class="row row-eq-height">
 			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; color: #333;">
-				<button id="scrollLeft" style="height: 300px; border: none; background-color: inherit;">
+				<button id="scrollLeft" class="scrollBtn" style="height: 300px; border: none; background-color: inherit;">
 					<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
 				</button>
 			</div>
@@ -110,7 +110,7 @@
 				<%  }); %>
 			</div>
 			<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; color: #333;">
-				<button id="scrollRight" style="height: 300px; background-color: inherit; border: none;">
+				<button id="scrollRight" class="scrollBtn" style="height: 300px; background-color: inherit; border: none;">
 					<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
 				</button>
 			</div>
@@ -121,67 +121,83 @@
 	</div>
 	<br>
 	<br>
-    <div class="row">
-	   	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey; border-radius: 5px;  max-width: 45%; margin-right: 5%; margin-left: 2%;">
-	    	<h3>Events</h3>
-	    	<br>
-	    	<table>
-	    		<tr>
-		    		<div class="container">
-			    		<ul>
-			    			<% events.forEach(function(event){ %>
-			    				<div class="row">
-			    				
-			    					<div style="width: 100%; margin: 10px; margin-bottom: 40px;">
-							 	   		<div class="">
-								 	   		<h2 id="<%= event._id %>" style="float: left; color:#333; text-align: center;">
-												<%= event.name %>
-												<br>
-												<br>
-												<p style="font-size: 10px;  float: left; text-align: left;">
-													<br>
-													location: <%= event.location %>
-													<br>
-													<br>
-													from: <%= event.fromDate %>
-													<br>
-													<br>
-													to: <%= event.toDate %>
-												</p>
-											</h2>
-											<br>
-												
-							 	   		</div>
-										<div class="">
-											<img class="img-circle" src="/club_uploads/events/<%= event.photo %>" alt="Generic placeholder image" width="150" height="150" style="float: right; margin-right: 0px;">
-										</div>							
-	       						</div>
-			    					
-			    			</div>
-			    			<% }); %>
-			    		</ul>	
-		    		</div>
-	    		</tr>
-	    	</table>	
+		<div style="background-color: #18BC9C; color: white">
+	    <div class="container">	
+		   	<h3 style="margin-left: auto; margin-right: auto; text-align: center;">Events</h3>
+		   	<br>
+	    	<div class="row">
+		    	<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0;">
+					<button id="eventsLeft" class="scrollBtn" style="height: 300px; border: none; background-color: inherit;">
+						<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+					</button>
+				</div>
+		    	<div class="deps" id="eventsDiv" style="display: flex; width: 90%; text-align: center;">
+		    		<% events.forEach(function(event){ %>
+			 	   		<div class="singleDepartment" style="margin-right: 10px; min-width: 250px;">
+							<img class="img-circle"  src="/club_uploads/events/<%= event.photo %>" alt="Generic placeholder image" width="150" height="150" style="max-width: 100%; margin: 5px;">
+				 	   		<h2 id="<%= event._id %>">
+								<div style="white-space: nowrap;overflow: hidden;
+								text-overflow: ellipsis; align-self: center; text-align: center;">
+								<%= event.name %></div>
+								<br>
+								<p style="font-size: 10px; text-align: center;">
+									<br>
+									location: <%= event.location %>
+									<br>
+									<br>
+									from: <%= event.fromDate %>
+									<br>
+									<br>
+									to: <%= event.toDate %>
+								</p>
+							</h2>
+							<br>	
+			 	   		</div>
+		    		<% }); %>
+		    	</div>
+		    	<div class="singleDepartment col-xs-1" style="width: 5%;">
+					<button id="eventsRight" class="scrollBtn" style="height: 300px; background-color: inherit; border: none;">
+						<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+					</button>
+				</div>
+		    </div>
+	    </div>
 	    </div>
 
-	    <div class="col-xs-8 col-sm-6" style="border: 2px solid grey; border-radius: 5px; max-width: 45%;">
-	    	<h3>Gallery</h3>
-	    	<br>
-	    	<table>
-	    		<tr>
-		    		<div class="container">
-		    			<% club.photos.forEach(function(photo){ %>
-		    				<img style="max-width: 100%; margin: 5px;" src="/club_uploads/<%= photo.src %>">
-		    				<h5 style="text-overflow: ellipsis; max-width: 200px; white-space: nowrap;
-	  						overflow: hidden; "><%= photo.name %></h5>
-		    			<% }); %>			    		
+	    <div class="container">	
+		   	<h3 style="margin-left: auto; margin-right: auto; text-align: center;">Gallery</h3>
+		   	<br>
+	    	<div class="row">
+		    	
+		    	<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; color: #333;">
+					<button id="photosLeft" class="scrollBtn" style="height: 300px; border: none; background-color: inherit;">
+						<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+					</button>
+				</div>
+
+		    	<div class="deps" id="photosDiv" style="display: flex; width: 90%; text-align: center; color: #333;">
+		    		<% club.photos.forEach(function(photo){ %>
+		    		<div class="singleDepartment" style="width: 350px;">
+	    				<img  width="350" height="300" src="/club_uploads/<%= photo.src %>">
+	    				<h4 style="text-overflow: ellipsis;  white-space: nowrap; overflow: hidden;
+	    				text-align: center; margin: 0; margin-right: 0;"><%= photo.name %></h4>
+		    			
 		    		</div>
-	    		</tr>
-	    	</table>
+			    	<% }); %>
+		    	</div>
+		    	<div class="singleDepartment col-xs-1" style="width: 5%; padding: 0; color: #333;">
+					<button id="photosRight" class="scrollBtn" style="height: 300px; background-color: inherit; border: none;">
+						<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+					</button>
+				</div>
+		    </div>
 	    </div>
-    </div>
 </div>
 <script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js'></script>
 <script type="text/javascript" src="/js/club_scripts/clubProfile.js"></script>
 
+<style type="text/css">
+	.scrollBtn:focus {
+	  outline: none;
+	}
+</style>

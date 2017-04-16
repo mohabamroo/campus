@@ -155,7 +155,7 @@ passport.deserializeUser(function(id, done) {
 });
 
 router.post('/signin',
-	passport.authenticate('local', {successRedirect: '/', failureRedirect: '/users/failSignIn'}),
+	passport.authenticate('local', {successRedirect: '/events', failureRedirect: '/users/failSignIn'}),
 	function(req, res, next) {
 	}
 );
@@ -192,8 +192,10 @@ function ensureUniqueUsername(req, res, next) {
 }
 
 function ensureUniqueEmail(req, res, next) {
+	var type = req.body.type;
 	var email = req.body.email;
-	email += "@student.guc.edu.eg";
+	if(type=="student")
+		email += "@student.guc.edu.eg";
 	User.findOne({email: email}, function(err, findRes) {
 		if(findRes!=null) {
 				req.flash('error_msg', 'Duplicate Email!\nUse different email.');
@@ -224,12 +226,13 @@ function ensureUniqueID(req, res, next) {
 
 router.post('/signup', ensureUniqueUsername, ensureUniqueEmail, ensureUniqueID, function(req, res) {
 	var name = req.body.name;
+	var type = req.body.type;
 	var email = req.body.email;
-	email += "@student.guc.edu.eg";
+	if(type=="student")
+		email += "@student.guc.edu.eg";
 	var password = req.body.password;
 	var confirmpassword = req.body.confirmpassword;
 	var username = req.body.username;
-	var type = req.body.type;
 	var gucid = req.body.gucid;
 	var major = req.body.major || "none";
 	var year = req.body.year;
@@ -346,7 +349,7 @@ router.get('/verify/:userID/:code', function(req, res) {
 					function(err2, updateRes) {
 						printError(err2);
 						printResult(updateRes);
-						req.flash('success_msg','Your email is verified!');
+						req.flash('success_msg','Your email is verified! Please log in again.');
 						res.redirect('/users/signin');
 				});
 			} else {
@@ -368,8 +371,7 @@ router.post('/addlink', ensureAuthenticated, function(req, res) {
 			var oldlinks = user.links;
 			oldlinks.push(newlink);
 			User.update({_id:res.locals.user.id}, {$set:{links:oldlinks, portifolio: "true"}}, function(err, res) {
-			if(err)
-				console.log(err);
+				printError(err);
 			});
 		});	
 	} else {
@@ -380,6 +382,38 @@ router.post('/addlink', ensureAuthenticated, function(req, res) {
 
 });
 
+
+function addTags(req, res) {
+	if(req.body.tags!="") {
+		var tagsStr = req.body.tags;
+		var tagsArr = tagsStr.split(', ');
+		User.getUserbyUsername(res.locals.user.username, function(err, user) {
+			var oldTags = user.tags;
+			tagsArr.forEach(function(tag) {
+				User.update({_id:res.locals.user.id}, {$push: {tags: tag}}, function(err1, ress) {
+					printError(err1);
+				});
+				var userToAdd = {name: user.username, profileid: user.id, photo: user.profilephoto};
+				Tag.getTagbyTagname(tag, function(err2, tagres) {
+					if(tagres!=null) {
+						Tag.update({_id: tagres.id}, {$push: {users: userToAdd}}, function(errpush, pushRes) {
+							if(errpush)
+								throw errpush;
+						});
+					} else {
+						var newTag = new Tag({tag: tag, users: [userToAdd]});
+						Tag.createTag(newTag, function(err3, resnewtag) {
+							if(err3)
+								throw err3;
+							else
+								console.log(resnewtag);
+						});
+					}
+				});
+			});
+		});	
+	}
+}
 router.post('/addTags', ensureAuthenticated, function(req, res) {
 	if(req.body.tags!="") {
 		var tagsStr = req.body.tags;
@@ -421,7 +455,7 @@ router.post('/deletelink/:link', ensureAuthenticated, function(req, res) {
 	var url = req.params.link;
 	User.update({_id: req.user.id},
 		{$pull: {
-		   		'links': {url: url}
+		   		'links': {_id: url}
 		   	}}, function(err, pullRes) {
 		   		if(err) {
 			  		console.log("Error:\n" + err);
@@ -587,8 +621,18 @@ router.post('/saveChanges', ensureAuthenticated, function(req, res) {
 					printError(err);
 					printResult(updateRes);
 	});
+	addTags(req, res);
+	req.flash('success_msg', 'Updated profile!')
 	res.redirect('/users/profile/'+req.user.id);
 
+});
+
+router.post('/deleteTags', ensureAuthenticated, function(req, res) {
+	User.update({_id: req.user.id}, {$set: {"tags": []}}, function(err1, updateRes) {
+		printError(err1);
+		printResult(updateRes)
+		res.json('success');
+	});
 });
 
 router.post('/deleteOrganization/:memberID', ensureAuthenticated, function(req, res) {
@@ -606,12 +650,16 @@ router.post('/addOrganization', ensureAuthenticated, function(req, res) {
 	var role = req.body.role;
 	var departmentName = req.body.department;
 	var comment = req.body.comment || "no comment";
+	var from = req.body.from || "Past";
+	var to = req.body.to || "Present";
 	var newOrganization = {
 		name: organizationName,
 		role: role,
 		review: "no review",
 		rating: "no rating",
-		comment: comment
+		comment: comment,
+		from: from,
+		to: to
 	}
 	User.update({_id: req.user.id}, {$push: {
 		organizations: newOrganization
@@ -627,7 +675,9 @@ router.post('/addOrganization', ensureAuthenticated, function(req, res) {
 			profilephoto: "default-photo.jpeg",
 			role: role,
 			club: organizationName,
-			departmentName: departmentName
+			departmentName: departmentName,
+			from: from,
+			to: to
 		});
 	Member.createMember(newMember, function(err, createRes) {
 		printError(err);

@@ -3,149 +3,153 @@
 </div>
 
 <div class="normalprofile">
-		    <!-- Header -->
-		    <header style=" background-color: #2C3E5F;">
-		        <div class="container" id="maincontent" tabindex="-1" style="padding-top: 100px;  font-family: Montserrat; max-width: 1000px;">
-		            <div class="row">
-		                <div class="col-sm-12">
-		                    <img class="img-responsive img-circle" src="/user_uploads/<%= dude.profilephoto %>" width="300" height="250" alt="">
-		                    <div class="intro-text">
-		                        <h1 class="name"><%= dude.name%></h1>
-		                        <hr class="star-light">
-		                        <span class="skills">
-		                        	<% dude.tags.forEach(function(tag) { %>
-										<a  href="/users/searchShort/<%= tag %>" style="color: white; font: bold;">
-									  		#<%= tag %>
-									  	</a>
-									<% }); %>
-		                        </span>
-		                    </div>
-		                    <br>
-		                    <div class="row" style="padding: 30px; text-align: left;">
-		                    	<div class="col-sm-6" style="border: 2px solid white; border-radius: 5px;">
-		                    		<h3>Personal
-		                    			<hr style="border: 2px solid white; border-radius: 5px;"></hr>
-									</h3>
-		                    		<span>Username: <%= dude.username%></span>
-						 	   		<br>
-							 	   	<span >Email:
-							 	   		<span class="email">
-							 	   			<%= dude.email%>	
-							 	   		</span>
-							 	   	</span>
-							 	   	<!-- <br>
-							 	   	<span>Phone: <%= dude.phone %></span> -->
-							 	   	<br>
-							 	   	<span>Age: <%= age %></span>
-							 	   	<br>
-							 	   	<span>Gender: <%= dude.gender %></span>
-							 	   	<br>
-		                    	</div>
-		                    	<div class="col-sm-1"></div>
-		                    	<div class="col-sm-5" style="border: 2px solid white; border-radius: 5px;">
-		                    		<h3>Uni
-		                    			<hr style="border: 2px solid white; border-radius: 5px;"></hr>
-									</h3>
-		                    		<span>GUC-ID: <%= dude.gucid %></span>
-							 	   	<br>
-							 	   	<span>Major: <%= dude.major %></span>
-							 	   	<br>
-							 	   	<span>Year: <%= dude.year %></span>
-							 	   	<br>
-		                    	</div>
-		                    </div>		   	
-					 	   	<br>
-					 	   	<span style="font-size: 30px; text-align: left;">About:
-					 	   		<p style="margin-left: 40px;"><%= dude.summary || "no summary!" %></p>
+    <!-- Header -->
+    <header style=" background-color: #2C3E5F;">
+        <div class="container" id="maincontent" tabindex="-1" style="padding-top: 100px;  font-family: Montserrat; max-width: 1000px;">
+            <div class="row">
+                <div class="col-sm-12">
+                    <img class=" img-circle" src="/user_uploads/<%= dude.profilephoto %>" width="300" height="250" alt="">
+                    <div class="intro-text">
+                        <h1 class="name"><%= dude.name%></h1>
+                        <hr class="star-light">
+                        <span class="skills">
+                        	<% dude.tags.forEach(function(tag) { %>
+								<a  href="/users/searchShort/<%= tag %>" style="color: white; font: bold;">
+							  		#<%= tag %>
+							  	</a>
+							<% }); %>
+                        </span>
+                    </div>
+                    <br>
+                    <div class="row" style="padding: 30px; text-align: left;">
+                    	<div class="col-sm-6" style="border: 2px solid white; border-radius: 5px;">
+                    		<h3>Personal
+                    			<hr style="border: 2px solid white; border-radius: 5px;"></hr>
+							</h3>
+                    		<span>Username: <%= dude.username%></span>
+				 	   		<br>
+					 	   	<span >Email:
+					 	   		<span class="email">
+					 	   			<%= dude.email%>	
+					 	   		</span>
 					 	   	</span>
-					 	   	
-							 <br>
-						    <% if(user!=null && dude._id.toString()==user.id) { %>
-							    <form method="GET" action="/users/profile/<%= user.id %>">
-									<button type="submit" value="editprofile" class="btn btn-lg" style="margin: 10px; background-color: #ffffff; color: #333; font-weight: bold;">Edit profile </button>	
-								</form>
-						    <% } %>
-		                </div>
-		            </div>
-		        </div>
-		    </header>
-		    
-		    <div class="container" style="border-radius: 5px; max-width: 1000px;">
-		    	<br>
-		    	<div class="col-xs-8 col-sm-2">
-			    </div>
-				<h2>C.V.</h2>
-				<table class="table" id="organizationTable">
-				<thead>
-				  <tr style="font-size: 20px;">
-				    	<th style="width: 10%;"></th>
-						<th style="width: 20%;">Name</th>
-						<th style="width: 20%;">Department</th>
-						<th style="width: 15%;">Role</th>
-						<th style="width: 20%;">Rating</th>
-						<th style="width: 20%;">Review</th>
-						<th style="width: 15%;">Comment</th>
-				  </tr>
-				</thead>
-				<br>
-				<tbody id="organizationsBody">
-				</tbody>
-				</table>
-			</div>
-		    <br>
-		    <hr>
-		    <div class="row">
-			    <div class="col-xs-8 col-sm-2">
-			    </div>
-			   	<div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
-		    	border-radius: 5px;  max-width: 45%; margin-right: 5%; margin-left: 2%;">
-			    	<h3>Links</h3>
-			    	<br>
-			    	<table>
-			    		<tr>
-				    		<div class="container">
-				    		<ul>
-				    			<%;
-				    			dude.links.forEach(function(link){ %>
-				    				<div class="row">
-				    				<li style="padding: 5px;text-overflow: ellipsis; white-space: nowrap;overflow: hidden;">
-				    					<span style="color:black; font-size: 30px; margin-right: 5px;" onclick="redirectToLink('<%= link.url %>')">
-				    						<%= link.name %>:
-				    					</span>
-				    					<span style="cursor:pointer; color:blue; font-size: 20px; text-decoration: underline;">
-				    						<%= link.url %>
-				    					</span>
-				    				</li>
-				    			</div>
-				    			<% }); %>
-				    		</ul>
-					    		
-				    		</div>
-			    		</tr>
-			    	</table>
-			    </div>
+					 	   	<!-- <br>
+					 	   	<span>Phone: <%= dude.phone %></span> -->
+					 	   	<br>
+					 	   	<span>Age: <%= age %></span>
+					 	   	<br>
+					 	   	<span>Gender: <%= dude.gender %></span>
+					 	   	<br>
+                    	</div>
+                    	<div class="col-sm-1"></div>
+                    	<div class="col-sm-5" style="border: 2px solid white; border-radius: 5px;">
+                    		<h3>Uni
+                    			<hr style="border: 2px solid white; border-radius: 5px;"></hr>
+							</h3>
+                    		<span>GUC-ID: <%= dude.gucid %></span>
+					 	   	<br>
+					 	   	<span>Major: <%= dude.major %></span>
+					 	   	<br>
+					 	   	<span>Year: <%= dude.year %></span>
+					 	   	<br>
+                    	</div>
+                    </div>		   	
+			 	   	<br>
+			 	   	<span style="font-size: 30px; text-align: left;">About:
+			 	   		<p style="margin-left: 40px;"><%= dude.summary || "no summary!" %></p>
+			 	   	</span>
+			 	   	
+					 <br>
+				    <% if(user!=null && dude._id.toString()==user.id) { %>
+					    <form method="GET" action="/users/profile/<%= user.id %>">
+							<button type="submit" value="editprofile" class="btn btn-lg" style="margin: 10px; background-color: #ffffff; color: #333; font-weight: bold;">Edit profile </button>	
+						</form>
+				    <% } %>
+                </div>
+            </div>
+        </div>
+    </header>
+	    	<% if(dude.links.length>0) { %>
+    <div class="row">
+    	<br>
+	    <div class="col-xs-8 col-sm-2">
+	    </div>
+	   	<div class="col-xs-8 col-sm-6" style="max-width: 45%; margin-right: 5%; margin-left: 2%; min-height: 300px;">
+	    	<h3>Links</h3>
+	    	<br>
+			<table>
+	    		<tr>
+		    		<div class="container">
+		    		<ul>
+		    			<%;
+		    			dude.links.forEach(function(link){ %>
+		    				<div class="row">
+		    				<li style="padding: 5px;text-overflow: ellipsis; white-space: nowrap;overflow: hidden;">
+		    					<span style="color:black; font-size: 25px; margin-right: 5px;" onclick="redirectToLink('<%= link.url %>')">
+		    						<%= link.name %>:
+		    					</span>
+		    					<span style="cursor:pointer; color:blue; font-size: 20px; text-decoration: underline;">
+		    						<%= link.url %>
+		    					</span>
+		    				</li>
+		    			</div>
+		    			<% }); %>
+		    		</ul>
+			    		
+		    		</div>
+	    		</tr>
+	    	</table>
+	    </div>
+	    	<% } %>
+	    	
 
-				<!-- <div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
-		    		border-radius: 5px; max-width: 45%; font-weight: bold;">
-			    	<h3>Screenshots</h3>
-			    	<br>
-			    	<table>
-			    		<tr>
-				    		<div class="container" >
-				    			<% dude.photos.forEach(function(photo){ %>
-				    				<img style="max-width:400px; margin: 5px;" src="/user_uploads/<%= photo.src %>">
-				    				<h5 style="text-overflow: ellipsis; max-width: 200px;white-space: nowrap;
-			  						overflow: hidden;"><%= photo.name %></h5>
-				    				
-				    			<% }); %>
-				    					    		
-				    		</div>
-			    		</tr>
-			    	</table>
-			    </div> -->
-		    </div>
+		<!-- <div class="col-xs-8 col-sm-6" style="border: 2px solid grey;
+    		border-radius: 5px; max-width: 45%; font-weight: bold;">
+	    	<h3>Screenshots</h3>
+	    	<br>
+	    	<table>
+	    		<tr>
+		    		<div class="container" >
+		    			<% dude.photos.forEach(function(photo){ %>
+		    				<img style="max-width:400px; margin: 5px;" src="/user_uploads/<%= photo.src %>">
+		    				<h5 style="text-overflow: ellipsis; max-width: 200px;white-space: nowrap;
+	  						overflow: hidden;"><%= photo.name %></h5>
+		    				
+		    			<% }); %>
+		    					    		
+		    		</div>
+	    		</tr>
+	    	</table>
+	    </div> -->
+    </div>
+    <div style=" background-color: #18BC9C;">
+    <div class="container" style="border-radius: 5px; max-width: 1000px; color: white;">
+    	<br>
+    	<div class="col-xs-8 col-sm-2">
+	    </div>
+		<h2>C.V.</h2>
+		<table class="table" id="organizationTable">
+		<thead>
+		  <tr style="font-size: 20px;">
+		    	<th style="width: 10%;"></th>
+				<th style="width: 20%;">Name</th>
+				<!-- <th style="width: 20%;">Department</th> -->
+				<th style="width: 20%;">Role</th>
+				<th style="width: 30%;">Rating</th>
+				<th style="width: 20%;">Review</th>
+				<th style="width: 20%;">Comment</th>
+		  </tr>
+		</thead>
+		<br>
+		<tbody id="organizationsBody">
+		</tbody>
+		</table>
+	</div>
+	</div>
+    
 </div>
 <script type="text/javascript" src="/js/user_scripts/normalProfile.js"></script>
+<link href="/css/rating-disabled.css" rel="stylesheet">
 
 <style type="text/css">
 	.reviewClass:hover {

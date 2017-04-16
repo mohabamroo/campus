@@ -943,6 +943,7 @@ function updateSingleMember(member, userRes, counterObject, limit, req, res) {
 }
 
 router.post('/updateMembers/:clubID', ensureAuthenticated, function(req, res) {
+	console.log('updating members')
 	var clubID = req.params.clubID;
 	Member.getMembersByClubID(clubID, function(err, members) {
 		printError(err);
@@ -959,6 +960,7 @@ router.post('/updateMembers/:clubID', ensureAuthenticated, function(req, res) {
 				});
 			});
 		} else {
+			req.flash('success_msg', 'Updated Members.');
 			res.redirect('/clubs/editStructre/'+req.user.id)
 		}
 	});
@@ -1092,7 +1094,7 @@ router.post('/addPhoto', ensureAuthenticated, function(req,res) {
         if(err) {
             return res.end("Error uploading file.\n"+err);
         }
-        res.redirect('/clubs/viewClub/'+req.user.id);
+        res.redirect('/clubs/editStructre/'+req.user.id);
     });
 
 });

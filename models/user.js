@@ -74,6 +74,12 @@ var userSchema = mongoose.Schema({
 			},
 			comment: {
 				type: String
+			},
+			from: {
+				type: String
+			},
+			to: {
+				type: String
 			}
 		}
 	],

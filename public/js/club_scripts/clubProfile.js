@@ -161,8 +161,22 @@ $(document).keyup(function(e) {
 });
 
 $('#scrollRight').click(function() {
-	$('#depsDiv').animate( { scrollLeft: '+=400' }, 300, 'easeOutQuad' );
+	$('#depsDiv').animate( { scrollLeft: '+=400' }, 200, 'easeOutQuad' );
 });
 $('#scrollLeft').click(function() {
-	$('#depsDiv').animate( { scrollLeft: '-=400' }, 300, 'easeOutQuad' );
+	$('#depsDiv').animate( { scrollLeft: '-=400' }, 200, 'easeOutQuad' );
+});
+
+$('#eventsRight').click(function() {
+	$('#eventsDiv').animate( { scrollLeft: '+=400' }, 200, 'easeOutQuad' );
+});
+$('#eventsLeft').click(function() {
+	$('#eventsDiv').animate( { scrollLeft: '-=400' }, 200, 'easeOutQuad' );
+});
+
+$('#photosRight').click(function() {
+	$('#photosDiv').animate( { scrollLeft: '+=400' }, 200, 'easeOutQuad' );
+});
+$('#photosLeft').click(function() {
+	$('#photosDiv').animate( { scrollLeft: '-=400' }, 200, 'easeOutQuad' );
 });

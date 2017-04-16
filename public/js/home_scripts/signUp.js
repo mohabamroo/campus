@@ -16,6 +16,7 @@ $('#userType').on('change', function() {
     $('#inputGUCID').remove();
     $('#major').remove();
     $('#birthdateInput').remove();
+    $('#gucComplete').hide();
     firstChange = false;
   }
   if(type==="student" && !firstChange) {
@@ -33,6 +34,7 @@ $('#userType').on('change', function() {
             + '<option value="mecha">Mechatronics</option>'
             + '<option value="production">Production</option>'
           + '</select>';
+    $('#gucComplete').show();
     $('#majorDivChild').append(majorHTML);
     $('#idDivChild').append(idHTML);
     $('#birthdateDivChlid').append(birthdateHTML);

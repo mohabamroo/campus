@@ -79,16 +79,14 @@ var updateEventsContainer = function(events) {
 			    +	'<hr style=\"width: 80%\"></div>';
 		});
 		if(max>2) {
-			html += '<div class=\"row col-lg-12\" id=\"seeMoreDiv\" style=\"width: 100%\">'
-				+	'<div class=\"col-lg-4\"></div>'
-			 	+	'<div class=\"col-lg-4\" style=\"text-align: center;\">'
-				+ 	'<h4 class=\"eventTitle\" id=\"seeMoreBtn\">'
+			html += '<div id="seeMoreDiv" style="width: 100%; text-align: center; margin-left:auto; margin-right: auto;">'
+			 	+	'<div  style="text-align: center;">'
+				+ 	'<h4 id="seeMoreBtn" class="eventTitle">'
 				+	'See More</h4></div>'
-				+	'<div class=\"col-lg-4\"></div>'
-				+	'<hr style=\"width: 80%\"></div>';
+				+	'<hr style="width: 80%;"></div>';
 		}
 	} else {
-		html += '<h1>no curent events!</h1>';
+		html += '<h3>no curent events!</h3>';
 	}
 	$('#eventsContainer').slideUp('fast', function() {
 	   	$('#eventsContainer').html(html);

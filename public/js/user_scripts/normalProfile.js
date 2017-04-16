@@ -34,9 +34,22 @@ $.post('/users/getOrganizations/'+userID, function(myMembers) {
 		    + '<br><span style="font-size: 10px;">To: '
 		    + memberObj.to +'</span>'
 		    + '</td>'
-		    + '<td>'+memberObj.departmentName+'</td>'
+		    // + '<td>'+memberObj.departmentName+'</td>'
 		    + '<td>'+memberObj.role+'</td>'
-		    + '<td>'+memberObj.rating+'</td>'
+		    + '<td><div rating=\"'+memberObj.rating+'\">'
+			+ '<fieldset class=\"rating\">'
+			+	'<input type=\"radio\" id=\"field2_star5\" name=\"rating2\" value=\"5\"/>'
+			+	'<label class = \"full ratingLabel\" for=\"field2_star5\"></label>'
+			+    '<input type=\"radio" id=\"field2_star4" name=\"rating2\" value=\"4\"/>'
+			+    '<label class = \"full ratingLabel\" for=\"field2_star4\"></label>'
+			+    '<input type="radio" id=\"field2_star3" name=\"rating2\" value=\"3\"/>'
+			+    '<label class = \"full ratingLabel\" for=\"field2_star3\"></label>'
+			+    '<input type=\"radio" id=\"field2_star2" name=\"rating2\" value=\"2\"/>'
+			+    '<label class = \"full ratingLabel\" for=\"field2_star2\"></label>'   
+			+    '<input type=\"radio" id=\"field2_star1" name=\"rating2\" value=\"1\"/>'
+			+    '<label class = \"full ratingLabel\" for=\"field2_star1\"></label>'
+			+ '</fieldset>'
+			+ '</div></td>'
 		    + '<td class=\"reviewClass\" style=\"text-overflow: ellipsis; max-width: 100px;white-space: nowrap;overflow: hidden;\" onclick=\"viewReview(\''+memberObj.name+'\', \''+memberObj.review+'\')\">'+memberObj.review+'</td>';
 		    if(memberObj.comment!=null)
 		    	html+= '<td>'+memberObj.comment +'</td></tr>';
@@ -44,6 +57,7 @@ $.post('/users/getOrganizations/'+userID, function(myMembers) {
 		       	html+= '<td>no comment</td></tr>';
 		});
 	$('#organizationsBody').append(html);
+	updateRatings();
 });
 
 $(document).mouseup(function (e) {
@@ -55,7 +69,19 @@ $(document).mouseup(function (e) {
         $('#topDiv').hide();
     }
 });
-
+function updateRatings() {
+	$("fieldset").each(function(i) {
+	  	var rating = $(this).parent().attr('rating');
+	    console.log(rating);
+	    if(!rating)
+	    	rating="0";
+	    var inputElement = $(this).find("[value="+rating+"]");
+	    $(this).find("input").nextAll().css({"color": "#ddd"});
+	    inputElement.css({"color": "#FFD700"});
+	  	inputElement.nextAll().css({"color": "#FFD700"});
+	    // console.log($(this).find("[value="+rating+"]").val());
+	});
+}
 $(document).keyup(function(e) {
   if (e.keyCode === 27) {
 		$('#backgroundDiv').hide();

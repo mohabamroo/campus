@@ -39,10 +39,12 @@ function printError(err) {
 }
 router.get('/search/students/:term', function(req, res) {
 	var term = req.params.term;
-	User.find({usertype: "student", $or: [{username: term}, {name: term}, {tags: term}]}).exec(function(err, data) {
+	User.find({usertype: "student", $or: [{username:  {'$regex': '.*'+term+'.*'}}, {name:  {'$regex': '.*'+term+'.*'}},
+		{gucid:  {'$regex': '.*'+term+'.*'}}, {tags:  {'$regex': '.*'+term+'.*'}}]}).exec(function(err, data) {
 		console.log(data.length)
 		printError(err);
-		if(data!=null) {
+		console.log(data)
+		if(data!=null && data.length>0) {
 			var limit = data.length;
 			var i = 0;
 			var studentsArr = [];
@@ -66,7 +68,7 @@ router.get('/search/students/:term', function(req, res) {
 				});
 			});
 		} else
-			res.json("no users found");
+			res.json([]);
 	});
 });
 
